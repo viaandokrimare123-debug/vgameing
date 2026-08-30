@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-Gaming Hub | @travelwithme123m Official Site</title>
+    <!-- Tailwind CSS with Neon Theme Configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- EmailJS SDK for Real Email Delivery -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neon: {
+                            cyan: '#00f3ff',
+                            pink: '#ff0055',
+                            purple: '#b000ff',
+                            green: '#00ff66',
+                            yellow: '#facc15',
+                            dark: '#0a0a12',
+                            card: '#12121f'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .neon-glow-cyan { box-shadow: 0 0 20px rgba(0, 243, 255, 0.25); }
+        .neon-glow-pink { box-shadow: 0 0 20px rgba(255, 0, 85, 0.25); }
+        .neon-glow-green { box-shadow: 0 0 20px rgba(0, 255, 102, 0.25); }
+        .neon-text-glow { text-shadow: 0 0 10px rgba(0, 243, 255, 0.6); }
+    </style>
+</head>
+<body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
+
+    <!-- ================= SECURE EMAIL VERIFICATION & SIGN-IN MODAL ================= -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-8 max-w-md w-full space-y-6 neon-glow-cyan text-center">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink neon-text-glow">⚡ V-GAMING HUB</h2>
+                <p id="authSubtitle" class="text-xs text-gray-400">Secure Sign-In: Enter your Gamer Tag & Email to receive your verification code.</p>
+            </div>
+            
+            <!-- STEP 1: Enter Username & Email -->
+            <form id="step1Form" onsubmit="sendVerificationCode(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">UNIQUE GAMER TAG</label>
+                    <input type="text" id="authUsername" required placeholder="e.g. VortexPlayer" maxlength="15" class="w-full bg-neon-dark border border-gray-800 rounded-xl px-4 py-3 text-sm text-neon-cyan focus:outline-none focus:border-neon-cyan font-bold">
+                    <p id="nameErrorMsg" class="text-[10px] text-neon-pink mt-1 hidden">⚠️ This name is already taken by someone else!</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">EMAIL ADDRESS</label>
+                    <input type="email" id="authEmail" required placeholder="gamer@example.com" class="w-full bg-neon-dark border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-cyan">
+                </div>
+                <button type="submit" id="sendBtn" class="w-full py-3 rounded-xl bg-neon-cyan text-black font-extrabold text-sm tracking-wide hover:opacity-90 transition shadow-lg">SEND VERIFICATION CODE &rarr;</button>
+            </form>
+
+            <!-- STEP 2: Enter Verification Code -->
+            <div id="step2Box" class="space-y-4 text-left hidden">
+                <div class="bg-neon-dark/80 border border-neon-green/40 p-3 rounded-xl text-xs text-gray-300 text-center">
+                    📧 Verification code successfully dispatched to <span id="sentEmailDisplay" class="text-neon-green font-bold"></span>.<br>
+                    <span class="text-gray-400 text-[11px] mt-1 block">Check your inbox or spam folder.</span>
+                </div>
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-1">ENTER 4-DIGIT CODE</label>
+                    <input type="text" id="enteredCode" placeholder="Enter code" maxlength="4" class="w-full bg-neon-dark border border-gray-800 rounded-xl px-4 py-3 text-center text-lg tracking-widest text-neon-green font-mono focus:outline-none focus:border-neon-green font-bold">
+                    <p id="codeErrorMsg" class="text-[10px] text-neon-pink mt-1 hidden">❌ Incorrect verification code! Access denied.</p>
+                </div>
+                <button type="button" onclick="verifyCode()" class="w-full py-3 rounded-xl bg-neon-green text-black font-extrabold text-sm tracking-wide hover:opacity-90 transition shadow-lg">VERIFY & ENTER SITE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="border-b border-neon-cyan/20 bg-neon-dark/90 backdrop-blur sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center justify-between w-full md:w-auto">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
+                    <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink neon-text-glow">⚡ V-GAMING HUB</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-neon-cyan focus:outline-none text-xl">☰</button>
+            </div>
+            
+            <nav id="navLinks" class="hidden md:flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-xs font-bold uppercase tracking-wider">
+                <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded transition text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30" data-tab="home">Home</button>
+                <button onclick="switchTab('challenges')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="challenges">Challenges</button>
+                <button onclick="switchTab('quiz')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="quiz">Quiz</button>
+                <button onclick="switchTab('arcade')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="arcade">Arcade</button>
+                <button onclick="switchTab('seeds')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="seeds">Seeds</button>
+                <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="leaderboard">Leaderboard</button>
+                <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
+            </nav>
+
+            <div class="hidden md:flex items-center gap-3 bg-neon-card border border-neon-cyan/30 px-3 py-1.5 rounded-xl">
+                <div class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></div>
+                <span id="displayUserTag" class="text-xs font-bold text-neon-cyan">Player</span>
+                <button onclick="signOut()" class="text-[10px] text-gray-400 hover:text-neon-pink transition ml-1">[Sign Out]</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- 1. HOME TAB -->
+        <section id="tab-home" class="space-y-12">
+            <div class="relative bg-gradient-to-r from-neon-card via-neon-dark to-neon-card border border-neon-cyan/30 rounded-2xl p-8 sm:p-12 text-center space-y-6 neon-glow-cyan overflow-hidden">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,243,255,0.08)_0,transparent_70%)] pointer-events-none"></div>
+                <div class="inline-block px-4 py-1 rounded-full bg-neon-pink/10 border border-neon-pink/30 text-neon-pink text-xs font-mono tracking-widest uppercase">Official Site of @travelwithme123m</div>
+                <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-pink neon-text-glow">Level Up Your Gaming Experience</h1>
+                <p class="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">Welcome to the community hub! Watch viral videos, view custom thumbnails, play arcade minigames, and explore world seeds.</p>
+                <div class="flex flex-wrap justify-center gap-4 pt-2">
+                    <button onclick="switchTab('youtube')" class="px-6 py-3 rounded-xl bg-neon-pink text-white font-extrabold text-sm tracking-wider hover:opacity-90 transition shadow-lg">WATCH POPULAR VIDEOS</button>
+                    <button onclick="switchTab('seeds')" class="px-6 py-3 rounded-xl border border-neon-green text-neon-green font-extrabold text-sm tracking-wider hover:bg-neon-green/10 transition">EXPLORE SEEDS</button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">🔥 Popular Uploads & Shorts</h2>
+                    <a href="https://www.youtube.com/@travelwithme123m" target="_blank" class="text-xs text-neon-pink hover:underline">Visit YouTube Channel &rarr;</a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="homeThumbnailsGrid"></div>
+            </div>
+        </section>
+
+        <!-- 2. CHALLENGES TAB -->
+        <section id="tab-challenges" class="hidden space-y-8 max-w-2xl mx-auto text-center">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-black text-neon-cyan">🎲 Challenge Generator</h2>
+                <p class="text-xs sm:text-sm text-gray-400">Stuck in a gaming rut? Generate a random gameplay challenge instantly.</p>
+            </div>
+            <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-8 space-y-6 neon-glow-cyan">
+                <div id="challengeDifficulty" class="inline-block px-3 py-1 rounded text-xs font-mono uppercase bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30">Difficulty: Medium</div>
+                <div id="challengeText" class="text-xl sm:text-2xl font-bold text-white min-h-[90px] flex items-center justify-center px-4">Click generate to receive your mission!</div>
+                <button onclick="generateChallenge()" class="px-6 py-3 rounded-xl bg-neon-cyan text-black font-extrabold text-sm tracking-wide hover:opacity-90 transition">🎲 ROLL CHALLENGE</button>
+            </div>
+        </section>
+
+        <!-- 3. QUIZ TAB -->
+        <section id="tab-quiz" class="hidden space-y-8 max-w-xl mx-auto">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-black text-neon-yellow">🧠 Minecraft Knowledge Quiz</h2>
+                <p class="text-xs sm:text-sm text-gray-400">Randomized questions every game session—test your mastery!</p>
+            </div>
+            <div id="quizCard" class="bg-neon-card border border-neon-yellow/30 rounded-2xl p-6 sm:p-8 space-y-6 shadow-[0_0_20px_rgba(250,204,21,0.15)]">
+                <div class="flex justify-between items-center text-xs text-gray-400 font-mono">
+                    <span id="quizProgress">Question 1 of 5</span>
+                    <span id="quizScoreTracker">Score: 0</span>
+                </div>
+                <div id="quizQuestion" class="text-lg font-bold text-white min-h-[60px]">Loading question...</div>
+                <div id="quizOptions" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- 4. ARCADE TAB -->
+        <section id="tab-arcade" class="hidden space-y-8">
+            <div id="arcadeMenu" class="space-y-8">
+                <div class="text-center space-y-2">
+                    <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">⚡ Gaming Arcade Hub</h2>
+                    <p class="text-xs sm:text-sm text-gray-400">Select a game below, set a high score, and rank on the global leaderboard!</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-neon-card border border-neon-cyan/30 rounded-2xl p-6 flex flex-col justify-between hover:border-neon-cyan transition neon-glow-cyan">
+                        <div class="space-y-3"><div class="text-3xl">⚡</div><h3 class="text-xl font-bold text-neon-cyan">Reaction Test</h3><p class="text-sm text-gray-400">Measure your neural response time in milliseconds.</p></div>
+                        <button onclick="launchGame('reaction')" class="mt-6 w-full py-2.5 rounded bg-neon-cyan text-black font-bold text-sm tracking-wide hover:opacity-95 transition">PLAY NOW</button>
+                    </div>
+                    <div class="bg-neon-card border border-neon-pink/30 rounded-2xl p-6 flex flex-col justify-between hover:border-neon-pink transition neon-glow-pink">
+                        <div class="space-y-3"><div class="text-3xl">🖱️</div><h3 class="text-xl font-bold text-neon-pink">Click-Speed (CPS)</h3><p class="text-sm text-gray-400">How many clicks can you generate in 5 seconds?</p></div>
+                        <button onclick="launchGame('cps')" class="mt-6 w-full py-2.5 rounded bg-neon-pink text-white font-bold text-sm tracking-wide hover:opacity-95 transition">PLAY NOW</button>
+                    </div>
+                    <div class="bg-neon-card border border-neon-green/30 rounded-2xl p-6 flex flex-col justify-between hover:border-neon-green transition neon-glow-green">
+                        <div class="space-y-3"><div class="text-3xl">🧟</div><h3 class="text-xl font-bold text-neon-green">Zombie Defense</h3><p class="text-sm text-gray-400">Eliminate the zombie horde before time runs out!</p></div>
+                        <button onclick="launchGame('zombie')" class="mt-6 w-full py-2.5 rounded bg-neon-green text-black font-bold text-sm tracking-wide hover:opacity-95 transition">PLAY NOW</button>
+                    </div>
+                </div>
+            </div>
+            <div id="gameplayContainer" class="hidden max-w-xl mx-auto bg-neon-card border border-gray-800 rounded-2xl p-6 text-center space-y-6">
+                <div class="flex justify-between items-center">
+                    <button onclick="exitGame()" class="text-xs text-gray-400 hover:text-white">&larr; Back to Arcade</button>
+                    <span id="activeGameTitle" class="text-neon-cyan font-bold tracking-wider text-sm">GAME</span>
+                    <span id="activeGameScore" class="text-sm font-mono text-gray-300">Score: 0</span>
+                </div>
+                <div id="gameArena" class="h-64 sm:h-80 bg-neon-dark rounded-xl border border-gray-800 flex items-center justify-center relative overflow-hidden select-none cursor-pointer"></div>
+                <div id="gameInstructions" class="text-xs text-gray-400">Follow on-screen instructions to play.</div>
+            </div>
+        </section>
+
+        <!-- 5. SEEDS TAB -->
+        <section id="tab-seeds" class="hidden space-y-6 max-w-4xl mx-auto">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-black text-neon-green">🌱 Seed Vault</h2>
+                <p class="text-xs sm:text-sm text-gray-400">Browse curated Minecraft world seeds with epic biomes and structures.</p>
+            </div>
+            <input type="text" id="seedSearchInput" oninput="filterSeeds()" placeholder="Search by structure, biome, or keyword..." class="w-full bg-neon-card border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-green">
+            <div id="seedsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- 6. LEADERBOARD TAB -->
+        <section id="tab-leaderboard" class="hidden space-y-6 max-w-2xl mx-auto">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">🏆 Global Leaderboard</h2>
+                <p class="text-xs text-gray-400">Automatic real-time scores tied to verified Gamer Tags</p>
+            </div>
+            <div class="flex justify-center gap-2 border-b border-gray-800 pb-3">
+                <button onclick="switchLeaderboardTab('reaction')" id="lbTabReaction" class="px-4 py-1.5 rounded text-xs font-bold bg-neon-cyan text-black transition">Reaction</button>
+                <button onclick="switchLeaderboardTab('cps')" id="lbTabCps" class="px-4 py-1.5 rounded text-xs font-bold text-gray-400 hover:text-white transition">CPS</button>
+                <button onclick="switchLeaderboardTab('zombie')" id="lbTabZombie" class="px-4 py-1.5 rounded text-xs font-bold text-gray-400 hover:text-white transition">Zombie</button>
+            </div>
+            <div class="bg-neon-card border border-gray-800 rounded-xl overflow-hidden">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-gray-400 text-xs uppercase bg-neon-dark/50">
+                            <th class="p-3 w-16 text-center">Rank</th>
+                            <th class="p-3">Gamer Tag</th>
+                            <th id="lbScoreHeader" class="p-3 text-right">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTableBody" class="divide-y divide-gray-800/50"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 7. YOUTUBE TAB -->
+        <section id="tab-youtube" class="hidden space-y-6 max-w-6xl mx-auto">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-black text-neon-pink">📺 @travelwithme123m Videos & Shorts</h2>
+                <p class="text-xs sm:text-sm text-gray-400">Directly view official video thumbnails, titles, and watch links from your channel.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="youtubeThumbnailsGrid"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800/80 py-6 text-center text-xs text-gray-500 mt-12 bg-neon-card/30">
+        <p>V-Gaming Hub &bull; Official Channel: <a href="https://www.youtube.com/@travelwithme123m" target="_blank" class="text-neon-pink hover:underline">@travelwithme123m</a> &bull; Verified Server Sign-In</p>
+    </footer>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        // --- EmailJS Configuration ---
+        const EMAILJS_PUBLIC_KEY = "idzYuv2H26NMQbJC_"; 
+        const EMAILJS_SERVICE_ID = "service_zre0a7g"; 
+        const EMAILJS_TEMPLATE_ID = "template_qyvow75";
+
+        // Initialize EmailJS
+        (function() {
+            if(EMAILJS_PUBLIC_KEY) {
+                emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+            }
+        })();
+
+        // --- Authentication & Session Storage Setup ---
+        let currentUser = localStorage.getItem('vgaming_current_user') || null;
+        let registeredUsers = JSON.parse(localStorage.getItem('vgaming_registered_users')) || {}; 
+
+        let pendingUsername = "";
+        let pendingEmail = "";
+        let generatedCode = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (currentUser) {
+                document.getElementById('authModal').classList.add('hidden');
+                document.getElementById('displayUserTag').innerText = currentUser;
+            } else {
+                document.getElementById('authModal').classList.remove('hidden');
+            }
+            initHomeFeatured();
+            startNewQuiz();
+            renderSeeds(seedCollection);
+            renderThumbnailsAndVideos();
+            renderLeaderboard();
+        });
+
+        // Step 1: Send real verification code via EmailJS
+        function sendVerificationCode(e) {
+            e.preventDefault();
+            let username = document.getElementById('authUsername').value.trim().toLowerCase();
+            let email = document.getElementById('authEmail').value.trim();
+            let nameError = document.getElementById('nameErrorMsg');
+            let sendBtn = document.getElementById('sendBtn');
+
+            if (registeredUsers[username] && registeredUsers[username] !== email) {
+                nameError.classList.remove('hidden');
+                return;
+            }
+            nameError.classList.add('hidden');
+
+            pendingUsername = document.getElementById('authUsername').value.trim();
+            pendingEmail = email;
+            generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+
+            sendBtn.innerText = "SENDING EMAIL...";
+            sendBtn.disabled = true;
+
+            let templateParams = {
+                to_email: email,
+                passcode: generatedCode,
+                to_name: pendingUsername
+            };
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(function(response) {
+                    sendBtn.innerText = "SEND VERIFICATION CODE →";
+                    sendBtn.disabled = false;
+                    proceedToStep2(email);
+                }, function(error) {
+                    sendBtn.innerText = "SEND VERIFICATION CODE →";
+                    sendBtn.disabled = false;
+                    alert("❌ Failed to send email. Error: " + JSON.stringify(error));
+                });
+        }
+
+        function proceedToStep2(email) {
+            document.getElementById('step1Form').classList.add('hidden');
+            document.getElementById('step2Box').classList.remove('hidden');
+            document.getElementById('sentEmailDisplay').innerText = email;
+            document.getElementById('authSubtitle').innerText = "Enter the 4-digit verification code sent to your inbox.";
+        }
+
+        // Step 2: Verify code and login
+        function verifyCode() {
+            let userCode = document.getElementById('enteredCode').value.trim();
+            let codeError = document.getElementById('codeErrorMsg');
+
+            if (userCode !== generatedCode) {
+                codeError.classList.remove('hidden');
+                return;
+            }
+
+            codeError.classList.add('hidden');
+            currentUser = pendingUsername;
+            registeredUsers[currentUser.toLowerCase()] = pendingEmail;
+
+            localStorage.setItem('vgaming_current_user', currentUser);
+            localStorage.setItem('vgaming_registered_users', JSON.stringify(registeredUsers));
+
+            document.getElementById('displayUserTag').innerText = currentUser;
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function signOut() {
+            localStorage.removeItem('vgaming_current_user');
+            location.reload();
+        }
+
+        // --- Navigation Controller ---
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white";
+                if(btn.dataset.tab === tabId) {
+                    btn.className = "nav-btn px-3 py-1.5 rounded transition text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30";
+                }
+            });
+
+            document.getElementById('navLinks').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if(tabId !== 'arcade') stopActiveGame();
+        }
+
+        function toggleMobileMenu() {
+            let nav = document.getElementById('navLinks');
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-full');
+            nav.classList.toggle('left-0');
+            nav.classList.toggle('w-full');
+            nav.classList.toggle('bg-neon-dark');
+            nav.classList.toggle('border-b');
+            nav.classList.toggle('border-neon-cyan/20');
+            nav.classList.toggle('p-4');
+        }
+
+        // --- Updated Channel Videos & Shorts Integration (@travelwithme123m) ---
+        const channelUploads = [
+            { title: "Minecraft Cinematic Shots That Feel Like a Movie 🎬🔥", type: "⚡ Cinematic Short", id: "cLPeNci95JQ", badge: "🎬 SHORTS" },
+            { title: "AMAZING Minecraft 1.20 Aesthetic Seeds You Need to Try! 🌸🐟", type: "🌸 Seed Showcase Short", id: "Ek3cGmJb_Ec", badge: "⚡ SHORTS" },
+            { title: "Bedrock Ka Khel (MINECRAFT Rap)", type: "🎵 Official Music Video", id: "Y_VDQj6ws1o", badge: "🔥 POPULAR" }
+        ];
+
+        function renderThumbnailsAndVideos() {
+            let cardsHtml = channelUploads.map(vid => `
+                <div class="bg-neon-card border border-neon-pink/30 rounded-2xl overflow-hidden flex flex-col justify-between neon-glow-pink transition hover:scale-[1.01]">
+                    <div class="relative group">
+                        <img src="https://img.youtube.com/vi/${vid.id}/hqdefault.jpg" alt="${vid.title}" class="w-full h-44 object-cover">
+                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-neon-pink border border-neon-pink/30">${vid.badge}</div>
+                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <span class="px-4 py-2 rounded-xl bg-neon-pink text-white font-extrabold text-xs shadow-lg">▶ Watch on YouTube</span>
+                        </a>
+                    </div>
+                    <div class="p-4 space-y-3 flex flex-col justify-between flex-grow">
+                        <div>
+                            <span class="text-[10px] font-mono text-gray-400 uppercase">${vid.type}</span>
+                            <h3 class="text-sm font-bold text-white mt-0.5">${vid.title}</h3>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="w-full text-center py-2 rounded bg-neon-pink/20 hover:bg-neon-pink text-neon-pink hover:text-black font-bold text-xs transition border border-neon-pink/40">Watch Video &rarr;</a>
+                    </div>
+                </div>
+            `).join('');
+
+            let homeGrid = document.getElementById('homeThumbnailsGrid');
+            let ytGrid = document.getElementById('youtubeThumbnailsGrid');
+            if(homeGrid) homeGrid.innerHTML = cardsHtml;
+            if(ytGrid) ytGrid.innerHTML = cardsHtml;
+        }
+
+        // --- Challenge Generator ---
+        const challengesList = [
+            { text: "Beat the Ender Dragon wearing only Leather Armor.", diff: "Hard" },
+            { text: "Build your entire base underground without seeing the sun.", diff: "Medium" },
+            { text: "Pacifist run: Kill zero passive mobs for 5 in-game days.", diff: "Easy" },
+            { text: "No sprinting allowed for your entire session.", diff: "Hard" }
+        ];
+
+        function initHomeFeatured() {
+            let feat = challengesList[Math.floor(Math.random() * challengesList.length)];
+            let el = document.getElementById('homeFeaturedChallenge');
+            if(el) el.innerText = feat.text;
+        }
+
+        function generateChallenge() {
+            let rand = challengesList[Math.floor(Math.random() * challengesList.length)];
+            document.getElementById('challengeText').innerText = `"${rand.text}"`;
+            document.getElementById('challengeDifficulty').innerText = `Difficulty: ${rand.diff}`;
+        }
+
+        // --- Dynamic Randomized Quiz Engine ---
+        const quizMasterPool = [
+            { q: "Which mob drops Ender Pearls?", options: ["Enderman", "Creeper", "Zombie", "Skeleton"], answer: 0 },
+            { q: "What tool is required to mine Diamond Ore?", options: ["Wooden Pickaxe", "Stone Pickaxe or higher", "Golden Pickaxe", "Iron Shovel"], answer: 1 },
+            { q: "Which mob explodes when it gets too close to the player?", options: ["Spider", "Creeper", "Witch", "Phantom"], answer: 1 },
+            { q: "What fuel source burns the longest in a furnace?", options: ["Coal", "Wooden Planks", "Lava Bucket", "Stick"], answer: 2 },
+            { q: "Which dimension is home to the Ender Dragon?", options: ["The Nether", "The Overworld", "The End", "The Aether"], answer: 2 },
+            { q: "What is required to grow a Nether Wart?", options: ["Water Block", "Soul Sand", "Farmland", "Podzol"], answer: 1 },
+            { q: "Which potion effect allows you to breathe underwater?", options: ["Night Vision", "Water Breathing", "Swiftness", "Invisibility"], answer: 1 }
+        ];
+        
+        let currentQuizQuestions = [];
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        function startNewQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            let shuffled = [...quizMasterPool].sort(() => 0.5 - Math.random());
+            currentQuizQuestions = shuffled.slice(0, 5);
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizIndex >= currentQuizQuestions.length) {
+                document.getElementById('quizCard').innerHTML = `
+                    <div class="text-center space-y-4 py-6">
+                        <div class="text-3xl font-black text-neon-yellow">Quiz Complete! 🎉</div>
+                        <p class="text-lg text-white">Score: <span class="text-neon-cyan">${quizScore} / ${currentQuizQuestions.length}</span></p>
+                        <button onclick="resetAndRestartQuiz()" class="px-6 py-2.5 rounded-xl bg-neon-yellow text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg">PLAY NEW QUIZ</button>
+                    </div>`;
+                return;
+            }
+            let q = currentQuizQuestions[currentQuizIndex];
+            document.getElementById('quizProgress').innerText = `Question ${currentQuizIndex + 1} of ${currentQuizQuestions.length}`;
+            document.getElementById('quizScoreTracker').innerText = `Score: ${quizScore}`;
+            document.getElementById('quizQuestion').innerText = q.q;
+            document.getElementById('quizOptions').innerHTML = q.options.map((opt, idx) => `
+                <button onclick="checkQuizAnswer(${idx})" class="w-full text-left p-3 rounded-xl bg-neon-dark border border-gray-800 hover:border-neon-yellow text-sm text-gray-200 transition">${opt}</button>
+            `).join('');
+        }
+
+        function checkQuizAnswer(idx) {
+            if (idx === currentQuizQuestions[currentQuizIndex].answer) quizScore++;
+            currentQuizIndex++;
+            loadQuizQuestion();
+        }
+
+        function resetAndRestartQuiz() {
+            document.getElementById('quizCard').innerHTML = `
+                <div class="flex justify-between items-center text-xs text-gray-400 font-mono">
+                    <span id="quizProgress">Question 1 of 5</span>
+                    <span id="quizScoreTracker">Score: 0</span>
+                </div>
+                <div id="quizQuestion" class="text-lg font-bold text-white min-h-[60px]">Loading question...</div>
+                <div id="quizOptions" class="space-y-3"></div>`;
+            startNewQuiz();
+        }
+
+        // --- Expanded Seed Vault ---
+        const seedCollection = [
+            { name: "Double Village & Desert Temple", seed: "-84293847291", version: "1.20+", tags: ["Village", "Desert"], desc: "Spawns between two adjacent villages with a visible desert temple nearby." },
+            { name: "Massive Lush Cave Spawns", seed: "48291039482", version: "1.20+", tags: ["Caves", "Lush"], desc: "Spawns directly above a breathtaking underground lush cave system full of glow berries." },
+            { name: "Bamboo Jungle & Ruined Portal", seed: "91823746501", version: "1.20+", tags: ["Jungle", "Portal"], desc: "Discover pandas roaming freely right next to an easily accessible ruined portal." },
+            { name: "Mushroom Island Paradise", seed: "50293847102", version: "1.20+", tags: ["Island", "Mushroom"], desc: "Isolated mushroom fields safe from hostile mob spawns, perfect for a mega base." },
+            { name: "Ancient City Underground Entry", seed: "10928374650", version: "1.20+", tags: ["Ancient City", "Deep Dark"], desc: "Quick descent down a deep dark cavern leading right into a massive Ancient City." }
+        ];
+
+        function renderSeeds(seedsToRender) {
+            document.getElementById('seedsGrid').innerHTML = seedsToRender.map(s => `
+                <div class="bg-neon-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-neon-green/40 transition">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-white text-base">${s.name}</h3>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-neon-green/10 text-neon-green border border-neon-green/30">${s.version}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">${s.desc}</p>
+                    </div>
+                    <div class="flex justify-between items-center bg-neon-dark px-3 py-2 rounded-xl border border-gray-800">
+                        <span class="font-mono text-xs text-neon-green select-all font-bold">${s.seed}</span>
+                        <button onclick="navigator.clipboard.writeText('${s.seed}');alert('Seed copied to clipboard!');" class="text-xs px-3 py-1 rounded bg-neon-green/20 text-neon-green font-bold hover:bg-neon-green hover:text-black transition">Copy</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterSeeds() {
+            let query = document.getElementById('seedSearchInput').value.toLowerCase();
+            let filtered = seedCollection.filter(s => 
+                s.name.toLowerCase().includes(query) || 
+                s.desc.toLowerCase().includes(query) || 
+                s.tags.some(t => t.toLowerCase().includes(query)) ||
+                s.seed.includes(query)
+            );
+            renderSeeds(filtered);
+        }
+
+        // --- Leaderboards & Arcade System ---
+        let leaderboards = JSON.parse(localStorage.getItem('vgaming_leaderboards')) || { reaction: [], cps: [], zombie: [] };
+        
+        function submitScore(game, score) {
+            if (!currentUser) return;
+            let list = leaderboards[game];
+            list = list.filter(item => item.name !== currentUser);
+            list.push({ name: currentUser, score: score });
+            list.sort((a, b) => game === 'reaction' ? a.score - b.score : b.score - a.score);
+            leaderboards[game] = list.slice(0, 10);
+            localStorage.setItem('vgaming_leaderboards', JSON.stringify(leaderboards));
+            switchTab('leaderboard');
+            switchLeaderboardTab(game);
+        }
+
+        let activeLbTab = 'reaction';
+        function switchLeaderboardTab(game) {
+            activeLbTab = game;
+            ['reaction', 'cps', 'zombie'].forEach(g => {
+                document.getElementById(`lbTab${g.charAt(0).toUpperCase() + g.slice(1)}`).className = g === game ? "px-4 py-1.5 rounded text-xs font-bold bg-neon-cyan text-black transition" : "px-4 py-1.5 rounded text-xs font-bold text-gray-400 hover:text-white transition";
+            });
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            let tbody = document.getElementById('leaderboardTableBody');
+            document.getElementById('lbScoreHeader').innerText = activeLbTab === 'reaction' ? 'Score (ms)' : (activeLbTab === 'cps' ? 'Score (CPS)' : 'Score (Kills)');
+            let data = leaderboards[activeLbTab];
+            if (!data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-gray-500">No records found. Play a game to claim #1!</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = data.map((e, i) => `
+                <tr class="hover:bg-gray-800/40 transition">
+                    <td class="p-3 text-center font-mono font-bold ${i===0?'text-yellow-400':'text-gray-500'}">#${i+1}</td>
+                    <td class="p-3 font-semibold text-gray-200">${e.name}</td>
+                    <td class="p-3 text-right font-mono text-neon-cyan font-bold">${e.score}</td>
+                </tr>`).join('');
+        }
+
+        let activeGame = null, gameInterval = null, gameTimeout = null;
+        function stopActiveGame() { clearInterval(gameInterval); clearTimeout(gameTimeout); }
+        function exitGame() { stopActiveGame(); document.getElementById('gameplayContainer').classList.add('hidden'); document.getElementById('arcadeMenu').classList.remove('hidden'); }
+        
+        function launchGame(type) {
+            stopActiveGame();
+            document.getElementById('arcadeMenu').classList.add('hidden');
+            document.getElementById('gameplayContainer').classList.remove('hidden');
+            let arena = document.getElementById('gameArena');
+            if (type === 'reaction') {
+                arena.className = "h-64 sm:h-80 bg-red-950/60 rounded-xl border border-red-500/40 flex items-center justify-center relative cursor-pointer";
+                arena.innerHTML = `<span class="text-red-400 font-bold">Wait for Green...</span>`;
+                let start, state = 'waiting';
+                gameTimeout = setTimeout(() => { state = 'ready'; start = performance.now(); arena.className = "h-64 sm:h-80 bg-green-950/80 rounded-xl border border-neon-green flex items-center justify-center relative cursor-pointer"; arena.innerHTML = `<span class="text-neon-green font-black text-2xl">CLICK NOW!</span>`; }, 2000);
+                arena.onclick = () => {
+                    if (state === 'waiting') { clearTimeout(gameTimeout); arena.innerHTML = `<span class="text-yellow-400">Too soon!</span>`; state = 'fail'; }
+                    else if (state === 'ready') { let t = Math.round(performance.now() - start); arena.onclick = null; submitScore('reaction', t); }
+                };
+            } else if (type === 'cps') {
+                arena.className = "h-64 sm:h-80 bg-neon-card rounded-xl border border-neon-pink/40 flex items-center justify-center relative cursor-pointer";
+                let clicks = 0, started = false;
+                arena.innerHTML = `<div class="text-neon-pink font-black text-2xl">CLICK TO START (5s)</div>`;
+                arena.onclick = () => {
+                    if (!started) {
+                        started = true; clicks = 1; let start = Date.now();
+                        arena.innerHTML = `<div id="cCount" class="text-4xl font-black text-white">1</div>`;
+                        gameInterval = setInterval(() => {
+                            let left = (5.0 - (Date.now() - start)/1000).toFixed(1);
+                            if (left <= 0) { clearInterval(gameInterval); arena.onclick = null; submitScore('cps', Number((clicks/5.0).toFixed(2))); }
+                        }, 50);
+                    } else { clicks++; document.getElementById('cCount').innerText = clicks; }
+                };
+            } else if (type === 'zombie') {
+                arena.className = "h-64 sm:h-80 bg-zinc-950 rounded-xl border border-neon-green/40 flex items-center justify-center relative cursor-crosshair";
+                let kills = 0, active = true;
+                arena.innerHTML = `<div class="absolute top-3 left-3 text-xs text-neon-green">Kills: <span id="zKills">0</span></div>`;
+                let sp = setInterval(() => {
+                    if(!active) return;
+                    let z = document.createElement('div');
+                    z.className = "absolute text-2xl cursor-pointer select-none"; z.innerText = '🧟';
+                    z.style.left = `${Math.floor(Math.random()*75)+10}%`; z.style.top = `${Math.floor(Math.random()*70)+15}%`;
+                    z.onclick = (e) => { e.stopPropagation(); if(!active)return; kills++; document.getElementById('zKills').innerText = kills; z.remove(); };
+                    arena.appendChild(z);
+                    setTimeout(() => { if(z.parentNode) z.remove(); }, 1200);
+                }, 700);
+                gameTimeout = setTimeout(() => { active = false; clearInterval(sp); arena.onclick = null; submitScore('zombie', kills); }, 10000);
+            }
+        }
+    </script>
+</body>
+</html>
