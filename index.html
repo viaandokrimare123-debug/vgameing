@@ -621,284 +621,117 @@
         }
     </script>
 
-<!-- ================= FREE VGAMEING CHATBOT ================= -->
+<!-- ================= VGAMEING GEMINI AI CHATBOT ================= -->
 <style>
-#vgChatButton{
-  position:fixed;right:20px;bottom:20px;z-index:2147483647;
-  pointer-events:auto !important;
-  width:62px;height:62px;border:0;border-radius:50%;
-  background:linear-gradient(135deg,#00f3ff,#b000ff);
-  color:#000;font-size:26px;font-weight:900;cursor:pointer;
-  box-shadow:0 0 25px rgba(0,243,255,.45);
-}
-#vgChatWindow{
-  position:fixed;right:20px;bottom:92px;z-index:9999;
-  width:min(390px,calc(100vw - 30px));height:540px;
-  background:#0b0a14;border:1px solid rgba(0,243,255,.4);
-  border-radius:20px;box-shadow:0 0 35px rgba(0,243,255,.2);
-  display:none;overflow:hidden;color:#fff;font-family:Arial,sans-serif;
-}
+#vgChatButton{position:fixed;right:20px;bottom:20px;z-index:2147483647;pointer-events:auto!important;width:62px;height:62px;border:0;border-radius:50%;background:linear-gradient(135deg,#00f3ff,#b000ff);color:#000;font-size:26px;font-weight:900;cursor:pointer;box-shadow:0 0 25px rgba(0,243,255,.45)}
+#vgChatWindow{position:fixed;right:20px;bottom:92px;z-index:9999;width:min(390px,calc(100vw - 30px));height:540px;background:#0b0a14;border:1px solid rgba(0,243,255,.4);border-radius:20px;box-shadow:0 0 35px rgba(0,243,255,.2);display:none;overflow:hidden;color:#fff;font-family:Arial,sans-serif}
 #vgChatWindow.open{display:flex;flex-direction:column}
-.vg-chat-head{
-  padding:14px 16px;background:linear-gradient(90deg,#15132a,#241039);
-  border-bottom:1px solid rgba(255,255,255,.1);
-  display:flex;align-items:center;justify-content:space-between
-}
-.vg-chat-title{font-weight:900;color:#00f3ff}
-.vg-chat-status{font-size:10px;color:#00ff66;margin-top:2px}
-.vg-chat-close{background:none;border:0;color:#aaa;font-size:22px;cursor:pointer}
-#vgMessages{
-  flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;
-  gap:10px
-}
-.vg-msg{
-  max-width:86%;padding:10px 12px;border-radius:13px;
-  white-space:pre-line;line-height:1.45;font-size:13px
-}
-.vg-bot{align-self:flex-start;background:#171522;border:1px solid #29243a}
-.vg-user{align-self:flex-end;background:linear-gradient(135deg,#6d20c9,#b000ff)}
-.vg-quick{padding:9px;display:flex;gap:6px;overflow-x:auto;border-top:1px solid #222}
-.vg-quick button{
-  white-space:nowrap;background:#15131f;color:#ddd;border:1px solid #393044;
-  border-radius:16px;padding:6px 9px;font-size:11px;cursor:pointer
-}
-.vg-quick button:hover{border-color:#00f3ff;color:#fff}
-.vg-input{
-  display:flex;gap:7px;padding:10px;border-top:1px solid #222
-}
-#vgChatInput{
-  flex:1;background:#08070d;color:#fff;border:1px solid #342b43;
-  border-radius:10px;padding:10px;outline:none
-}
-#vgChatInput:focus{border-color:#00f3ff}
-#vgSend{
-  border:0;border-radius:10px;padding:0 14px;background:#00f3ff;
-  color:#000;font-weight:900;cursor:pointer
-}
-@media(max-width:600px){
-  #vgChatButton{right:14px;bottom:14px}
-  #vgChatWindow{right:10px;bottom:85px;height:500px}
-}
+.vg-chat-head{padding:14px 16px;background:linear-gradient(90deg,#15132a,#241039);border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:space-between}
+.vg-chat-title{font-weight:900;color:#00f3ff}.vg-chat-status{font-size:10px;color:#00ff66;margin-top:2px}.vg-chat-close{background:none;border:0;color:#aaa;font-size:22px;cursor:pointer}
+#vgMessages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.vg-msg{max-width:86%;padding:10px 12px;border-radius:13px;white-space:pre-line;line-height:1.45;font-size:13px}
+.vg-bot{align-self:flex-start;background:#171522;border:1px solid #29243a}.vg-user{align-self:flex-end;background:linear-gradient(135deg,#6d20c9,#b000ff)}
+.vg-quick{padding:9px;display:flex;gap:6px;overflow-x:auto;border-top:1px solid #222}.vg-quick button{white-space:nowrap;background:#15131f;color:#ddd;border:1px solid #393044;border-radius:16px;padding:6px 9px;font-size:11px;cursor:pointer}
+.vg-quick button:hover{border-color:#00f3ff;color:#fff}.vg-input{display:flex;gap:7px;padding:10px;border-top:1px solid #222}
+#vgChatInput{flex:1;background:#08070d;color:#fff;border:1px solid #342b43;border-radius:10px;padding:10px;outline:none}#vgChatInput:focus{border-color:#00f3ff}
+#vgSend{border:0;border-radius:10px;padding:0 14px;background:#00f3ff;color:#000;font-weight:900;cursor:pointer}#vgSend:disabled{opacity:.6;cursor:wait}
+@media(max-width:600px){#vgChatButton{right:14px;bottom:14px}#vgChatWindow{right:10px;bottom:85px;height:500px}}
 </style>
 
-<button id="vgChatButton" type="button" aria-label="Open Vgameing Bot" onclick="window.vgToggleChat && window.vgToggleChat(); return false;">🤖</button>
+<button id="vgChatButton" type="button" aria-label="Open Vgameing AI">🤖</button>
 
 <div id="vgChatWindow">
   <div class="vg-chat-head">
-    <div>
-      <div class="vg-chat-title">🤖 Vgameing Bot</div>
-      <div class="vg-chat-status">● FREE • RULE-BASED • ONLINE</div>
-    </div>
-    <button class="vg-chat-close" onclick="vgToggleChat()">×</button>
+    <div><div class="vg-chat-title">🤖 Vgameing AI</div><div class="vg-chat-status">● GEMINI AI • ONLINE</div></div>
+    <button class="vg-chat-close" type="button" id="vgChatClose">×</button>
   </div>
-
   <div id="vgMessages"></div>
-
   <div class="vg-quick">
-    <button onclick="vgQuick('Give me a Minecraft tip')">⛏️ Tip</button>
-    <button onclick="vgQuick('Give me a quiz')">🎯 Quiz</button>
-    <button onclick="vgQuick('Give me a seed')">🌱 Seed</button>
-    <button onclick="vgQuick('How do I find diamonds?')">💎 Diamonds</button>
-    <button onclick="vgQuick('What is Redstone?')">🔴 Redstone</button>
+    <button type="button" data-vg-q="Give me a Minecraft tip">⛏️ Tip</button>
+    <button type="button" data-vg-q="Give me a Minecraft quiz question">🎯 Quiz</button>
+    <button type="button" data-vg-q="Give me a Minecraft seed idea">🌱 Seed</button>
+    <button type="button" data-vg-q="How do I find diamonds in Minecraft?">💎 Diamonds</button>
+    <button type="button" data-vg-q="What is Redstone in Minecraft?">🔴 Redstone</button>
   </div>
-
   <div class="vg-input">
-    <input id="vgChatInput" placeholder="Ask about Minecraft or gaming..." autocomplete="off">
-    <button id="vgSend" onclick="vgSendMessage()">Send</button>
+    <input id="vgChatInput" placeholder="Ask Vgameing AI anything..." autocomplete="off">
+    <button id="vgSend" type="button">Send</button>
   </div>
 </div>
 
 <script>
 (function(){
-  const msgBox=document.getElementById("vgMessages");
+  const SUPABASE_URL="https://xtmjivldcwyajgyhmygk.supabase.co";
+  const FUNCTION_URL=SUPABASE_URL+"/functions/v1/bright-api";
+  const SUPABASE_PUBLISHABLE_KEY="sb_publishable_LJYIhtSx9nbKbt9VjLXkeg_ubMt_KSI";
+
+  const win=document.getElementById("vgChatWindow");
+  const button=document.getElementById("vgChatButton");
+  const close=document.getElementById("vgChatClose");
   const input=document.getElementById("vgChatInput");
+  const send=document.getElementById("vgSend");
+  const messages=document.getElementById("vgMessages");
 
-  const quizzes=[
-    ["Which mob explodes when it gets close to a player?","Creeper 💥"],
-    ["Which dimension contains Nether Fortresses?","The Nether 🔥"],
-    ["Which mob can drop Ender Pearls?","Enderman 👁️"],
-    ["Which boss lives in The End?","The Ender Dragon 🐉"],
-    ["What material is used to make a Nether portal frame?","Obsidian 🟪"],
-    ["What tool is normally used to mine stone?","Pickaxe ⛏️"]
-  ];
-
-  const tips=[
-    "Carry a water bucket while mining. It can save you from lava and fall damage. 💧",
-    "Don't dig straight down—you never know what's underneath! 😅",
-    "Make a shield early in survival. It is very useful against skeletons. 🛡️",
-    "Bring food and torches whenever you explore caves. 🔥",
-    "Keep spare blocks in your hotbar for emergencies."
-  ];
-
-  function clean(s){
-    return s.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
-  }
-
-  function add(text,type){
+  function addMessage(text,type){
     const d=document.createElement("div");
     d.className="vg-msg "+(type==="user"?"vg-user":"vg-bot");
     d.textContent=text;
-    msgBox.appendChild(d);
-    msgBox.scrollTop=msgBox.scrollHeight;
+    messages.appendChild(d);
+    messages.scrollTop=messages.scrollHeight;
   }
 
-  function bot(text){
-    const t=clean(text);
-
-    if(!t) return "Type something bro 😎";
-
-    if(/^(hi|hello|hey|hii)\b/.test(t))
-      return "Yo! 👋 Welcome to Vgameing!\n\nI'm your free Minecraft & gaming bot. Ask me about mobs, crafting, Redstone, seeds, quizzes, mining or gaming.";
-
-    if(t==="help" || t.includes("what can you do") || t==="commands")
-      return "🔥 I can help with:\n\n⛏️ Minecraft tips\n🎯 Minecraft quizzes\n🌱 Seed ideas\n💎 Diamonds\n🔴 Redstone\n🔥 Nether\n🐉 End\n👾 Mobs\n🛠️ Crafting\n🎮 FPS & ping\n\nTry typing: "quiz" or "give me a seed".";
-
-    if(t==="quiz" || t.includes("minecraft quiz") || t.includes("quiz me") || t.includes("give me a quiz")){
-      const q=quizzes[Math.floor(Math.random()*quizzes.length)];
-      return "🎯 MINECRAFT QUIZ\n\n"+q[0]+"\n\nReply with your answer!\n\nType \"quiz\" for another.";
+  async function askGemini(message){
+    const response=await fetch(FUNCTION_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_PUBLISHABLE_KEY,
+        "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY
+      },
+      body:JSON.stringify({message:message})
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok){
+      throw new Error(data.error || data.message || ("HTTP "+response.status));
     }
-
-    if(t.includes("seed")){
-      if(t.includes("cherry")) return "🌸 Cherry Grove idea:\nLook around large mountain ranges for Cherry Grove biomes. They make awesome bases!\n\n⚠️ For verified numeric seeds, use your Vgameing Seed Vault.";
-      if(t.includes("village")) return "🏘️ Village seed idea:\nLook for plains, savanna or desert villages for an easy survival start.\n\n⚠️ For verified numeric seeds, use your Vgameing Seed Vault.";
-      if(t.includes("mountain")) return "🏔️ Mountain seed idea:\nLook for tall peaks near forests or plains so you get great terrain and building materials.";
-      return "🌱 Seed tip:\nTry a world with a village near mountains, cherry groves, or a large cave system.\n\n⚠️ I won't invent a numeric seed and call it verified. Use the Vgameing Seed Vault for exact seeds.";
-    }
-
-    if(t.includes("diamond"))
-      return "💎 DIAMONDS\n\nIn modern Minecraft, diamond ore generates deep underground. Explore the deeper layers and watch for lava.\n\n💡 Always carry a water bucket!";
-
-    if(t.includes("redstone"))
-      return "🔴 REDSTONE\n\nRedstone lets you build circuits and machines such as doors, farms, piston systems, traps and automatic contraptions.";
-
-    if(t.includes("nether"))
-      return "🔥 NETHER\n\nBring armor, food, blocks and tools. Mark your portal location and be careful around lava. Nether Fortresses and Bastions are major structures to explore.";
-
-    if(t==="end" || t.includes("ender dragon"))
-      return "🐉 THE END\n\nThe End is home to the Ender Dragon. Prepare strong armor, weapons, food, blocks and a bow before the fight.";
-
-    if(t.includes("mob") || t.includes("creeper") || t.includes("zombie") || t.includes("skeleton") || t.includes("enderman"))
-      return "👾 MOBS\n\n💥 Creeper — explodes\n🏹 Skeleton — bow attack\n🧟 Zombie — hostile undead mob\n👁️ Enderman — teleports\n🐮 Cow — passive mob";
-
-    if(t.includes("craft") || t.includes("crafting"))
-      return "🛠️ CRAFTING\n\nEarly survival essentials include a Crafting Table, Pickaxe, Sword, Shield, Furnace and Bucket.\n\nTell me an item and I'll try to explain its recipe.";
-
-    if(t.includes("mine") || t.includes("mining"))
-      return "⛏️ MINING TIPS\n\n1. Bring torches.\n2. Carry food.\n3. Bring a water bucket.\n4. Don't dig straight down.\n5. Watch for lava.";
-
-    if(t.includes("survival"))
-      return "🏕️ SURVIVAL START\n\nCollect wood → make tools → get food → build shelter → make a furnace → get protection → start mining.";
-
-    if(t==="fps" || t.includes("what is fps"))
-      return "🎮 FPS means Frames Per Second. It describes how many frames your game displays each second. Higher FPS can make gameplay look smoother.";
-
-    if(t.includes("ping"))
-      return "📡 Ping is network response time, usually measured in milliseconds (ms). Lower latency generally means faster communication with a game server.";
-
-    if(t.includes("gaming"))
-      return "🎮 Vgameing is a gaming hub focused on Minecraft, quizzes, arcade games, seeds and gaming content.";
-
-    if(t.includes("tip") || t.includes("tips"))
-      return "⛏️ TIP:\n"+tips[Math.floor(Math.random()*tips.length)];
-
-    if(t.includes("thank"))
-      return "No problem bro! 😎🔥";
-
-    return "🤖 I don't have a programmed answer for that yet!\n\nTry:\n• \"quiz\"\n• \"give me a seed\"\n• \"diamond tips\"\n• \"what is Redstone?\"\n• \"Nether tips\"\n• \"tell me about mobs\"\n• \"what is FPS?\"\n\nType \"help\" for the full list.";
+    return data.answer || "Gemini returned no answer.";
   }
 
-  window.vgToggleChat=function(){
-    const w=document.getElementById("vgChatWindow");
-    w.classList.toggle("open");
-    if(w.classList.contains("open")) input.focus();
-  };
-
-  window.vgQuick=function(text){
-    input.value=text;
-    vgSendMessage();
-  };
-
-  window.vgSendMessage=function(){
-    const text=input.value.trim();
-    if(!text)return;
-    add(text,"user");
+  async function sendMessage(prefilled){
+    const text=(prefilled || input.value).trim();
+    if(!text || send.disabled)return;
+    addMessage(text,"user");
     input.value="";
-    setTimeout(()=>add(bot(text),"bot"),180);
-  };
-
-  input.addEventListener("keydown",e=>{
-    if(e.key==="Enter") vgSendMessage();
-  });
-
-  add("Yo! 👋 I'm Vgameing Bot!\n\nI'm completely free and needs no API key. Ask me about Minecraft, seeds, quizzes or gaming.\n\nType \"help\" to see what I can do. 🎮🔥","bot");
-})();
-</script>
-<script>
-(function(){
-  function initVgameingChatButton(){
-    const btn=document.getElementById("vgChatButton");
-    const win=document.getElementById("vgChatWindow");
-    if(!btn || !win) return;
-    btn.onclick=null;
-    btn.addEventListener("click",function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      win.classList.toggle("open");
-      const input=document.getElementById("vgChatInput");
-      if(win.classList.contains("open") && input) input.focus();
-    },true);
-  }
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",initVgameingChatButton);
-  }else{
-    initVgameingChatButton();
-  }
-})();
-</script>
-<script>
-(function(){
-  function initVgameingChat(){
-    const input=document.getElementById("vgChatInput");
-    const send=document.getElementById("vgSend");
-    const messages=document.getElementById("vgMessages");
-    if(!input || !send || !messages) return;
-
-    function addMessage(text,type){
-      const d=document.createElement("div");
-      d.className="vg-msg "+(type==="user"?"vg-user":"vg-bot");
-      d.textContent=text;
-      messages.appendChild(d);
-      messages.scrollTop=messages.scrollHeight;
+    send.disabled=true;
+    send.textContent="...";
+    try{
+      const answer=await askGemini(text);
+      addMessage(answer,"bot");
+    }catch(error){
+      console.error("Vgameing AI error:",error);
+      addMessage("⚠️ Gemini is temporarily unavailable.\n\n"+error.message,"bot");
+    }finally{
+      send.disabled=false;
+      send.textContent="Send";
+      input.focus();
     }
-
-    function reply(text){
-      const t=text.toLowerCase();
-      if(t.includes("diamond")) return "💎 Diamonds are found deep underground. Carry a water bucket and watch for lava!";
-      if(t.includes("redstone")) return "🔴 Redstone is used to build Minecraft circuits, farms, doors and machines.";
-      if(t.includes("seed")) return "🌱 Check the Vgameing Seed Vault for the seeds on this site!";
-      if(t.includes("quiz")) return "🎯 Quiz: Which mob explodes when it gets close to a player? Reply with your answer!";
-      if(t.includes("tip")) return "⛏️ Tip: Never dig straight down, and always carry food, torches and a water bucket!";
-      if(t.includes("hello") || t.includes("hi")) return "Yo bro! 👋 Welcome to Vgameing! Ask me anything about Minecraft.";
-      return "🤖 I got your message! Try asking about Minecraft, diamonds, Redstone, seeds, quizzes or tips.";
-    }
-
-    function sendMessage(){
-      const text=input.value.trim();
-      if(!text) return;
-      addMessage(text,"user");
-      input.value="";
-      setTimeout(function(){ addMessage(reply(text),"bot"); },180);
-    }
-
-    send.onclick=function(e){ e.preventDefault(); e.stopPropagation(); sendMessage(); };
-    input.onkeydown=function(e){ if(e.key==="Enter"){ e.preventDefault(); sendMessage(); } };
   }
 
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initVgameingChat);
-  else initVgameingChat();
+  function toggle(){
+    win.classList.toggle("open");
+    if(win.classList.contains("open"))input.focus();
+  }
+
+  button.addEventListener("click",toggle);
+  close.addEventListener("click",toggle);
+  send.addEventListener("click",()=>sendMessage());
+  input.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();sendMessage();}});
+  document.querySelectorAll("[data-vg-q]").forEach(b=>b.addEventListener("click",()=>sendMessage(b.dataset.vgQ)));
+
+  addMessage("Yo bro! 👋 I'm Vgameing AI powered by Gemini.\n\nAsk me about Minecraft, gaming, Redstone, mobs, crafting, Nether, End, seeds, or anything else. 🎮🔥","bot");
 })();
 </script>
-<!-- ================= END FREE VGAMEING CHATBOT ================= -->
+<!-- ================= END VGAMEING GEMINI AI CHATBOT ================= -->
 
 </body>
 </html>
