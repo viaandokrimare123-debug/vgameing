@@ -754,7 +754,7 @@
 
     if(t==="quiz" || t.includes("minecraft quiz") || t.includes("quiz me") || t.includes("give me a quiz")){
       const q=quizzes[Math.floor(Math.random()*quizzes.length)];
-      return "🎯 MINECRAFT QUIZ\n\n"+q[0]+"\n\nReply with your answer!\n\nType "quiz" for another.";
+      return "🎯 MINECRAFT QUIZ\n\n"+q[0]+"\n\nReply with your answer!\n\nType \"quiz\" for another.";
     }
 
     if(t.includes("seed")){
@@ -803,7 +803,7 @@
     if(t.includes("thank"))
       return "No problem bro! 😎🔥";
 
-    return "🤖 I don't have a programmed answer for that yet!\n\nTry:\n• "quiz"\n• "give me a seed"\n• "diamond tips"\n• "what is Redstone?"\n• "Nether tips"\n• "tell me about mobs"\n• "what is FPS?"\n\nType "help" for the full list.";
+    return "🤖 I don't have a programmed answer for that yet!\n\nTry:\n• \"quiz\"\n• \"give me a seed\"\n• \"diamond tips\"\n• \"what is Redstone?\"\n• \"Nether tips\"\n• \"tell me about mobs\"\n• \"what is FPS?\"\n\nType \"help\" for the full list.";
   }
 
   window.vgToggleChat=function(){
@@ -829,7 +829,7 @@
     if(e.key==="Enter") vgSendMessage();
   });
 
-  add("Yo! 👋 I'm Vgameing Bot!\n\nI'm completely free and needs no API key. Ask me about Minecraft, seeds, quizzes or gaming.\n\nType "help" to see what I can do. 🎮🔥","bot");
+  add("Yo! 👋 I'm Vgameing Bot!\n\nI'm completely free and needs no API key. Ask me about Minecraft, seeds, quizzes or gaming.\n\nType \"help\" to see what I can do. 🎮🔥","bot");
 })();
 </script>
 <!-- ================= END FREE VGAMEING CHATBOT ================= -->
