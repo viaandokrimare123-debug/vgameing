@@ -833,6 +833,28 @@
   add("Yo! 👋 I'm Vgameing Bot!\n\nI'm completely free and needs no API key. Ask me about Minecraft, seeds, quizzes or gaming.\n\nType \"help\" to see what I can do. 🎮🔥","bot");
 })();
 </script>
+<script>
+(function(){
+  function initVgameingChatButton(){
+    const btn=document.getElementById("vgChatButton");
+    const win=document.getElementById("vgChatWindow");
+    if(!btn || !win) return;
+    btn.onclick=null;
+    btn.addEventListener("click",function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      win.classList.toggle("open");
+      const input=document.getElementById("vgChatInput");
+      if(win.classList.contains("open") && input) input.focus();
+    },true);
+  }
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",initVgameingChatButton);
+  }else{
+    initVgameingChatButton();
+  }
+})();
+</script>
 <!-- ================= END FREE VGAMEING CHATBOT ================= -->
 
 </body>
