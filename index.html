@@ -624,7 +624,8 @@
 <!-- ================= FREE VGAMEING CHATBOT ================= -->
 <style>
 #vgChatButton{
-  position:fixed;right:20px;bottom:20px;z-index:9999;
+  position:fixed;right:20px;bottom:20px;z-index:2147483647;
+  pointer-events:auto !important;
   width:62px;height:62px;border:0;border-radius:50%;
   background:linear-gradient(135deg,#00f3ff,#b000ff);
   color:#000;font-size:26px;font-weight:900;cursor:pointer;
@@ -680,7 +681,7 @@
 }
 </style>
 
-<button id="vgChatButton" aria-label="Open Vgameing Bot" onclick="vgToggleChat()">🤖</button>
+<button id="vgChatButton" type="button" aria-label="Open Vgameing Bot" onclick="window.vgToggleChat && window.vgToggleChat(); return false;">🤖</button>
 
 <div id="vgChatWindow">
   <div class="vg-chat-head">
