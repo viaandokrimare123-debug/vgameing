@@ -855,6 +855,49 @@
   }
 })();
 </script>
+<script>
+(function(){
+  function initVgameingChat(){
+    const input=document.getElementById("vgChatInput");
+    const send=document.getElementById("vgSend");
+    const messages=document.getElementById("vgMessages");
+    if(!input || !send || !messages) return;
+
+    function addMessage(text,type){
+      const d=document.createElement("div");
+      d.className="vg-msg "+(type==="user"?"vg-user":"vg-bot");
+      d.textContent=text;
+      messages.appendChild(d);
+      messages.scrollTop=messages.scrollHeight;
+    }
+
+    function reply(text){
+      const t=text.toLowerCase();
+      if(t.includes("diamond")) return "💎 Diamonds are found deep underground. Carry a water bucket and watch for lava!";
+      if(t.includes("redstone")) return "🔴 Redstone is used to build Minecraft circuits, farms, doors and machines.";
+      if(t.includes("seed")) return "🌱 Check the Vgameing Seed Vault for the seeds on this site!";
+      if(t.includes("quiz")) return "🎯 Quiz: Which mob explodes when it gets close to a player? Reply with your answer!";
+      if(t.includes("tip")) return "⛏️ Tip: Never dig straight down, and always carry food, torches and a water bucket!";
+      if(t.includes("hello") || t.includes("hi")) return "Yo bro! 👋 Welcome to Vgameing! Ask me anything about Minecraft.";
+      return "🤖 I got your message! Try asking about Minecraft, diamonds, Redstone, seeds, quizzes or tips.";
+    }
+
+    function sendMessage(){
+      const text=input.value.trim();
+      if(!text) return;
+      addMessage(text,"user");
+      input.value="";
+      setTimeout(function(){ addMessage(reply(text),"bot"); },180);
+    }
+
+    send.onclick=function(e){ e.preventDefault(); e.stopPropagation(); sendMessage(); };
+    input.onkeydown=function(e){ if(e.key==="Enter"){ e.preventDefault(); sendMessage(); } };
+  }
+
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initVgameingChat);
+  else initVgameingChat();
+})();
+</script>
 <!-- ================= END FREE VGAMEING CHATBOT ================= -->
 
 </body>
