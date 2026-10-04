@@ -774,8 +774,11 @@
               (s.structures ? '<p class="mt-3 text-xs text-gray-300"><b>Structures:</b> ' + safeText(s.structures) + '</p>' : '') +
               (s.coordinates ? '<p class="mt-1 text-xs text-gray-300"><b>Coords:</b> ' + safeText(s.coordinates) + '</p>' : '') +
               (s.notes ? '<p class="mt-2 text-xs text-gray-400">' + safeText(s.notes) + '</p>' : '') +
-              '<div class="mt-4 flex items-center justify-between gap-2"><span class="text-[10px] text-gray-500">by ' + safeText(s.submitted_by) + '</span><button onclick="copyCommunitySeed(' + JSON.stringify(String(s.seed)) + ')" class="rounded-lg border border-neon-green/30 px-3 py-2 text-xs font-bold text-neon-green">COPY SEED</button></div></article>';
+              '<div class="mt-4 flex items-center justify-between gap-2"><span class="text-[10px] text-gray-500">by ' + safeText(s.submitted_by) + '</span><button data-copy-seed="' + safeText(s.seed) + '" class="community-copy-seed rounded-lg border border-neon-green/30 px-3 py-2 text-xs font-bold text-neon-green">COPY SEED</button></div></article>';
           }).join("");
+          grid.querySelectorAll(".community-copy-seed").forEach(function(btn) {
+            btn.addEventListener("click", function(){ copyCommunitySeed(btn.getAttribute("data-copy-seed") || ""); });
+          });
         }
         async function copyCommunitySeed(seed) {
           try { await navigator.clipboard.writeText(seed); alert("Seed copied! Paste it into your Minecraft world settings."); }
@@ -824,8 +827,11 @@
           if (!grid) return;
           if (!lfgRows.length) { grid.innerHTML = '<div class="rounded-xl border border-gray-800 bg-neon-card p-6 text-sm text-gray-400">No active posts yet. Create the first squad request! 🎮</div>'; return; }
           grid.innerHTML = lfgRows.map(function(p) {
-            return '<article class="rounded-2xl border border-neon-purple/25 bg-neon-card p-4"><div class="flex flex-wrap items-start justify-between gap-2"><div><h4 class="font-black text-white">' + safeText(p.username) + '</h4><p class="mt-1 text-[10px] text-neon-purple">' + safeText(p.game_mode) + ' • ' + safeText(p.edition) + ' • ' + safeText(p.mc_version) + '</p></div><span class="rounded-full border border-neon-green/30 px-2 py-1 text-[9px] text-neon-green">OPEN TO TEAMMATES</span></div><p class="mt-3 text-sm text-gray-300 whitespace-pre-wrap">' + safeText(p.description) + '</p><div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-800 pt-3"><span class="text-[10px] text-gray-500">🌐 ' + safeText(p.region) + ' • ' + safeText(p.contact_method) + '</span><button onclick="revealLfgContact(' + JSON.stringify(String(p.contact_method)) + ',' + JSON.stringify(String(p.contact_handle)) + ')" class="rounded-lg bg-neon-purple/15 border border-neon-purple/30 px-3 py-2 text-xs font-bold text-neon-cyan">VIEW CONTACT</button></div><p class="mt-2 text-[10px] text-gray-600">Expires ' + safeText(new Date(p.expires_at).toLocaleDateString()) + '</p></article>';
+            return '<article class="rounded-2xl border border-neon-purple/25 bg-neon-card p-4"><div class="flex flex-wrap items-start justify-between gap-2"><div><h4 class="font-black text-white">' + safeText(p.username) + '</h4><p class="mt-1 text-[10px] text-neon-purple">' + safeText(p.game_mode) + ' • ' + safeText(p.edition) + ' • ' + safeText(p.mc_version) + '</p></div><span class="rounded-full border border-neon-green/30 px-2 py-1 text-[9px] text-neon-green">OPEN TO TEAMMATES</span></div><p class="mt-3 text-sm text-gray-300 whitespace-pre-wrap">' + safeText(p.description) + '</p><div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-800 pt-3"><span class="text-[10px] text-gray-500">🌐 ' + safeText(p.region) + ' • ' + safeText(p.contact_method) + '</span><button data-contact-method="' + safeText(p.contact_method) + '" data-contact-handle="' + safeText(p.contact_handle) + '" class="lfg-contact-btn rounded-lg bg-neon-purple/15 border border-neon-purple/30 px-3 py-2 text-xs font-bold text-neon-cyan">VIEW CONTACT</button></div><p class="mt-2 text-[10px] text-gray-600">Expires ' + safeText(new Date(p.expires_at).toLocaleDateString()) + '</p></article>';
           }).join("");
+          grid.querySelectorAll(".lfg-contact-btn").forEach(function(btn) {
+            btn.addEventListener("click", function(){ revealLfgContact(btn.getAttribute("data-contact-method") || "Contact", btn.getAttribute("data-contact-handle") || ""); });
+          });
         }
         function revealLfgContact(method, handle) {
           alert(method + " contact:\n" + handle + "\n\nOnly contact players you trust. Never share passwords or personal information.");
