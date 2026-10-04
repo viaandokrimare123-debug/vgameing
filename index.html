@@ -107,6 +107,7 @@
             <div class="hidden md:flex items-center gap-3 bg-neon-card border border-neon-cyan/30 px-3 py-1.5 rounded-xl">
                 <div class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></div>
                 <span id="displayUserTag" class="text-xs font-bold text-neon-cyan">Player</span>
+                <button onclick="openLogin()" class="text-[10px] text-neon-green hover:text-white transition ml-1">[Login]</button>
                 <button onclick="signOut()" class="text-[10px] text-gray-400 hover:text-neon-pink transition ml-1">[Sign Out]</button>
             </div>
         </div>
@@ -465,6 +466,72 @@
             }
             return emailJsLoadPromise;
         }
+
+        // --- Supabase OAuth Login ---
+        let vgSupabase = null;
+        (function initSupabaseAuth(){
+            try {
+                const script = document.createElement("script");
+                script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+                script.onload = function(){
+                    try {
+                        if(window.supabase && window.supabase.createClient){
+                            vgSupabase = window.supabase.createClient(
+                                "https://xtmjivldcwyajgyhmygk.supabase.co",
+                                "sb_publishable_LJYIhtSx9nbKbt9VjLXkeg_ubMt_KSI"
+                            );
+                            vgSupabase.auth.getSession().then(function(result){
+                                const session = result && result.data && result.data.session;
+                                if(session && session.user) applyOAuthUser(session.user);
+                            });
+                            vgSupabase.auth.onAuthStateChange(function(event, session){
+                                if(session && session.user) applyOAuthUser(session.user);
+                            });
+                        }
+                    } catch(e){ console.warn("Supabase Auth init failed:", e); }
+                };
+                script.onerror = function(){ console.warn("Supabase Auth library could not load."); };
+                document.head.appendChild(script);
+            } catch(e){ console.warn("Supabase Auth setup skipped:", e); }
+        })();
+
+        function applyOAuthUser(user){
+            const metadata = user.user_metadata || {};
+            const name = metadata.full_name || metadata.name || metadata.user_name || (user.email ? user.email.split("@")[0] : "Player");
+            currentUser = String(name).slice(0,20);
+            localStorage.setItem("vgaming_current_user", currentUser);
+            const tag = document.getElementById("displayUserTag");
+            if(tag) tag.innerText = currentUser;
+            closeLogin();
+        }
+        function openLogin(){
+            const modal=document.getElementById("loginModal");
+            if(modal) modal.classList.remove("hidden");
+            const status=document.getElementById("loginStatus");
+            if(status) status.textContent="";
+        }
+        function closeLogin(){
+            const modal=document.getElementById("loginModal");
+            if(modal) modal.classList.add("hidden");
+        }
+        async function loginWithProvider(provider){
+            const status=document.getElementById("loginStatus");
+            if(status) status.textContent="Opening login…";
+            if(!vgSupabase){
+                if(status) status.textContent="Login service is still loading. Try again in a moment.";
+                return;
+            }
+            try{
+                const redirectTo=window.location.origin+window.location.pathname;
+                const result=await vgSupabase.auth.signInWithOAuth({provider:provider,options:{redirectTo:redirectTo}});
+                if(result.error) throw result.error;
+            }catch(error){
+                console.error("Vgameing OAuth error:",error);
+                if(status) status.textContent="⚠️ "+(error.message || "Could not start login.");
+            }
+        }
+        function loginWithGoogle(){ return loginWithProvider("google"); }
+        function loginWithMicrosoft(){ return loginWithProvider("azure"); }
 
         // --- Authentication & Session Storage Setup ---
         // The hub is always accessible. Email verification is optional and never blocks the site.
