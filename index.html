@@ -98,6 +98,7 @@
                 <button onclick="switchTab('arcade')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="arcade">Arcade</button>
                 <button onclick="switchTab('seeds')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="seeds">Seeds</button>
                 <button onclick="switchTab('community')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="community">Community+</button>
+                <button onclick="switchTab('tools')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="tools">Tools</button>
                 <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="leaderboard">Leaderboard</button>
                 <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
             </nav>
@@ -205,6 +206,65 @@
             </div>
             <input type="text" id="seedSearchInput" oninput="filterSeeds()" placeholder="Search by structure, biome, or keyword..." class="w-full bg-neon-card border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-green">
             <div id="seedsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- 6. MINECRAFT TOOLS + DAILY MISSIONS -->
+        <section id="tab-tools" class="hidden space-y-8 max-w-6xl mx-auto">
+          <div class="text-center space-y-2">
+            <h2 class="text-3xl font-black text-neon-cyan">🧰 Minecraft Tools</h2>
+            <p class="text-sm text-gray-400">Useful calculators for builders, survival players, and redstone nerds.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="vg-tool-card"><h3>🟩 XP Calculator</h3>
+              <label>Current level <input id="toolXpLevel" type="number" min="0" max="1000" value="20"></label>
+              <label>XP progress to next level (%) <input id="toolXpPercent" type="number" min="0" max="99" value="50"></label>
+              <button onclick="calculateXpTool()">CALCULATE</button><p id="toolXpResult" class="vg-tool-result"></p>
+            </div>
+            <div class="vg-tool-card"><h3>✨ Enchantment Cost</h3>
+              <label>Base XP levels <input id="toolEnchantBase" type="number" min="0" value="5"></label>
+              <label>Number of prior anvil uses <input id="toolEnchantUses" type="number" min="0" max="20" value="0"></label>
+              <button onclick="calculateEnchantTool()">CALCULATE</button><p id="toolEnchantResult" class="vg-tool-result"></p>
+            </div>
+            <div class="vg-tool-card"><h3>🌋 Nether ↔ Overworld</h3>
+              <label>X <input id="toolCoordX" type="number" value="800"></label>
+              <label>Z <input id="toolCoordZ" type="number" value="-240"></label>
+              <button onclick="calculateCoordsTool()">CONVERT</button><p id="toolCoordResult" class="vg-tool-result"></p>
+            </div>
+            <div class="vg-tool-card"><h3>📦 Stack Calculator</h3>
+              <label>Total items <input id="toolStackItems" type="number" min="0" value="150"></label>
+              <label>Items per stack <input id="toolStackSize" type="number" min="1" value="64"></label>
+              <button onclick="calculateStackTool()">CALCULATE</button><p id="toolStackResult" class="vg-tool-result"></p>
+            </div>
+            <div class="vg-tool-card"><h3>🔥 Smelting Calculator</h3>
+              <label>Items to smelt <input id="toolSmeltItems" type="number" min="0" value="32"></label>
+              <label>Seconds per item <input id="toolSmeltSeconds" type="number" min="1" value="10"></label>
+              <button onclick="calculateSmeltTool()">CALCULATE</button><p id="toolSmeltResult" class="vg-tool-result"></p>
+            </div>
+            <div class="vg-tool-card"><h3>🔴 Redstone Calculator</h3>
+              <label>Repeaters <input id="toolRedstoneRepeaters" type="number" min="1" value="10"></label>
+              <label>Delay per repeater (ticks) <input id="toolRedstoneDelay" type="number" min="1" max="4" value="4"></label>
+              <button onclick="calculateRedstoneTool()">CALCULATE</button><p id="toolRedstoneResult" class="vg-tool-result"></p>
+            </div>
+          </div>
+
+          <div class="bg-neon-card border border-neon-purple/40 rounded-2xl p-6 sm:p-8 space-y-6">
+            <div class="flex flex-wrap justify-between items-center gap-3">
+              <div><h2 class="text-2xl font-black text-neon-purple">🎯 Daily Missions</h2><p class="text-xs text-gray-400">Complete all 4 missions for today's reward.</p></div>
+              <div class="text-right"><div id="vgMissionProgress" class="text-neon-cyan font-black">0 / 4</div><div class="text-xs text-gray-500">missions complete</div></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button id="missionHouse" class="vg-mission" onclick="completeMission('house')"><span>🏠</span><div><b>Build a starter house</b><small>Mark complete when you've built one in Minecraft.</small></div></button>
+              <button id="missionQuiz" class="vg-mission" onclick="completeMission('quiz')"><span>🎯</span><div><b>Score 80%+ in Quiz</b><small>Test your Minecraft knowledge.</small></div></button>
+              <button id="missionReaction" class="vg-mission" onclick="completeMission('reaction')"><span>⚡</span><div><b>Get &lt;250ms in Reaction Rush</b><small>Beat the 250ms target.</small></div></button>
+              <button id="missionSeed" class="vg-mission" onclick="completeMission('seed')"><span>🌱</span><div><b>Discover a rare seed</b><small>Find a rare/interesting Minecraft seed.</small></div></button>
+            </div>
+            <div id="vgMissionReward" class="hidden rounded-xl border border-neon-yellow/40 bg-neon-yellow/10 p-5 text-center">
+              <div class="text-2xl font-black text-neon-yellow">🏆 MISSION COMPLETE!</div>
+              <p class="mt-2 text-sm text-gray-200">+500 XP &nbsp; • &nbsp; +100 V-Coins</p>
+              <p class="mt-1 text-xs text-neon-cyan font-bold">🏅 Badge unlocked: DAILY WARRIOR</p>
+            </div>
+          </div>
         </section>
 
         <!-- VGAMEING COMMUNITY HUB -->
@@ -1884,6 +1944,19 @@
 
     </script>
 
+<style>
+.vg-tool-card{background:#12121f;border:1px solid rgba(0,243,255,.2);border-radius:18px;padding:20px;box-shadow:0 0 18px rgba(0,243,255,.07)}
+.vg-tool-card h3{font-weight:900;font-size:18px;color:#00f3ff;margin-bottom:14px}
+.vg-tool-card label{display:block;font-size:11px;color:#9ca3af;margin:9px 0}
+.vg-tool-card input{display:block;width:100%;margin-top:5px;background:#0a0a12;border:1px solid #293044;border-radius:9px;padding:9px;color:#fff;outline:none}
+.vg-tool-card input:focus{border-color:#00f3ff}
+.vg-tool-card button{width:100%;margin-top:10px;padding:9px;border-radius:9px;background:#00f3ff;color:#000;font-weight:900;font-size:11px;cursor:pointer}
+.vg-tool-result{min-height:22px;margin-top:12px;font-size:12px;color:#00ff66;font-weight:700}
+.vg-mission{display:flex;align-items:center;gap:14px;text-align:left;background:#0d0c17;border:1px solid #29243a;border-radius:14px;padding:15px;color:#fff;cursor:pointer;transition:.2s}
+.vg-mission:hover{border-color:#00f3ff;transform:translateY(-1px)}
+.vg-mission.done{border-color:#00ff66;background:rgba(0,255,102,.08)}
+.vg-mission>span{font-size:28px}.vg-mission b{display:block;font-size:14px}.vg-mission small{display:block;color:#888;font-size:10px;margin-top:4px}
+</style>
 <!-- ================= VGAMEING GAMING TASKBAR ================= -->
 <style>
   body{padding-bottom:92px}
@@ -1926,6 +1999,51 @@
 </nav>
 <!-- ================= END VGAMEING GAMING TASKBAR ================= -->
 
+<script>
+(function(){
+  const missionKey="vg_daily_missions_"+new Date().toISOString().slice(0,10);
+  const defaults={house:false,quiz:false,reaction:false,seed:false};
+  let missions=JSON.parse(localStorage.getItem(missionKey)||"null")||defaults;
+  function saveMissions(){localStorage.setItem(missionKey,JSON.stringify(missions));}
+  window.updateMissionUI=function(){
+    let done=Object.values(missions).filter(Boolean).length;
+    document.getElementById("vgMissionProgress")?.replaceChildren(document.createTextNode(done+" / 4"));
+    Object.keys(missions).forEach(k=>document.getElementById("mission"+k.charAt(0).toUpperCase()+k.slice(1))?.classList.toggle("done",missions[k]));
+    const reward=document.getElementById("vgMissionReward");
+    if(reward) reward.classList.toggle("hidden",done<4);
+  };
+  window.completeMission=function(name){
+    missions[name]=true; saveMissions(); updateMissionUI();
+    if(Object.values(missions).every(Boolean)) alert("🏆 Daily Missions complete! +500 XP +100 V-Coins + DAILY WARRIOR badge!");
+  };
+  window.calculateXpTool=function(){
+    const level=Math.max(0,Number(document.getElementById("toolXpLevel").value)||0), pct=Math.min(99,Math.max(0,Number(document.getElementById("toolXpPercent").value)||0));
+    document.getElementById("toolXpResult").textContent="Level "+level+" • "+pct+"% toward level "+(level+1);
+  };
+  window.calculateEnchantTool=function(){
+    const base=Math.max(0,Number(document.getElementById("toolEnchantBase").value)||0), uses=Math.max(0,Number(document.getElementById("toolEnchantUses").value)||0);
+    const penalty=Math.min(39,Math.pow(2,uses)-1), total=base+penalty;
+    document.getElementById("toolEnchantResult").textContent="Approx. anvil cost: "+total+" levels";
+  };
+  window.calculateCoordsTool=function(){
+    const x=Number(document.getElementById("toolCoordX").value)||0,z=Number(document.getElementById("toolCoordZ").value)||0;
+    document.getElementById("toolCoordResult").textContent="Nether: X "+Math.round(x/8)+", Z "+Math.round(z/8)+" • Overworld: X "+(x*8)+", Z "+(z*8);
+  };
+  window.calculateStackTool=function(){
+    const items=Math.max(0,Math.floor(Number(document.getElementById("toolStackItems").value)||0)), size=Math.max(1,Math.floor(Number(document.getElementById("toolStackSize").value)||64));
+    document.getElementById("toolStackResult").textContent=Math.floor(items/size)+" full stack(s) + "+(items%size)+" item(s)";
+  };
+  window.calculateSmeltTool=function(){
+    const items=Math.max(0,Math.floor(Number(document.getElementById("toolSmeltItems").value)||0)), sec=Math.max(1,Number(document.getElementById("toolSmeltSeconds").value)||10);
+    const total=items*sec; document.getElementById("toolSmeltResult").textContent=total+" seconds • "+(total/60).toFixed(1)+" minutes";
+  };
+  window.calculateRedstoneTool=function(){
+    const count=Math.max(1,Math.floor(Number(document.getElementById("toolRedstoneRepeaters").value)||1)), delay=Math.min(4,Math.max(1,Number(document.getElementById("toolRedstoneDelay").value)||1));
+    const ticks=count*delay; document.getElementById("toolRedstoneResult").textContent=ticks+" redstone ticks • "+(ticks/10).toFixed(1)+" seconds";
+  };
+  window.addEventListener("DOMContentLoaded",function(){updateMissionUI(); calculateXpTool();calculateEnchantTool();calculateCoordsTool();calculateStackTool();calculateSmeltTool();calculateRedstoneTool();});
+})();
+</script>
 <!-- ================= VGAMEING GEMINI AI CHATBOT ================= -->
 <style>
 #vgChatButton{position:fixed;right:20px;bottom:96px;z-index:2147483647;pointer-events:auto!important;width:62px;height:62px;border:0;border-radius:50%;background:linear-gradient(135deg,#00f3ff,#b000ff);color:#000;font-size:26px;font-weight:900;cursor:pointer;box-shadow:0 0 25px rgba(0,243,255,.45);transition:.2s ease}#vgChatButton:hover{transform:scale(1.08);box-shadow:0 0 35px rgba(176,0,255,.55)}
