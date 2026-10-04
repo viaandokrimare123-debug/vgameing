@@ -59,6 +59,8 @@
                 <button type="submit" id="sendBtn" class="w-full py-3 rounded-xl bg-neon-cyan text-black font-extrabold text-sm tracking-wide hover:opacity-90 transition shadow-lg">SEND VERIFICATION CODE &rarr;</button>
             </form>
 
+            <button type="button" onclick="continueAsGuest()" class="w-full mt-3 py-3 rounded-xl border border-gray-600 text-gray-200 font-bold text-sm hover:border-neon-cyan hover:text-neon-cyan transition">CONTINUE AS GUEST (EMAIL NOT WORKING?)</button>
+
             <!-- STEP 2: Enter Verification Code -->
             <div id="step2Box" class="space-y-4 text-left hidden">
                 <div class="bg-neon-dark/80 border border-neon-green/40 p-3 rounded-xl text-xs text-gray-300 text-center">
@@ -327,21 +329,42 @@
         const EMAILJS_SERVICE_ID = "service_zre0a7g"; 
         const EMAILJS_TEMPLATE_ID = "template_qyvow75";
 
-        // Initialize EmailJS
+        // EmailJS: load on demand so a slow/blocked CDN doesn't permanently break sign-in.
         let emailJsReady = false;
-        (function() {
-            try {
-                if (EMAILJS_PUBLIC_KEY && typeof window.emailjs !== "undefined" && typeof window.emailjs.init === "function") {
+        let emailJsLoadPromise = null;
+        async function ensureEmailJs() {
+            if (window.emailjs && typeof window.emailjs.send === "function") {
+                if (!emailJsReady) {
                     window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
                     emailJsReady = true;
-                } else {
-                    console.warn("Vgameing: EmailJS SDK is not available yet.");
                 }
-            } catch (err) {
-                console.error("Vgameing: EmailJS initialization failed:", err);
-                emailJsReady = false;
+                return true;
             }
-        })();
+            if (!emailJsLoadPromise) {
+                emailJsLoadPromise = new Promise((resolve, reject) => {
+                    const existing = document.querySelector('script[data-vgameing-emailjs="true"]');
+                    const script = existing || document.createElement("script");
+                    script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+                    script.async = true;
+                    script.dataset.vgameingEmailjs = "true";
+                    script.onload = () => {
+                        try {
+                            if (!window.emailjs || typeof window.emailjs.send !== "function") throw new Error("EmailJS SDK loaded but its API is unavailable.");
+                            window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+                            emailJsReady = true;
+                            resolve(true);
+                        } catch (err) { reject(err); }
+                    };
+                    script.onerror = () => reject(new Error("Could not load EmailJS from the CDN. Check your connection or ad/script blocker."));
+                    if (!existing) document.head.appendChild(script);
+                    else if (window.emailjs) resolve(true);
+                }).catch(err => {
+                    emailJsLoadPromise = null;
+                    throw err;
+                });
+            }
+            return emailJsLoadPromise;
+        }
 
         // --- Authentication & Session Storage Setup ---
         let currentUser = localStorage.getItem('vgaming_current_user') || null;
@@ -370,7 +393,7 @@
         });
 
         // Step 1: Send real verification code via EmailJS
-        function sendVerificationCode(e) {
+        async function sendVerificationCode(e) {
             e.preventDefault();
             let username = document.getElementById('authUsername').value.trim().toLowerCase();
             let email = document.getElementById('authEmail').value.trim();
@@ -396,25 +419,19 @@
                 to_name: pendingUsername
             };
 
-            if (!emailJsReady || typeof window.emailjs === "undefined" || typeof window.emailjs.send !== "function") {
+            try {
+                await ensureEmailJs();
+                await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
                 sendBtn.innerText = "SEND VERIFICATION CODE →";
                 sendBtn.disabled = false;
-                alert("❌ Verification service is not loaded. Please refresh the page and try again.");
-                return;
+                proceedToStep2(email);
+            } catch (error) {
+                sendBtn.innerText = "SEND VERIFICATION CODE →";
+                sendBtn.disabled = false;
+                console.error("Vgameing verification send failed:", error);
+                const detail = error && (error.text || error.message) ? (error.text || error.message) : "Unknown error";
+                alert("❌ Could not send the verification email. " + detail + "\n\nYou can still enter as a guest using the button below. For email verification, check the EmailJS service, template variables (to_email, passcode, to_name), and allowed domain.");
             }
-
-            window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                .then(function() {
-                    sendBtn.innerText = "SEND VERIFICATION CODE →";
-                    sendBtn.disabled = false;
-                    proceedToStep2(email);
-                })
-                .catch(function(error) {
-                    sendBtn.innerText = "SEND VERIFICATION CODE →";
-                    sendBtn.disabled = false;
-                    console.error("EmailJS verification error:", error);
-                    alert("❌ Verification email could not be sent. Please check the EmailJS service/template and try again.");
-                });
         }
 
         function proceedToStep2(email) {
@@ -422,6 +439,15 @@
             document.getElementById('step2Box').classList.remove('hidden');
             document.getElementById('sentEmailDisplay').innerText = email;
             document.getElementById('authSubtitle').innerText = "Enter the 4-digit verification code sent to your inbox.";
+        }
+
+        // Safe fallback so the site remains usable if email delivery is unavailable.
+        function continueAsGuest() {
+            const guestName = "Guest" + Math.floor(1000 + Math.random() * 9000);
+            currentUser = guestName;
+            localStorage.setItem("vgaming_current_user", currentUser);
+            document.getElementById("displayUserTag").innerText = currentUser;
+            document.getElementById("authModal").classList.add("hidden");
         }
 
         // Step 2: Verify code and login
