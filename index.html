@@ -113,6 +113,20 @@
         </div>
     </header>
 
+    <!-- OAUTH LOGIN MODAL -->
+    <div id="loginModal" class="hidden fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-7 max-w-md w-full space-y-5 neon-glow-cyan text-center">
+        <div>
+          <div class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">⚡ LOGIN TO VGAMEING</div>
+          <p class="text-xs text-gray-400 mt-2">Sign in with your Google or Microsoft account.</p>
+        </div>
+        <button type="button" onclick="loginWithGoogle()" class="w-full py-3 rounded-xl bg-white text-gray-900 font-extrabold text-sm hover:bg-gray-200 transition">🔵 Continue with Google</button>
+        <button type="button" onclick="loginWithMicrosoft()" class="w-full py-3 rounded-xl bg-[#2f2f2f] border border-gray-600 text-white font-extrabold text-sm hover:bg-[#3b3b3b] transition">▦ Continue with Microsoft</button>
+        <div id="loginStatus" class="text-xs text-gray-400 min-h-[18px]" aria-live="polite"></div>
+        <button type="button" onclick="closeLogin()" class="text-xs text-gray-500 hover:text-white">Cancel</button>
+      </div>
+    </div>
+
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
 
