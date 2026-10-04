@@ -42,7 +42,7 @@
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
 
     <!-- ================= SECURE EMAIL VERIFICATION & SIGN-IN MODAL ================= -->
-    <div id="authModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-8 max-w-md w-full space-y-6 neon-glow-cyan text-center">
             <div class="space-y-2">
                 <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink neon-text-glow">⚡ V-GAMING HUB</h2>
@@ -371,6 +371,7 @@
         }
 
         // --- Authentication & Session Storage Setup ---
+        // The hub is always accessible. Email verification is optional and never blocks the site.
         // Never lock the entire site behind email verification: create a local guest session if needed.
         let currentUser = localStorage.getItem('vgaming_current_user');
         if (!currentUser) {
