@@ -91,6 +91,7 @@
                 <button onclick="switchTab('quiz')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="quiz">Quiz</button>
                 <button onclick="switchTab('arcade')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="arcade">Arcade</button>
                 <button onclick="switchTab('seeds')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="seeds">Seeds</button>
+                <button onclick="switchTab('community')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="community">Community+</button>
                 <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="leaderboard">Leaderboard</button>
                 <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
             </nav>
@@ -200,6 +201,84 @@
             <div id="seedsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
+        <!-- VGAMEING COMMUNITY HUB -->
+        <section id="tab-community" class="hidden space-y-7 max-w-6xl mx-auto">
+          <div class="relative overflow-hidden rounded-3xl border border-neon-cyan/30 bg-gradient-to-br from-[#111326] via-[#0b0b16] to-[#1b0c25] p-6 sm:p-9">
+            <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(0,243,255,.13),transparent_35%),radial-gradient(circle_at_90%_80%,rgba(176,0,255,.14),transparent_35%)]"></div>
+            <div class="relative">
+              <span class="text-[10px] font-black tracking-[.25em] text-neon-cyan">VGAMEING // COMMUNITY NETWORK</span>
+              <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">Minecraft <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">Community Hub</span></h2>
+              <p class="mt-3 max-w-2xl text-sm text-gray-400">Find verified worlds, master redstone, check mob drops, and squad up with other players.</p>
+              <div class="mt-5 flex flex-wrap gap-2">
+                <button onclick="showCommunityPanel('seeds')" class="community-tab px-4 py-2 rounded-xl border border-neon-green/40 bg-neon-green/10 text-neon-green text-xs font-black">🌍 SEED DB</button>
+                <button onclick="showCommunityPanel('redstone')" class="community-tab px-4 py-2 rounded-xl border border-gray-700 text-gray-300 text-xs font-black">⚙️ REDSTONE LAB</button>
+                <button onclick="showCommunityPanel('mobs')" class="community-tab px-4 py-2 rounded-xl border border-gray-700 text-gray-300 text-xs font-black">📚 MOB WIKI</button>
+                <button onclick="showCommunityPanel('lfg')" class="community-tab px-4 py-2 rounded-xl border border-gray-700 text-gray-300 text-xs font-black">🤝 FIND A SQUAD</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="community-panel-seeds" class="community-panel grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-5">
+            <div class="space-y-4">
+              <div class="flex flex-wrap items-end justify-between gap-3"><div><h3 class="text-2xl font-black text-neon-green">🌍 Verified Community Seeds</h3><p class="text-xs text-gray-400 mt-1">Only moderator-verified submissions appear in this public list.</p></div><button onclick="loadCommunitySeeds()" class="px-3 py-2 rounded-lg border border-neon-green/30 text-neon-green text-xs font-bold">↻ Refresh</button></div>
+              <input id="communitySeedSearch" oninput="renderCommunitySeeds()" placeholder="Search seed, biome, version..." class="w-full bg-neon-card border border-gray-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-neon-green">
+              <div id="communitySeedsGrid" class="grid grid-cols-1 gap-3"><div class="rounded-xl border border-gray-800 bg-neon-card p-5 text-sm text-gray-400">Loading verified seeds…</div></div>
+            </div>
+            <form id="communitySeedForm" class="rounded-2xl border border-neon-green/25 bg-neon-card p-5 sm:p-6 space-y-3 h-fit">
+              <div><span class="text-[10px] font-black tracking-widest text-neon-green">CONTRIBUTE TO THE VAULT</span><h3 class="text-xl font-black mt-1">Submit a Seed</h3><p class="text-xs text-gray-400 mt-1">Submissions stay unverified until a moderator checks the edition, version, and coordinates.</p></div>
+              <input name="title" required maxlength="90" placeholder="Seed title (e.g. Cherry Grove Ring)" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm">
+              <div class="grid grid-cols-2 gap-2"><input name="seed" required maxlength="120" placeholder="Seed number / text" class="min-w-0 rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><select name="edition" class="rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><option>Java</option><option>Bedrock</option></select></div>
+              <div class="grid grid-cols-2 gap-2"><input name="version" required maxlength="40" placeholder="MC version (e.g. 1.21.x)" class="min-w-0 rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><input name="biome" required maxlength="100" placeholder="Main biome" class="min-w-0 rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"></div>
+              <input name="structures" maxlength="300" placeholder="Structures nearby (village, trial chamber…)" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm">
+              <input name="coordinates" maxlength="160" placeholder="Coordinates (e.g. X: 120, Y: 68, Z: -40)" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm">
+              <input name="screenshot" type="url" maxlength="700" placeholder="Screenshot URL (optional, https://…)" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm">
+              <input name="submittedBy" required maxlength="32" minlength="2" placeholder="Your Vgameing name" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm">
+              <textarea name="notes" maxlength="1200" rows="2" placeholder="Extra details / spawn description" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"></textarea>
+              <button class="w-full rounded-xl bg-neon-green py-3 text-sm font-black text-black hover:brightness-110">SEND FOR VERIFICATION →</button>
+              <p id="communitySeedStatus" aria-live="polite" class="text-xs text-gray-400"></p>
+            </form>
+          </div>
+
+          <div id="community-panel-redstone" class="community-panel hidden space-y-5">
+            <div><h3 class="text-2xl font-black text-neon-cyan">⚙️ Redstone Lab</h3><p class="text-sm text-gray-400 mt-1">Quick calculators and practical starter guides for builders.</p></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="rounded-2xl border border-neon-cyan/30 bg-neon-card p-5 space-y-4">
+                <h4 class="font-black text-white">⏱️ Repeater Delay Calculator</h4><p class="text-xs text-gray-400">One redstone tick is 0.1 seconds. A repeater can be set to 1–4 redstone ticks.</p>
+                <label class="block text-xs text-gray-400">Number of repeaters</label><input id="rsCount" type="number" min="1" max="100" value="4" oninput="calculateRedstone()" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3">
+                <label class="block text-xs text-gray-400">Delay per repeater</label><select id="rsDelay" onchange="calculateRedstone()" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3"><option value="1">1 redstone tick (0.1s)</option><option value="2" selected>2 redstone ticks (0.2s)</option><option value="3">3 redstone ticks (0.3s)</option><option value="4">4 redstone ticks (0.4s)</option></select>
+                <div class="rounded-xl border border-neon-cyan/30 bg-neon-cyan/5 p-4"><span class="text-xs text-gray-400">TOTAL REPEATER DELAY</span><div id="rsResult" class="text-3xl font-black text-neon-cyan mt-1">0.8 seconds</div><div id="rsTicks" class="text-xs text-gray-400 mt-1">8 redstone ticks • 16 game ticks</div></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <article class="rounded-2xl border border-gray-800 bg-neon-card p-5"><div class="text-2xl">🔁</div><h4 class="font-bold text-neon-cyan mt-2">Repeater Basics</h4><p class="text-xs text-gray-400 mt-2">Repeaters refresh a redstone signal, enforce direction, add delay, and can lock when powered from the side.</p><span class="inline-block mt-3 text-[10px] text-neon-cyan border border-neon-cyan/30 rounded px-2 py-1">SIGNAL TIMING</span></article>
+                <article class="rounded-2xl border border-gray-800 bg-neon-card p-5"><div class="text-2xl">📦</div><h4 class="font-bold text-neon-pink mt-2">Hopper Clock</h4><p class="text-xs text-gray-400 mt-2">Two hoppers facing each other can move items back and forth; comparator output changes with inventory.</p><span class="inline-block mt-3 text-[10px] text-neon-pink border border-neon-pink/30 rounded px-2 py-1">ITEM TIMING</span></article>
+                <article class="rounded-2xl border border-gray-800 bg-neon-card p-5"><div class="text-2xl">📡</div><h4 class="font-bold text-neon-green mt-2">Comparator</h4><p class="text-xs text-gray-400 mt-2">Compares signal strengths in compare mode, or subtracts rear input from side input strength in subtract mode.</p><span class="inline-block mt-3 text-[10px] text-neon-green border border-neon-green/30 rounded px-2 py-1">SIGNAL STRENGTH</span></article>
+                <article class="rounded-2xl border border-gray-800 bg-neon-card p-5"><div class="text-2xl">🧲</div><h4 class="font-bold text-neon-yellow mt-2">Sticky Pistons</h4><p class="text-xs text-gray-400 mt-2">Sticky pistons usually pull a block back when retracting; slime and honey blocks have different attachment behavior.</p><span class="inline-block mt-3 text-[10px] text-neon-yellow border border-neon-yellow/30 rounded px-2 py-1">MECHANISMS</span></article>
+              </div>
+            </div>
+            <p class="text-[11px] text-gray-500">Timing assumes steady-state repeater delay; game lag and edition/version differences can affect observed behavior.</p>
+          </div>
+
+          <div id="community-panel-mobs" class="community-panel hidden space-y-5">
+            <div><h3 class="text-2xl font-black text-neon-pink">📚 Mob & Loot Field Guide</h3><p class="text-sm text-gray-400 mt-1">Common drops at a glance. Looting, mob variants, and game versions can change results.</p></div>
+            <input id="mobSearch" oninput="filterMobTable()" placeholder="Search mob or drop…" class="w-full bg-neon-card border border-gray-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-neon-pink">
+            <div class="overflow-x-auto rounded-2xl border border-gray-800 bg-neon-card"><table class="w-full min-w-[560px] text-left text-sm"><thead class="bg-black/30 text-xs uppercase text-gray-400"><tr><th class="p-4">Mob</th><th class="p-4">Common drop</th><th class="p-4">Base amount</th><th class="p-4">Quick tip</th></tr></thead><tbody id="mobTableBody" class="divide-y divide-gray-800"></tbody></table></div>
+            <p class="text-xs text-gray-500">Base drops shown without Looting or other modifiers; some drops depend on mob state and edition.</p>
+          </div>
+
+          <div id="community-panel-lfg" class="community-panel hidden grid grid-cols-1 lg:grid-cols-[.85fr_1.15fr] gap-5">
+            <form id="lfgForm" class="rounded-2xl border border-neon-purple/30 bg-neon-card p-5 sm:p-6 space-y-3 h-fit">
+              <div><span class="text-[10px] font-black tracking-widest text-neon-purple">PARTY FINDER</span><h3 class="text-xl font-black mt-1">🤝 Post an LFG Request</h3><p class="text-xs text-gray-400 mt-1">Share a safe contact method and what kind of team you need. Never post passwords or personal details.</p></div>
+              <input name="username" required minlength="2" maxlength="32" placeholder="Minecraft / Vgameing name" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm">
+              <div class="grid grid-cols-2 gap-2"><select name="mode" class="rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><option>Survival</option><option>Minigames</option><option>Build Team</option><option>Server Collab</option><option>Other</option></select><select name="edition" class="rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><option>Either</option><option>Java</option><option>Bedrock</option></select></div>
+              <div class="grid grid-cols-2 gap-2"><input name="version" maxlength="40" value="Any" placeholder="Version" class="min-w-0 rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><input name="region" maxlength="60" value="Any" placeholder="Region / timezone" class="min-w-0 rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"></div>
+              <textarea name="description" required minlength="10" maxlength="500" rows="3" placeholder="What are you looking for? (10–500 chars)" class="w-full rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"></textarea>
+              <div class="grid grid-cols-2 gap-2"><select name="contactMethod" class="rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"><option>Discord</option><option>Minecraft Server</option><option>Other</option></select><input name="contactHandle" required minlength="2" maxlength="100" placeholder="Discord tag / server address" class="min-w-0 rounded-lg bg-[#090912] border border-gray-800 p-3 text-sm"></div>
+              <button class="w-full rounded-xl bg-gradient-to-r from-neon-cyan to-neon-purple py-3 text-sm font-black text-black hover:brightness-110">POST FIND-A-TEAM →</button><p id="lfgStatus" aria-live="polite" class="text-xs text-gray-400"></p>
+            </form>
+            <div class="space-y-4"><div class="flex flex-wrap items-end justify-between gap-3"><div><h3 class="text-2xl font-black text-neon-purple">🎮 Players Looking for Group</h3><p class="text-xs text-gray-400 mt-1">Posts expire automatically after seven days.</p></div><button onclick="loadLfgPosts()" class="px-3 py-2 rounded-lg border border-neon-purple/30 text-neon-purple text-xs font-bold">↻ Refresh</button></div><div id="lfgPostsGrid" class="space-y-3"><div class="rounded-xl border border-gray-800 bg-neon-card p-5 text-sm text-gray-400">Loading player posts…</div></div></div>
+          </div>
+        </section>
+
         <!-- 6. LEADERBOARD TAB -->
         <section id="tab-leaderboard" class="hidden space-y-6 max-w-2xl mx-auto">
             <div class="text-center space-y-2">
@@ -275,6 +354,10 @@
             renderSeeds(seedCollection);
             renderThumbnailsAndVideos();
             renderLeaderboard();
+            loadCommunitySeeds();
+            loadLfgPosts();
+            renderMobTable();
+            calculateRedstone();
         });
 
         // Step 1: Send real verification code via EmailJS
@@ -619,6 +702,172 @@
                 gameTimeout = setTimeout(() => { active = false; clearInterval(sp); arena.onclick = null; submitScore('zombie', kills); }, 10000);
             }
         }
+
+        // --- Vgameing Community Hub: public REST API + RLS-protected tables ---
+        const VG_DB_URL = "https://xtmjivldcwyajgyhmygk.supabase.co";
+        const VG_DB_KEY = "sb_publishable_LJYIhtSx9nbKbt9VjLXkeg_ubMt_KSI";
+        const VG_DB_HEADERS = { apikey: VG_DB_KEY, Authorization: "Bearer " + VG_DB_KEY, "Content-Type": "application/json" };
+        let communitySeedRows = [];
+        let lfgRows = [];
+        const mobRows = [
+          ["Zombie","Rotten flesh","0–2","Burning sunlight can affect drops."],
+          ["Skeleton","Bones, arrows","0–2 each","Arrows are useful for early ranged combat."],
+          ["Creeper","Gunpowder","0–2","A charged creeper changes mob-head drops."],
+          ["Enderman","Ender pearl","0–1","Avoid eye contact until you are ready to fight."],
+          ["Blaze","Blaze rod","0–1","Blaze rods are key for brewing and Eyes of Ender."],
+          ["Spider","String, spider eye","0–2 string; eye sometimes","Spider eyes are useful for brewing."],
+          ["Slime","Slimeballs","Size-dependent","Small slimes are the usual source of slimeballs."],
+          ["Witch","Mixed potion ingredients","Variable","Can drop sticks, bottles, dust, sugar and more."],
+          ["Cow","Raw beef, leather","0–3 beef; 0–2 leather","Cook raw beef for a stronger food source."],
+          ["Chicken","Raw chicken, feathers","0–1 chicken; 0–2 feathers","Cook chicken before eating to avoid hunger risk."]
+        ];
+        function safeText(value) {
+          return String(value == null ? "" : value).replace(/[&<>"']/g, function(ch) {
+            return ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[ch];
+          });
+        }
+        function safeHttpUrl(value) {
+          try { const u = new URL(value); return (u.protocol === "https:" || u.protocol === "http:") ? u.href : ""; } catch (_) { return ""; }
+        }
+        function communityApiHeaders(extra) { return Object.assign({}, VG_DB_HEADERS, extra || {}); }
+        function showCommunityPanel(name) {
+          document.querySelectorAll(".community-panel").forEach(function(el){ el.classList.add("hidden"); });
+          const panel = document.getElementById("community-panel-" + name);
+          if (panel) panel.classList.remove("hidden");
+          document.querySelectorAll(".community-tab").forEach(function(btn) {
+            const active = btn.getAttribute("onclick").indexOf("'" + name + "'") >= 0;
+            btn.className = "community-tab px-4 py-2 rounded-xl border text-xs font-black " + (active ? "border-neon-cyan/50 bg-neon-cyan/10 text-neon-cyan" : "border-gray-700 text-gray-300");
+          });
+          if (name === "seeds") loadCommunitySeeds();
+          if (name === "lfg") loadLfgPosts();
+          if (name === "mobs") renderMobTable();
+          if (name === "redstone") calculateRedstone();
+        }
+        async function loadCommunitySeeds() {
+          const grid = document.getElementById("communitySeedsGrid");
+          if (!grid) return;
+          grid.innerHTML = '<div class="rounded-xl border border-gray-800 bg-neon-card p-5 text-sm text-gray-400">Syncing verified seeds…</div>';
+          try {
+            const response = await fetch(VG_DB_URL + "/rest/v1/community_seeds?select=id,title,seed,edition,mc_version,biome,structures,coordinates,screenshot_url,notes,submitted_by,is_verified,created_at&is_verified=eq.true&order=created_at.desc&limit=60", { headers: communityApiHeaders() });
+            if (!response.ok) throw new Error("Database request failed (" + response.status + ")");
+            communitySeedRows = await response.json();
+            renderCommunitySeeds();
+          } catch (error) {
+            grid.innerHTML = '<div class="rounded-xl border border-neon-pink/30 bg-neon-card p-5 text-sm text-gray-300">Could not load the community database right now. Check your connection and refresh. <span class="text-gray-500">' + safeText(error.message) + '</span></div>';
+          }
+        }
+        function renderCommunitySeeds() {
+          const grid = document.getElementById("communitySeedsGrid");
+          if (!grid) return;
+          const q = (document.getElementById("communitySeedSearch")?.value || "").toLowerCase().trim();
+          const rows = communitySeedRows.filter(function(s){ return [s.title,s.seed,s.edition,s.mc_version,s.biome,s.structures,s.coordinates].join(" ").toLowerCase().includes(q); });
+          if (!rows.length) {
+            grid.innerHTML = '<div class="rounded-xl border border-gray-800 bg-neon-card p-6 text-sm text-gray-400">No verified community seeds found yet. Be the first to submit one for review! 🌱</div>';
+            return;
+          }
+          grid.innerHTML = rows.map(function(s) {
+            const imageUrl = safeHttpUrl(s.screenshot_url);
+            const img = imageUrl ? '<img loading="lazy" src="' + safeText(imageUrl) + '" alt="Screenshot for ' + safeText(s.title) + '" class="w-full h-40 object-cover rounded-xl mb-3 border border-gray-800">' : "";
+            return '<article class="rounded-2xl border border-neon-green/25 bg-neon-card p-4 hover:border-neon-green/60 transition">' + img +
+              '<div class="flex items-start justify-between gap-2"><h4 class="font-black text-white">' + safeText(s.title) + '</h4><span class="shrink-0 rounded-full border border-neon-green/40 bg-neon-green/10 px-2 py-1 text-[9px] font-black text-neon-green">✓ VERIFIED</span></div>' +
+              '<p class="mt-2 break-all font-mono text-lg text-neon-green">' + safeText(s.seed) + '</p><div class="mt-2 flex flex-wrap gap-2 text-[10px]"><span class="rounded bg-white/5 px-2 py-1 text-gray-300">' + safeText(s.edition) + '</span><span class="rounded bg-white/5 px-2 py-1 text-gray-300">MC ' + safeText(s.mc_version) + '</span><span class="rounded bg-white/5 px-2 py-1 text-gray-300">' + safeText(s.biome) + '</span></div>' +
+              (s.structures ? '<p class="mt-3 text-xs text-gray-300"><b>Structures:</b> ' + safeText(s.structures) + '</p>' : '') +
+              (s.coordinates ? '<p class="mt-1 text-xs text-gray-300"><b>Coords:</b> ' + safeText(s.coordinates) + '</p>' : '') +
+              (s.notes ? '<p class="mt-2 text-xs text-gray-400">' + safeText(s.notes) + '</p>' : '') +
+              '<div class="mt-4 flex items-center justify-between gap-2"><span class="text-[10px] text-gray-500">by ' + safeText(s.submitted_by) + '</span><button onclick="copyCommunitySeed(' + JSON.stringify(String(s.seed)) + ')" class="rounded-lg border border-neon-green/30 px-3 py-2 text-xs font-bold text-neon-green">COPY SEED</button></div></article>';
+          }).join("");
+        }
+        async function copyCommunitySeed(seed) {
+          try { await navigator.clipboard.writeText(seed); alert("Seed copied! Paste it into your Minecraft world settings."); }
+          catch (_) { window.prompt("Copy this Minecraft seed:", seed); }
+        }
+        document.getElementById("communitySeedForm")?.addEventListener("submit", async function(event) {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const f = new FormData(form);
+          const status = document.getElementById("communitySeedStatus");
+          const screenshot = String(f.get("screenshot") || "").trim();
+          if (screenshot && !safeHttpUrl(screenshot)) { status.textContent = "Please enter a valid http/https screenshot URL."; return; }
+          const payload = {
+            title: String(f.get("title") || "").trim(), seed: String(f.get("seed") || "").trim(),
+            edition: String(f.get("edition") || "Java"), mc_version: String(f.get("version") || "").trim(),
+            biome: String(f.get("biome") || "").trim(), structures: String(f.get("structures") || "").trim(),
+            coordinates: String(f.get("coordinates") || "").trim(), screenshot_url: screenshot,
+            notes: String(f.get("notes") || "").trim(), submitted_by: String(f.get("submittedBy") || "").trim(),
+            is_verified: false
+          };
+          status.textContent = "Sending your seed for moderation…";
+          const btn = form.querySelector("button[type=submit],button:not([type])"); if(btn) btn.disabled = true;
+          try {
+            const response = await fetch(VG_DB_URL + "/rest/v1/community_seeds", { method:"POST", headers:communityApiHeaders({Prefer:"return=minimal"}), body:JSON.stringify(payload) });
+            if (!response.ok) { const e = await response.json().catch(function(){return {};}); throw new Error(e.message || e.hint || "Submission failed (" + response.status + ")"); }
+            form.reset();
+            status.textContent = "✅ Submitted! It will only appear publicly after a moderator verifies it in the database.";
+          } catch (error) { status.textContent = "⚠️ " + error.message; }
+          finally { if(btn) btn.disabled = false; }
+        });
+        async function loadLfgPosts() {
+          const grid = document.getElementById("lfgPostsGrid");
+          if (!grid) return;
+          grid.innerHTML = '<div class="rounded-xl border border-gray-800 bg-neon-card p-5 text-sm text-gray-400">Finding active players…</div>';
+          try {
+            const response = await fetch(VG_DB_URL + "/rest/v1/lfg_posts?select=id,username,game_mode,edition,mc_version,region,description,contact_method,contact_handle,created_at,expires_at&is_open=eq.true&expires_at=gt." + encodeURIComponent(new Date().toISOString()) + "&order=created_at.desc&limit=60", {headers:communityApiHeaders()});
+            if (!response.ok) throw new Error("Database request failed (" + response.status + ")");
+            lfgRows = await response.json();
+            renderLfgPosts();
+          } catch (error) {
+            grid.innerHTML = '<div class="rounded-xl border border-neon-pink/30 bg-neon-card p-5 text-sm text-gray-300">Could not load LFG posts. Refresh in a moment. <span class="text-gray-500">' + safeText(error.message) + '</span></div>';
+          }
+        }
+        function renderLfgPosts() {
+          const grid = document.getElementById("lfgPostsGrid");
+          if (!grid) return;
+          if (!lfgRows.length) { grid.innerHTML = '<div class="rounded-xl border border-gray-800 bg-neon-card p-6 text-sm text-gray-400">No active posts yet. Create the first squad request! 🎮</div>'; return; }
+          grid.innerHTML = lfgRows.map(function(p) {
+            return '<article class="rounded-2xl border border-neon-purple/25 bg-neon-card p-4"><div class="flex flex-wrap items-start justify-between gap-2"><div><h4 class="font-black text-white">' + safeText(p.username) + '</h4><p class="mt-1 text-[10px] text-neon-purple">' + safeText(p.game_mode) + ' • ' + safeText(p.edition) + ' • ' + safeText(p.mc_version) + '</p></div><span class="rounded-full border border-neon-green/30 px-2 py-1 text-[9px] text-neon-green">OPEN TO TEAMMATES</span></div><p class="mt-3 text-sm text-gray-300 whitespace-pre-wrap">' + safeText(p.description) + '</p><div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray-800 pt-3"><span class="text-[10px] text-gray-500">🌐 ' + safeText(p.region) + ' • ' + safeText(p.contact_method) + '</span><button onclick="revealLfgContact(' + JSON.stringify(String(p.contact_method)) + ',' + JSON.stringify(String(p.contact_handle)) + ')" class="rounded-lg bg-neon-purple/15 border border-neon-purple/30 px-3 py-2 text-xs font-bold text-neon-cyan">VIEW CONTACT</button></div><p class="mt-2 text-[10px] text-gray-600">Expires ' + safeText(new Date(p.expires_at).toLocaleDateString()) + '</p></article>';
+          }).join("");
+        }
+        function revealLfgContact(method, handle) {
+          alert(method + " contact:\n" + handle + "\n\nOnly contact players you trust. Never share passwords or personal information.");
+        }
+        document.getElementById("lfgForm")?.addEventListener("submit", async function(event) {
+          event.preventDefault();
+          const form = event.currentTarget; const f = new FormData(form); const status = document.getElementById("lfgStatus");
+          const payload = {
+            username:String(f.get("username") || "").trim(), game_mode:String(f.get("mode") || "Survival"),
+            edition:String(f.get("edition") || "Either"), mc_version:String(f.get("version") || "Any").trim() || "Any",
+            region:String(f.get("region") || "Any").trim() || "Any", description:String(f.get("description") || "").trim(),
+            contact_method:String(f.get("contactMethod") || "Other"), contact_handle:String(f.get("contactHandle") || "").trim(),
+            is_open:true, expires_at:new Date(Date.now() + 7*24*60*60*1000).toISOString()
+          };
+          status.textContent = "Posting your team request…";
+          const btn = form.querySelector("button[type=submit],button:not([type])"); if(btn) btn.disabled = true;
+          try {
+            const response = await fetch(VG_DB_URL + "/rest/v1/lfg_posts", {method:"POST",headers:communityApiHeaders({Prefer:"return=minimal"}),body:JSON.stringify(payload)});
+            if (!response.ok) { const e = await response.json().catch(function(){return {};}); throw new Error(e.message || e.hint || "Post failed (" + response.status + ")"); }
+            form.reset(); status.textContent = "✅ Your LFG post is live for up to 7 days!"; await loadLfgPosts();
+          } catch (error) { status.textContent = "⚠️ " + error.message; }
+          finally { if(btn) btn.disabled = false; }
+        });
+        function calculateRedstone() {
+          const countEl = document.getElementById("rsCount"), delayEl = document.getElementById("rsDelay");
+          if (!countEl || !delayEl) return;
+          const count = Math.max(1, Math.min(100, Number(countEl.value) || 1));
+          const ticksEach = Math.max(1, Math.min(4, Number(delayEl.value) || 1));
+          const redstoneTicks = count * ticksEach;
+          const seconds = redstoneTicks / 10;
+          document.getElementById("rsResult").textContent = seconds.toFixed(1) + (seconds === 1 ? " second" : " seconds");
+          document.getElementById("rsTicks").textContent = redstoneTicks + " redstone ticks • " + (redstoneTicks * 2) + " game ticks";
+        }
+        function renderMobTable() {
+          const body = document.getElementById("mobTableBody"); if (!body) return;
+          const q = (document.getElementById("mobSearch")?.value || "").toLowerCase().trim();
+          body.innerHTML = mobRows.filter(function(row){ return row.join(" ").toLowerCase().includes(q); }).map(function(row){
+            return "<tr class='hover:bg-white/5'><td class='p-4 font-bold text-white'>" + safeText(row[0]) + "</td><td class='p-4 text-neon-pink'>" + safeText(row[1]) + "</td><td class='p-4 font-mono text-neon-cyan'>" + safeText(row[2]) + "</td><td class='p-4 text-xs text-gray-400'>" + safeText(row[3]) + "</td></tr>";
+          }).join("");
+        }
+        function filterMobTable() { renderMobTable(); }
+
     </script>
 
 <!-- ================= VGAMEING GAMING TASKBAR ================= -->
@@ -656,6 +905,7 @@
   <button class="vg-task-btn" onclick="switchTab('quiz')"><span>🧠</span>Quiz</button>
   <button class="vg-task-btn" onclick="switchTab('arcade')"><span>🎮</span>Arcade</button>
   <button class="vg-task-btn" onclick="switchTab('seeds')"><span>🌱</span>Seeds</button>
+  <button class="vg-task-btn" onclick="switchTab('community')"><span>🧩</span>Community</button>
   <button class="vg-task-btn" onclick="switchTab('leaderboard')"><span>🏆</span>Ranks</button>
   <div class="vg-task-divider"></div>
   <button class="vg-task-btn vg-ai-task" type="button" onclick="document.getElementById('vgChatButton').click()"><span>🤖</span>AI</button>
