@@ -371,8 +371,18 @@
         }
 
         // --- Authentication & Session Storage Setup ---
-        let currentUser = localStorage.getItem('vgaming_current_user') || null;
-        let registeredUsers = JSON.parse(localStorage.getItem('vgaming_registered_users')) || {}; 
+        // Never lock the entire site behind email verification: create a local guest session if needed.
+        let currentUser = localStorage.getItem('vgaming_current_user');
+        if (!currentUser) {
+            currentUser = "Guest" + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('vgaming_current_user', currentUser);
+        }
+        let registeredUsers = {};
+        try {
+            registeredUsers = JSON.parse(localStorage.getItem('vgaming_registered_users') || '{}') || {};
+        } catch (error) {
+            registeredUsers = {};
+        }
 
         let pendingUsername = "";
         let pendingEmail = "";
