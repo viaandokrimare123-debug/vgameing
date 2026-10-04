@@ -328,9 +328,18 @@
         const EMAILJS_TEMPLATE_ID = "template_qyvow75";
 
         // Initialize EmailJS
+        let emailJsReady = false;
         (function() {
-            if(EMAILJS_PUBLIC_KEY) {
-                emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+            try {
+                if (EMAILJS_PUBLIC_KEY && typeof window.emailjs !== "undefined" && typeof window.emailjs.init === "function") {
+                    window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+                    emailJsReady = true;
+                } else {
+                    console.warn("Vgameing: EmailJS SDK is not available yet.");
+                }
+            } catch (err) {
+                console.error("Vgameing: EmailJS initialization failed:", err);
+                emailJsReady = false;
             }
         })();
 
@@ -387,15 +396,24 @@
                 to_name: pendingUsername
             };
 
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                .then(function(response) {
+            if (!emailJsReady || typeof window.emailjs === "undefined" || typeof window.emailjs.send !== "function") {
+                sendBtn.innerText = "SEND VERIFICATION CODE →";
+                sendBtn.disabled = false;
+                alert("❌ Verification service is not loaded. Please refresh the page and try again.");
+                return;
+            }
+
+            window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(function() {
                     sendBtn.innerText = "SEND VERIFICATION CODE →";
                     sendBtn.disabled = false;
                     proceedToStep2(email);
-                }, function(error) {
+                })
+                .catch(function(error) {
                     sendBtn.innerText = "SEND VERIFICATION CODE →";
                     sendBtn.disabled = false;
-                    alert("❌ Failed to send email. Error: " + JSON.stringify(error));
+                    console.error("EmailJS verification error:", error);
+                    alert("❌ Verification email could not be sent. Please check the EmailJS service/template and try again.");
                 });
         }
 
