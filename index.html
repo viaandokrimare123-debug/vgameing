@@ -1602,7 +1602,9 @@
         }
 ];
 
-        function renderSeeds(seedsToRender) {\n            const counter = document.getElementById('seedVaultCount');\n            if (counter) counter.textContent = seedCollection.length + '+ catalog seeds loaded';
+        function renderSeeds(seedsToRender) {
+            const counter = document.getElementById('seedVaultCount');
+            if (counter) counter.textContent = seedCollection.length + '+ catalog seeds loaded';
             document.getElementById('seedsGrid').innerHTML = seedsToRender.map(s => `
                 <div class="bg-neon-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-neon-green/40 transition">
                     <div>
