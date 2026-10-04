@@ -98,6 +98,7 @@
                 <button onclick="switchTab('arcade')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="arcade">Arcade</button>
                 <button onclick="switchTab('seeds')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="seeds">Seeds</button>
                 <button onclick="switchTab('community')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="community">Community+</button>
+                <button onclick="switchTab('friends')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="friends">Friends</button>
                 <button onclick="switchTab('tools')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="tools">Tools</button>
                 <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="leaderboard">Leaderboard</button>
                 <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
@@ -263,6 +264,41 @@
               <div class="text-2xl font-black text-neon-yellow">🏆 MISSION COMPLETE!</div>
               <p class="mt-2 text-sm text-gray-200">+500 XP &nbsp; • &nbsp; +100 V-Coins</p>
               <p class="mt-1 text-xs text-neon-cyan font-bold">🏅 Badge unlocked: DAILY WARRIOR</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- VGAMEING FRIENDS -->
+        <section id="tab-friends" class="hidden space-y-7 max-w-5xl mx-auto">
+          <div class="relative overflow-hidden rounded-3xl border border-neon-cyan/30 bg-gradient-to-br from-[#111326] via-[#0b0b16] to-[#170d24] p-6 sm:p-9">
+            <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(0,243,255,.12),transparent_35%),radial-gradient(circle_at_85%_75%,rgba(176,0,255,.14),transparent_35%)]"></div>
+            <div class="relative">
+              <span class="text-[10px] font-black tracking-[.25em] text-neon-cyan">VGAMEING // FRIEND NETWORK</span>
+              <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">👥 My <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">Friends</span></h2>
+              <p class="mt-3 text-sm text-gray-400">Add friends by Gamer Tag. No photo or file upload needed. Friends are saved on this browser.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-[.8fr_1.2fr] gap-5">
+            <div class="rounded-2xl border border-neon-cyan/25 bg-neon-card p-5 sm:p-6">
+              <h3 class="text-xl font-black text-neon-cyan">➕ Add a Friend</h3>
+              <p class="mt-1 text-xs text-gray-500">Just enter their Gamer Tag.</p>
+              <form id="friendForm" class="mt-5 space-y-3">
+                <input id="friendTagInput" required maxlength="20" autocomplete="off" placeholder="e.g. Steve123" class="w-full rounded-xl bg-[#090912] border border-gray-800 p-3 text-sm text-white outline-none focus:border-neon-cyan">
+                <button type="submit" class="w-full rounded-xl bg-neon-cyan py-3 text-sm font-black text-black hover:brightness-110">ADD FRIEND</button>
+                <p id="friendStatus" aria-live="polite" class="text-xs text-gray-400 min-h-[18px]"></p>
+              </form>
+            </div>
+
+            <div class="rounded-2xl border border-neon-purple/25 bg-neon-card p-5 sm:p-6">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-xl font-black text-neon-purple">🟣 Friend List</h3>
+                  <p id="friendCount" class="text-xs text-gray-500 mt-1">0 friends</p>
+                </div>
+                <button type="button" onclick="renderFriends()" class="rounded-lg border border-gray-700 px-3 py-2 text-xs font-bold text-gray-300 hover:border-neon-cyan hover:text-neon-cyan">↻ Refresh</button>
+              </div>
+              <div id="friendsList" class="mt-4 space-y-2"></div>
             </div>
           </div>
         </section>
@@ -435,7 +471,7 @@
         // Never lock the entire site behind email verification: create a local guest session if needed.
         let currentUser = localStorage.getItem('vgaming_current_user');
         if (!currentUser) {
-            currentUser = "Guest" + Math.floor(1000 + Math.random() * 9000);
+            currentUser = "Guest " + Math.floor(100 + Math.random() * 900);
             localStorage.setItem('vgaming_current_user', currentUser);
         }
         let registeredUsers = {};
@@ -452,7 +488,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             // Always initialize the player label first. The site must never be blocked by auth or another startup feature.
             if (!currentUser) {
-                currentUser = "Guest" + Math.floor(1000 + Math.random() * 9000);
+                currentUser = "Guest " + Math.floor(100 + Math.random() * 900);
                 localStorage.setItem('vgaming_current_user', currentUser);
             }
             const userTag = document.getElementById('displayUserTag');
@@ -559,9 +595,24 @@
             document.getElementById('authModal').classList.add('hidden');
         }
 
+        function createGuestSession() {
+            const guestNumber = Math.floor(100 + Math.random() * 900);
+            currentUser = "Guest " + guestNumber;
+            localStorage.setItem("vgaming_current_user", currentUser);
+            const userTag = document.getElementById("displayUserTag");
+            if (userTag) userTag.innerText = currentUser;
+            const authModal = document.getElementById("authModal");
+            if (authModal) {
+                authModal.classList.add("hidden");
+                authModal.style.setProperty("display", "none", "important");
+            }
+            return currentUser;
+        }
+
         function signOut() {
-            localStorage.removeItem('vgaming_current_user');
-            location.reload();
+            localStorage.removeItem("vgaming_current_user");
+            createGuestSession();
+            alert("👋 Signed out! You are now " + currentUser + ".");
         }
 
         // --- Navigation Controller ---
@@ -1955,6 +2006,7 @@
 .vg-mission{display:flex;align-items:center;gap:14px;text-align:left;background:#0d0c17;border:1px solid #29243a;border-radius:14px;padding:15px;color:#fff;cursor:pointer;transition:.2s}
 .vg-mission:hover{border-color:#00f3ff;transform:translateY(-1px)}
 .vg-mission.done{border-color:#00ff66;background:rgba(0,255,102,.08)}
+.vg-friend-online{box-shadow:0 0 12px rgba(0,255,102,.18)}
 .vg-mission>span{font-size:28px}.vg-mission b{display:block;font-size:14px}.vg-mission small{display:block;color:#888;font-size:10px;margin-top:4px}
 </style>
 <!-- ================= VGAMEING GAMING TASKBAR ================= -->
@@ -1998,6 +2050,66 @@
   <button class="vg-task-btn vg-ai-task" type="button" onclick="document.getElementById('vgChatButton').click()"><span>🤖</span>AI</button>
 </nav>
 <!-- ================= END VGAMEING GAMING TASKBAR ================= -->
+
+<script>
+(function(){
+  const friendKey = "vg_friends_v1";
+  function readFriends(){
+    try { return JSON.parse(localStorage.getItem(friendKey) || "[]") || []; }
+    catch(e){ return []; }
+  }
+  function saveFriends(list){ localStorage.setItem(friendKey, JSON.stringify(list)); }
+
+  window.renderFriends = function(){
+    const list = readFriends();
+    const box = document.getElementById("friendsList");
+    const count = document.getElementById("friendCount");
+    if(count) count.textContent = list.length + (list.length === 1 ? " friend" : " friends");
+    if(!box) return;
+    if(!list.length){
+      box.innerHTML = '<div class="rounded-xl border border-gray-800 bg-[#090912] p-5 text-sm text-gray-500">No friends yet. Add a Gamer Tag above. 👥</div>';
+      return;
+    }
+    box.innerHTML = list.map(function(name, index){
+      return '<div class="flex items-center justify-between gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3">' +
+        '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div>' +
+        '<div><div class="font-bold text-white">' + safeText(name) + '</div><div class="text-[10px] text-neon-green">FRIEND</div></div></div>' +
+        '<button type="button" onclick="removeFriend(' + index + ')" class="text-[10px] text-gray-500 hover:text-neon-pink">REMOVE</button></div>';
+    }).join("");
+  };
+
+  window.removeFriend = function(index){
+    const list = readFriends();
+    if(index >= 0 && index < list.length) list.splice(index, 1);
+    saveFriends(list);
+    renderFriends();
+  };
+
+  document.getElementById("friendForm")?.addEventListener("submit", function(event){
+    event.preventDefault();
+    const input = document.getElementById("friendTagInput");
+    const status = document.getElementById("friendStatus");
+    const name = (input.value || "").trim();
+    if(!name) return;
+    if(name.toLowerCase() === String(currentUser || "").toLowerCase()){
+      status.textContent = "⚠️ You cannot add yourself.";
+      return;
+    }
+    const list = readFriends();
+    if(list.some(function(x){ return x.toLowerCase() === name.toLowerCase(); })){
+      status.textContent = "⚠️ That friend is already in your list.";
+      return;
+    }
+    list.unshift(name);
+    saveFriends(list);
+    input.value = "";
+    status.textContent = "✅ " + name + " added to your friends!";
+    renderFriends();
+  });
+
+  window.addEventListener("DOMContentLoaded", renderFriends);
+})();
+</script>
 
 <script>
 (function(){
