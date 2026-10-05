@@ -555,7 +555,7 @@
             const tag = document.getElementById("displayUserTag");
             if(tag) tag.innerText = currentUser;
             closeLogin();
-            if(window.vgEnsureProfile) window.vgEnsureProfile(user);
+            if(window.vgEnsureProfile) window.vgEnsureProfile(user).then(function(profile){if(profile&&window.vgStartPresence)window.vgStartPresence(user);});
         }
         function openLogin(){
             const modal=document.getElementById("loginModal");
@@ -728,7 +728,10 @@
             return currentUser;
         }
 
-        function signOut() {
+        async function signOut() {
+            try{if(window.vgStopPresence)await window.vgStopPresence();}catch(e){}
+            if(vgSupabase){try{await vgSupabase.auth.signOut();}catch(e){}}
+            window.vgAuthUser=null;window.vgProfile=null;
             localStorage.removeItem("vgaming_current_user");
             createGuestSession();
             alert("👋 Signed out! You are now " + currentUser + ".");
@@ -2283,6 +2286,44 @@
     }catch(e){ if(status) status.textContent="⚠️ "+(e.message||"Could not create Gamer Tag."); }
   };
 
+  // Realtime online presence for Friends + voice calls.
+  let vgPresenceChannel=null;
+  const vgOnlineUserIds=new Set();
+  let vgPresenceUserId=null;
+  function vgRefreshOnlineIds(){
+    vgOnlineUserIds.clear();
+    if(!vgPresenceChannel) return;
+    const state=vgPresenceChannel.presenceState();
+    Object.keys(state||{}).forEach(function(key){
+      (state[key]||[]).forEach(function(meta){
+        const id=meta?.user_id || key;
+        if(id) vgOnlineUserIds.add(String(id));
+      });
+    });
+  }
+  async function startVgPresence(user){
+    if(!vgSupabase||!user) return;
+    if(vgPresenceUserId===user.id && vgPresenceChannel) return;
+    await stopVgPresence();
+    vgPresenceUserId=user.id;
+    vgPresenceChannel=vgSupabase.channel("vgameing-online-presence",{config:{presence:{key:String(user.id)}}});
+    vgPresenceChannel.on("presence",{event:"sync"},function(){vgRefreshOnlineIds();loadFriendNetwork();});
+    vgPresenceChannel.on("presence",{event:"join"},function(){vgRefreshOnlineIds();loadFriendNetwork();});
+    vgPresenceChannel.on("presence",{event:"leave"},function(){vgRefreshOnlineIds();loadFriendNetwork();});
+    vgPresenceChannel.subscribe(async function(status){
+      if(status==="SUBSCRIBED"){
+        try{await vgPresenceChannel.track({user_id:String(user.id),gamer_tag:window.vgProfile?.gamer_tag||""});}catch(e){console.warn("Vgameing presence track failed:",e);}
+      }
+    });
+  }
+  async function stopVgPresence(){
+    vgOnlineUserIds.clear(); vgPresenceUserId=null;
+    if(vgPresenceChannel){try{await vgPresenceChannel.untrack();}catch(e){} try{await vgSupabase.removeChannel(vgPresenceChannel);}catch(e){} vgPresenceChannel=null;}
+  }
+  window.vgIsUserOnline=function(userId){return vgOnlineUserIds.has(String(userId));};
+  window.vgStartPresence=startVgPresence;
+  window.vgStopPresence=stopVgPresence;
+
   window.loadFriendNetwork=async function(){
     const gate=document.getElementById("friendsAuthGate"), app=document.getElementById("friendsApp");
     if(!gate||!app) return;
@@ -2329,7 +2370,12 @@
       if(friends){
         friends.innerHTML=acc.length?acc.map(function(x){
           const other=x.requester_id===vgAuthUser.id?x.addressee_id:x.requester_id;
-          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div><div class="font-bold text-white">'+escapeHtml(byId[other]||"Player")+'</div><div class="text-[10px] text-neon-green">FRIEND</div></div><button type="button" onclick="startVoiceCall(\''+other+'\',\''+escapeHtml(byId[other]||"Player")+'\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black">📞 CALL</button></div>';
+          const online=window.vgIsUserOnline(other);
+          const friendTag=escapeHtml(byId[other]||"Player");
+          const callButton=online
+            ? '<button type="button" onclick="startVoiceCall(\\''+other+'\\',\\''+friendTag+'\\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black hover:opacity-90">📞 CALL</button>'
+            : '<button type="button" disabled title="This player is offline" class="rounded-lg bg-gray-700 px-3 py-2 text-[10px] font-black text-gray-400 cursor-not-allowed opacity-60">📞 OFFLINE</button>';
+          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div class="min-w-0 flex-1"><div class="font-bold text-white">'+friendTag+'</div><div class="text-[10px] '+(online?'text-neon-green':'text-gray-500')+'">'+(online?'🟢 ONLINE':'⚫ OFFLINE')+'</div></div>'+callButton+'</div>';
         }).join(""):'<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">No accepted friends yet.</div>';
       }
     }catch(e){
@@ -2395,7 +2441,7 @@ async function media(){if(callStream)return callStream;if(!navigator.mediaDevice
 function pc(){if(callPc)callPc.close();callPc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});pendingIce=[];callPc.onicecandidate=e=>{if(e.candidate)signal("ice",e.candidate.toJSON()).catch(console.error)};callPc.onconnectionstatechange=()=>{if(callPc.connectionState==="connected")status("Connected");else if(["failed","disconnected"].includes(callPc.connectionState))status("Connection interrupted")};if(callStream)callStream.getTracks().forEach(t=>callPc.addTrack(t,callStream));return callPc}
 async function addIce(c){if(!callPc)return;if(callPc.remoteDescription?.type)await callPc.addIceCandidate(c);else pendingIce.push(c)}
 async function flushIce(){const q=pendingIce.splice(0);for(const c of q){try{await callPc.addIceCandidate(c)}catch(e){}}}
-window.startVoiceCall=async function(friendId,friendTag){if(!logged()){openLogin();return}if(currentCall){alert("You are already in a call.");return}try{title("Calling "+friendTag);status("Requesting microphone…");await media();pc();const s=await vgSupabase.from("vg_call_sessions").insert({caller_id:vgAuthUser.id,callee_id:friendId,status:"ringing"}).select("id,caller_id,callee_id").single();if(s.error)throw s.error;currentCall=s.data;const offer=await callPc.createOffer();await callPc.setLocalDescription(offer);await signal("offer",{type:offer.type,sdp:offer.sdp});incoming.classList.add("hidden");active.classList.remove("hidden");open();status("Ringing "+friendTag+"…")}catch(e){console.error(e);alert("Could not start call: "+(e.message||"Microphone permission denied."));cleanup(true)}};
+window.startVoiceCall=async function(friendId,friendTag){if(!logged()){openLogin();return}if(!window.vgIsUserOnline?.(friendId)){alert(friendTag+" is offline. You can call only when they are online.");return}if(currentCall){alert("You are already in a call.");return}try{title("Calling "+friendTag);status("Requesting microphone…");await media();pc();const s=await vgSupabase.from("vg_call_sessions").insert({caller_id:vgAuthUser.id,callee_id:friendId,status:"ringing"}).select("id,caller_id,callee_id").single();if(s.error)throw s.error;currentCall=s.data;const offer=await callPc.createOffer();await callPc.setLocalDescription(offer);await signal("offer",{type:offer.type,sdp:offer.sdp});incoming.classList.add("hidden");active.classList.remove("hidden");open();status("Ringing "+friendTag+"…")}catch(e){console.error(e);alert("Could not start call: "+(e.message||"Microphone permission denied."));cleanup(true)}};
 window.vgAcceptIncoming=async function(){if(!incomingCall||!logged())return;try{currentCall=incomingCall;incomingCall=null;title("Vgameing Voice Call");status("Starting microphone…");await media();pc();const q=await vgSupabase.from("vg_call_signals").select("id,payload").eq("call_id",currentCall.id).eq("kind","offer").order("created_at",{ascending:true});if(q.error)throw q.error;const offer=q.data?.[0]?.payload;if(!offer)throw new Error("Call offer was not found.");await callPc.setRemoteDescription(offer);await flushIce();const u=await vgSupabase.from("vg_call_sessions").update({status:"accepted"}).eq("id",currentCall.id).eq("callee_id",vgAuthUser.id);if(u.error)throw u.error;const answer=await callPc.createAnswer();await callPc.setLocalDescription(answer);await signal("answer",{type:answer.type,sdp:answer.sdp});incoming.classList.add("hidden");active.classList.remove("hidden");open();status("Connecting…")}catch(e){console.error(e);alert("Could not accept call: "+e.message);cleanup(true)}};
 window.vgDeclineIncoming=async function(){if(!incomingCall)return;const id=incomingCall.id;incomingCall=null;await vgSupabase.from("vg_call_sessions").update({status:"declined",ended_at:new Date().toISOString()}).eq("id",id).eq("callee_id",vgAuthUser.id);close()};
 window.vgHangupCall=async function(){const id=currentCall?.id;if(id&&logged())await vgSupabase.from("vg_call_sessions").update({status:"ended",ended_at:new Date().toISOString()}).eq("id",id);if(id)try{await signal("hangup",{reason:"ended"})}catch(e){}cleanup(true)};
