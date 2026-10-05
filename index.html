@@ -607,7 +607,7 @@
             if(tag) tag.innerText = currentUser;
             updateVgAuthUI(user);
             closeLogin();
-            if(window.vgEnsureProfile) window.vgEnsureProfile(user).then(function(profile){if(profile&&window.vgStartPresence)window.vgStartPresence(user);});
+            if(window.vgEnsureProfile) window.vgEnsureProfile(user).then(function(profile){if(profile&&window.vgStartPresence)window.vgStartPresence(user); window.dispatchEvent(new Event("vg-auth-ready"));});
         }
         function openLogin(){
             const modal=document.getElementById("loginModal");
@@ -2521,8 +2521,6 @@
   else initFriendNetworkUI();
 
   window.addEventListener("vg-auth-ready",function(){ loadFriendNetwork(); });
-    setTimeout(function(){ loadFriendNetwork(); },400);
-  });
   window.vgEnsureProfile=ensureProfile;
   window.vgCleanTag=cleanTag;
 })();
