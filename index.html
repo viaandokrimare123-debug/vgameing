@@ -2341,6 +2341,7 @@
       return;
     }
     gate.classList.add("hidden"); app.classList.remove("hidden");
+    if(window.vgStartPresence && window.vgAuthUser) window.vgStartPresence(window.vgAuthUser);
     const incoming=document.getElementById("incomingFriendsList"), friends=document.getElementById("friendsList");
     if(incoming) incoming.innerHTML='<div class="text-xs text-gray-500">Loading requests…</div>';
     if(friends) friends.innerHTML='<div class="text-xs text-gray-500">Loading friends…</div>';
