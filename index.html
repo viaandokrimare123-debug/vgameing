@@ -2401,7 +2401,7 @@
         friends.innerHTML=acc.length?acc.map(function(x){
           const other=x.requester_id===vgAuthUser.id?x.addressee_id:x.requester_id;
           const friendTag=escapeHtml(byId[other]||"Player");
-          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div class="min-w-0 flex-1"><div class="font-bold text-white">'+friendTag+'</div><div class="text-[10px] text-neon-green">💬 FRIEND</div></div><button type="button" onclick="openFriendChat(\\''+other+'\\',\\''+friendTag+'\\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black hover:opacity-90">💬 MESSAGE</button></div>';
+          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div class="min-w-0 flex-1"><div class="font-bold text-white">'+friendTag+'</div><div class="text-[10px] text-neon-green">💬 FRIEND</div></div><button type="button" data-friend-id="'+other+'" data-friend-tag="'+friendTag+'" class="vg-message-friend rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black hover:opacity-90">💬 MESSAGE</button></div>';
         }).join(""):'<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">No accepted friends yet.</div>';
       }
     }catch(e){
@@ -2479,6 +2479,10 @@
     loadFriendNetwork();
   };
 
+  document.addEventListener("click",function(event){
+    const btn=event.target.closest(".vg-message-friend");
+    if(btn) openFriendChat(btn.dataset.friendId,btn.dataset.friendTag);
+  });
   function initFriendNetworkUI(){
     const form=document.getElementById("friendForm");
     if(form && !form.dataset.vgBound){
