@@ -158,6 +158,11 @@
             </div>
             <button id="adminRefreshBtn" type="button" onclick="loadAdminStats()" class="hidden mt-5 rounded-xl bg-neon-cyan px-5 py-3 text-sm font-black text-black">↻ REFRESH STATS</button>
             <div id="adminStatsStatus" class="mt-3 text-xs text-gray-500"></div>
+            <div id="adminUsersPanel" class="hidden mt-6 rounded-2xl border border-neon-pink/20 bg-[#090912] p-5">
+              <div class="flex items-center justify-between gap-3 mb-4"><div><div class="text-lg font-black text-white">👮 USER CONTROL</div><div class="text-xs text-gray-500">Ban or unban Vgameing accounts.</div></div><button type="button" onclick="loadAdminUsers()" class="rounded-lg border border-gray-700 px-3 py-2 text-xs font-black text-gray-300">↻ REFRESH USERS</button></div>
+              <div id="adminUsersStatus" class="text-xs text-gray-500 mb-3"></div>
+              <div id="adminUsersList" class="space-y-2"></div>
+            </div>
           </div>
         </section>
 
@@ -632,7 +637,11 @@
             }
         }
 
-        function applyOAuthUser(user){
+        async function applyOAuthUser(user){
+            if(user){
+              window.vgAuthUser=user;
+              if(await enforceMyBan()) return;
+            }
             const metadata = user.user_metadata || {};
             const name = metadata.full_name || metadata.name || metadata.user_name || (user.email ? user.email.split("@")[0] : "Player");
             currentUser = String(name).slice(0,20);
@@ -832,6 +841,41 @@
             alert("👋 Signed out! You are now " + currentUser + ".");
         }
 
+        async function loadAdminUsers(){
+            const panel=document.getElementById("adminUsersPanel"), list=document.getElementById("adminUsersList"), status=document.getElementById("adminUsersStatus");
+            if(!panel||!list||!window.vgAuthUser)return;
+            panel.classList.remove("hidden"); list.innerHTML='<div class="text-xs text-gray-500">Loading users…</div>';
+            const result=await vgSupabase.rpc("vg_admin_list_users");
+            if(result.error){list.innerHTML='<div class="text-xs text-neon-pink">🔒 Admin access required.</div>';return;}
+            const users=result.data||[];
+            list.innerHTML=users.map(function(u){
+              const safeTag=String(u.gamer_tag||"No Gamer Tag").replace(/[&<>"']/g,function(x){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[x]);});
+              const safeEmail=String(u.email||"").replace(/[&<>"']/g,function(x){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[x]);});
+              const banned=!!u.is_banned, self=u.user_id===window.vgAuthUser.id;
+              return '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-gray-800 bg-black/20 p-3"><div class="min-w-0"><div class="font-bold text-white">'+safeTag+(self?' <span class="text-[9px] text-neon-cyan">(YOU)</span>':'')+'</div><div class="text-[10px] text-gray-500 break-all">'+safeEmail+'</div><div class="text-[10px] '+(banned?'text-neon-pink':'text-neon-green')+'">'+(banned?'🚫 BANNED: '+String(u.ban_reason||"No reason"):'● ACTIVE')+'</div></div><div class="flex gap-2">'+(self?'':'<button type="button" onclick="adminToggleBan(\''+u.user_id+'\','+(banned?'false':'true')+')" class="rounded-lg '+(banned?'border border-neon-green/40 text-neon-green':'bg-neon-pink text-white')+' px-3 py-2 text-[10px] font-black">'+(banned?'UNBAN':'BAN')+'</button>')+'</div></div>';
+            }).join("")||'<div class="text-xs text-gray-500">No users found.</div>';
+            status.textContent=users.length+" account"+(users.length===1?"":"s")+" loaded.";
+        }
+        async function adminToggleBan(userId,ban){
+            if(!window.vgAuthUser)return;
+            let reason="Banned by Vgameing admin";
+            if(ban){ reason=prompt("Ban reason:",reason); if(reason===null)return; }
+            const result=await vgSupabase.rpc(ban?"vg_admin_ban_user":"vg_admin_unban_user",ban?{target_user:userId,ban_reason:reason}:{target_user:userId});
+            if(result.error){alert("❌ "+result.error.message);return;}
+            await loadAdminUsers(); await loadAdminStats();
+        }
+        async function enforceMyBan(){
+            if(!window.vgAuthUser||!vgSupabase)return false;
+            try{
+              const result=await vgSupabase.rpc("vg_check_my_ban");
+              if(result.data?.banned){
+                alert("🚫 Your Vgameing account is banned.\n\nReason: "+(result.data.reason||"No reason"));
+                await vgSupabase.auth.signOut();
+                return true;
+              }
+            }catch(e){console.warn("Ban check failed:",e);}
+            return false;
+        }
         async function loadAdminStats(){
             const gate=document.getElementById("adminStatsGate"), panel=document.getElementById("adminStatsPanel"), refresh=document.getElementById("adminRefreshBtn"), status=document.getElementById("adminStatsStatus");
             if(!gate||!panel)return;
@@ -846,6 +890,7 @@
             document.getElementById("adminFriends").textContent=s.friends??"0";
             document.getElementById("adminMessages").textContent=s.messages??"0";
             status.textContent="Updated just now.";
+            loadAdminUsers();
         }
         function updateAdminUI(){
             const btn=document.getElementById("adminNavBtn");
