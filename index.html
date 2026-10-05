@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="vgameing-build" content="2026-10-05-2200">
+    <meta name="vgameing-build" content="2026-10-05-2205">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -2056,7 +2056,11 @@
         }
 
         async function submitScore(game, score) {
-            if(!currentUser) return;
+            // Guests can play, but only logged-in accounts can enter the live leaderboard.
+            if(!currentUser || !window.vgAuthUser || !window.vgProfile){
+                alert("🔒 Login with Google to appear on the live leaderboard.");
+                return;
+            }
             const localList=(leaderboards[game]||[]).filter(item=>item.name!==currentUser);
             localList.push({name:currentUser,score:Number(score)||0});
             localList.sort((a,b)=>leaderboardSort(game,a,b));
