@@ -822,8 +822,13 @@
             window.vgAuthUser=null;window.vgProfile=null;
             localStorage.removeItem("vgaming_current_user");
             localStorage.removeItem("vgaming_verified_session");
+            if(typeof window.closeFriendChat==="function"){try{window.closeFriendChat();}catch(e){}}
             updateVgAuthUI(null);
+            updateSettingsUI();
+            updateAdminUI();
+            if(typeof window.loadFriendNetwork==="function") window.loadFriendNetwork();
             createGuestSession();
+            switchTab("home");
             alert("👋 Signed out! You are now " + currentUser + ".");
         }
 
@@ -857,6 +862,14 @@
 
         // --- Navigation Controller ---
         function switchTab(tabId) {
+            if(tabId === "friends" && !window.vgAuthUser){
+                openLogin();
+                return;
+            }
+            if(tabId === "admin" && !window.vgAuthUser){
+                openLogin();
+                return;
+            }
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             
@@ -2420,7 +2433,11 @@
     const gate=document.getElementById("friendsAuthGate"), app=document.getElementById("friendsApp");
     if(!gate||!app) return;
     if(!isLoggedIn()){
-      gate.classList.remove("hidden"); app.classList.add("hidden"); return;
+      gate.classList.remove("hidden"); app.classList.add("hidden");
+      const incoming=document.getElementById("incomingFriendsList"), friends=document.getElementById("friendsList");
+      if(incoming) incoming.innerHTML='<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">🔒 Login with Google to see friend requests.</div>';
+      if(friends) friends.innerHTML='<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">🔒 Login with Google to see your friends.</div>';
+      return;
     }
     // On refresh OAuth/session restoration can finish after this page loads.
     // Wait for the real Supabase profile before deciding whether a Gamer Tag is needed.
