@@ -325,6 +325,10 @@
             <div class="rounded-2xl border border-neon-cyan/25 bg-neon-card p-5 sm:p-6">
               <h3 class="text-xl font-black text-neon-cyan">➕ Send Friend Request</h3>
               <p class="mt-1 text-xs text-gray-500">Enter an existing player's exact Gamer Tag.</p>
+              <div class="mt-3 flex items-center justify-between gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3">
+                <div class="min-w-0"><div class="text-[10px] uppercase tracking-widest text-gray-500">YOUR GAMER TAG</div><div id="friendsCurrentTag" class="truncate font-black text-white">Loading…</div></div>
+                <button type="button" onclick="openGamerTagChange()" class="shrink-0 rounded-lg border border-neon-purple/50 px-3 py-2 text-[10px] font-black text-neon-purple hover:bg-neon-purple/10">✏️ CHANGE</button>
+              </div>
               <form id="friendForm" class="mt-5 space-y-3">
                 <input id="friendTagInput" required maxlength="20" autocomplete="off" placeholder="e.g. Steve123" class="w-full rounded-xl bg-[#090912] border border-gray-800 p-3 text-sm text-white outline-none focus:border-neon-cyan">
                 <button type="submit" class="w-full rounded-xl bg-neon-cyan py-3 text-sm font-black text-black hover:brightness-110">SEND REQUEST</button>
@@ -2263,6 +2267,7 @@
       throw result.error;
     }
     window.vgProfile=result.data;
+    const friendsTag=document.getElementById("friendsCurrentTag"); if(friendsTag) friendsTag.textContent=result.data.gamer_tag;
     currentUser=result.data.gamer_tag;
     localStorage.setItem("vgaming_current_user",currentUser);
     const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
@@ -2314,6 +2319,14 @@
   }
 
   let gamerTagSetupForUser=null;
+  window.openGamerTagChange=function(){
+    if(!isLoggedIn()||!window.vgProfile){ openLogin(); return; }
+    const m=document.getElementById("gamerTagModal"), input=document.getElementById("gamerTagSetupInput"), status=document.getElementById("gamerTagSetupStatus");
+    if(input) input.value=window.vgProfile.gamer_tag||"";
+    if(status) status.textContent="";
+    if(m) m.classList.remove("hidden");
+    if(input) input.focus();
+  };
   window.openGamerTagSetup=function(){
     const userId=window.vgAuthUser?.id || null;
     if(!userId) return;
@@ -2356,6 +2369,7 @@
       return;
     }
     gate.classList.add("hidden"); app.classList.remove("hidden");
+    const friendsTag=document.getElementById("friendsCurrentTag"); if(friendsTag) friendsTag.textContent=window.vgProfile.gamer_tag;
     if(window.vgStartPresence && window.vgAuthUser) window.vgStartPresence(window.vgAuthUser);
     const incoming=document.getElementById("incomingFriendsList"), friends=document.getElementById("friendsList");
     if(incoming) incoming.innerHTML='<div class="text-xs text-gray-500">Loading requests…</div>';
@@ -2479,10 +2493,10 @@
       const pr=await vgSupabase.from("vg_profiles").select("user_id,gamer_tag").ilike("gamer_tag",tag).maybeSingle();
       if(pr.error) throw pr.error;
       if(!pr.data){ status.textContent="⚠️ No existing Vgameing player has that Gamer Tag."; return; }
-      const existing=await vgSupabase.from("vg_friend_requests").select("id,status,requester_id,addressee_id").or("and(requester_id.eq."+vgAuthUser.id+",addressee_id.eq."+pr.data.user_id+"),and(requester_id.eq."+pr.data.user_id+",addressee_id.eq."+vgAuthUser.id+")").maybeSingle();
+      const existing=await vgSupabase.from("vg_friend_requests").select("id,status,requester_id,addressee_id").or("and(requester_id.eq."+vgAuthUser.id+",addressee_id.eq."+pr.data.user_id+"),and(requester_id.eq."+pr.data.user_id+",addressee_id.eq."+vgAuthUser.id+")").in("status",["pending","accepted"]).maybeSingle();
       if(existing.error) throw existing.error;
       if(existing.data){
-        status.textContent=existing.data.status==="accepted"?"⚠️ You are already friends.":existing.data.status==="pending"?"⚠️ A request already exists.":"⚠️ A previous request already exists.";
+        status.textContent=existing.data.status==="accepted"?"⚠️ You are already friends.":"⚠️ A request already exists.";
         return;
       }
       const ins=await vgSupabase.from("vg_friend_requests").insert({requester_id:vgAuthUser.id,addressee_id:pr.data.user_id,status:"pending"});
