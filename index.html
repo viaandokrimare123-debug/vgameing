@@ -2008,6 +2008,10 @@
 
         // --- Live Supabase Leaderboards & Arcade System ---
         let leaderboards = JSON.parse(localStorage.getItem('vgaming_leaderboards')) || { reaction: [], cps: [], zombie: [] };
+        // Clean any old guest/local-only records and keep up to 28 visible ranks.
+        ['reaction','cps','zombie'].forEach(function(g){
+            leaderboards[g]=(leaderboards[g]||[]).filter(function(item){ return !/^Guest\\s+\\d+$/i.test(String(item.name||'')); }).slice(0,28);
+        });
         let liveLeaderboardChannel = null;
         let leaderboardLoadPromise = null;
 
