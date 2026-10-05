@@ -2249,6 +2249,9 @@
           localStorage.setItem("vgaming_current_user",currentUser);
           const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
         }
+        if(profile && typeof window.loadFriendNetwork==="function"){
+          try{ window.loadFriendNetwork(); }catch(e){}
+        }
         return profile;
       }catch(e){
         console.warn("Vgameing profile load failed:",e);
