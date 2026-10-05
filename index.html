@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="vgameing-build" content="2026-10-04-2150">
+    <meta name="vgameing-build" content="2026-10-05-2200">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -2033,7 +2033,7 @@
                         const old=best.get(name);
                         if(!old || leaderboardSort(game,row,old)<0) best.set(name,{name:name,score:Number(row.score)||0,created_at:row.created_at});
                     });
-                    leaderboards[game]=Array.from(best.values()).sort((a,b)=>leaderboardSort(game,a,b)).slice(0,10);
+                    leaderboards[game]=Array.from(best.values()).sort((a,b)=>leaderboardSort(game,a,b)).slice(0,28);
                     localStorage.setItem('vgaming_leaderboards',JSON.stringify(leaderboards));
                 } catch(e) {
                     console.warn('Live leaderboard load failed:',e);
@@ -2060,7 +2060,7 @@
             const localList=(leaderboards[game]||[]).filter(item=>item.name!==currentUser);
             localList.push({name:currentUser,score:Number(score)||0});
             localList.sort((a,b)=>leaderboardSort(game,a,b));
-            leaderboards[game]=localList.slice(0,10);
+            leaderboards[game]=localList.slice(0,28);
             localStorage.setItem('vgaming_leaderboards',JSON.stringify(leaderboards));
 
             if(vgSupabase && window.vgAuthUser && window.vgProfile){
