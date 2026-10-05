@@ -85,8 +85,11 @@
     <header class="border-b border-neon-cyan/20 bg-neon-dark/90 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center justify-between w-full md:w-auto">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
-                    <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink neon-text-glow">⚡ V-GAMING HUB</span>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('home')">
+                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink neon-text-glow">⚡ VGAMEING</span>
+                    </div>
+                    <a href="https://www.youtube.com/@travelwithme123m" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-lg bg-red-600/90 px-3 py-2 text-[10px] font-black text-white hover:bg-red-500 transition shadow-lg" title="Subscribe to the Vgameing YouTube channel">▶ SUBSCRIBE</a>
                 </div>
                 <button onclick="toggleMobileMenu()" class="md:hidden text-neon-cyan focus:outline-none text-xl">☰</button>
             </div>
@@ -104,11 +107,12 @@
                 <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
             </nav>
 
-            <div class="hidden md:flex items-center gap-3 bg-neon-card border border-neon-cyan/30 px-3 py-1.5 rounded-xl">
-                <div class="w-2 h-2 rounded-full bg-neon-green animate-pulse"></div>
+            <div id="vgAuthBadge" class="hidden md:flex items-center gap-3 bg-neon-card border border-neon-cyan/30 px-3 py-1.5 rounded-xl">
+                <div id="vgAuthDot" class="w-2 h-2 rounded-full bg-gray-500"></div>
                 <span id="displayUserTag" class="text-xs font-bold text-neon-cyan">Player</span>
-                <button onclick="openLogin()" class="text-[10px] text-neon-green hover:text-white transition ml-1">[Login]</button>
-                <button onclick="signOut()" class="text-[10px] text-gray-400 hover:text-neon-pink transition ml-1">[Sign Out]</button>
+                <span id="vgVerifiedBadge" class="hidden text-[9px] font-black text-neon-green border border-neon-green/40 rounded px-1.5 py-0.5">✓ VERIFIED</span>
+                <button id="vgLoginButton" onclick="openLogin()" class="text-[10px] text-neon-green hover:text-white transition ml-1">[Login]</button>
+                <button id="vgSignOutButton" onclick="signOut()" class="hidden text-[10px] text-gray-400 hover:text-neon-pink transition ml-1">[Sign Out]</button>
             </div>
         </div>
     </header>
@@ -537,10 +541,22 @@
                             );
                             vgSupabase.auth.getSession().then(function(result){
                                 const session = result && result.data && result.data.session;
-                                if(session && session.user) { window.vgAuthUser=session.user; applyOAuthUser(session.user); }
+                                if(session && session.user) {
+                                    window.vgAuthUser=session.user;
+                                    localStorage.setItem("vgaming_verified_session","1");
+                                    applyOAuthUser(session.user);
+                                } else {
+                                    updateVgAuthUI(null);
+                                }
                             });
                             vgSupabase.auth.onAuthStateChange(function(event, session){
-                                if(session && session.user) applyOAuthUser(session.user);
+                                if(session && session.user) {
+                                    localStorage.setItem("vgaming_verified_session","1");
+                                    applyOAuthUser(session.user);
+                                } else if(event==="SIGNED_OUT") {
+                                    localStorage.removeItem("vgaming_verified_session");
+                                    updateVgAuthUI(null);
+                                }
                             });
                         }
                     } catch(e){ console.warn("Supabase Auth init failed:", e); }
@@ -550,6 +566,27 @@
             } catch(e){ console.warn("Supabase Auth setup skipped:", e); }
         })();
 
+        function updateVgAuthUI(user){
+            const tag=document.getElementById("displayUserTag");
+            const login=document.getElementById("vgLoginButton");
+            const out=document.getElementById("vgSignOutButton");
+            const verified=document.getElementById("vgVerifiedBadge");
+            const dot=document.getElementById("vgAuthDot");
+            if(user){
+                if(tag && window.vgProfile?.gamer_tag) tag.innerText=window.vgProfile.gamer_tag;
+                if(login) login.classList.add("hidden");
+                if(out) out.classList.remove("hidden");
+                if(verified) verified.classList.remove("hidden");
+                if(dot){dot.classList.remove("bg-gray-500");dot.classList.add("bg-neon-green");}
+            }else{
+                if(tag) tag.innerText=localStorage.getItem("vgaming_current_user")||"Player";
+                if(login) login.classList.remove("hidden");
+                if(out) out.classList.add("hidden");
+                if(verified) verified.classList.add("hidden");
+                if(dot){dot.classList.remove("bg-neon-green");dot.classList.add("bg-gray-500");}
+            }
+        }
+
         function applyOAuthUser(user){
             const metadata = user.user_metadata || {};
             const name = metadata.full_name || metadata.name || metadata.user_name || (user.email ? user.email.split("@")[0] : "Player");
@@ -557,6 +594,7 @@
             localStorage.setItem("vgaming_current_user", currentUser);
             const tag = document.getElementById("displayUserTag");
             if(tag) tag.innerText = currentUser;
+            updateVgAuthUI(user);
             closeLogin();
             if(window.vgEnsureProfile) window.vgEnsureProfile(user).then(function(profile){if(profile&&window.vgStartPresence)window.vgStartPresence(user);});
         }
@@ -736,6 +774,8 @@
             if(vgSupabase){try{await vgSupabase.auth.signOut();}catch(e){}}
             window.vgAuthUser=null;window.vgProfile=null;
             localStorage.removeItem("vgaming_current_user");
+            localStorage.removeItem("vgaming_verified_session");
+            updateVgAuthUI(null);
             createGuestSession();
             alert("👋 Signed out! You are now " + currentUser + ".");
         }
