@@ -126,6 +126,16 @@
       </div>
     </div>
 
+    <!-- GAMER TAG SETUP -->
+    <div id="gamerTagModal" class="hidden fixed inset-0 z-[70] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-7 max-w-md w-full space-y-5 neon-glow-cyan">
+        <div><div class="text-2xl font-black text-white">🎮 Create your Gamer Tag</div><p class="text-xs text-gray-400 mt-2">This is the name other Vgameing players will use to find you. 3–20 letters, numbers, or underscores.</p></div>
+        <input id="gamerTagSetupInput" maxlength="20" autocomplete="off" placeholder="e.g. VianGamer123" class="w-full rounded-xl bg-[#090912] border border-gray-800 p-3 text-sm text-white outline-none focus:border-neon-cyan">
+        <button type="button" onclick="submitGamerTagSetup()" class="w-full rounded-xl bg-neon-cyan py-3 text-sm font-black text-black">SAVE GAMER TAG</button>
+        <div id="gamerTagSetupStatus" class="text-xs text-gray-400 min-h-[18px]"></div>
+      </div>
+    </div>
+
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
 
@@ -288,31 +298,47 @@
             <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(0,243,255,.12),transparent_35%),radial-gradient(circle_at_85%_75%,rgba(176,0,255,.14),transparent_35%)]"></div>
             <div class="relative">
               <span class="text-[10px] font-black tracking-[.25em] text-neon-cyan">VGAMEING // FRIEND NETWORK</span>
-              <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">👥 My <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">Friends</span></h2>
-              <p class="mt-3 text-sm text-gray-400">Add friends by Gamer Tag. No photo or file upload needed. Friends are saved on this browser.</p>
+              <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">👥 <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">Friends</span></h2>
+              <p class="mt-3 text-sm text-gray-400">Google login required. Send requests only to existing Vgameing players — they must accept before you become friends.</p>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-[.8fr_1.2fr] gap-5">
+          <div id="friendsAuthGate" class="hidden rounded-2xl border border-neon-pink/30 bg-neon-card p-6 text-center">
+            <div class="text-4xl">🔐</div>
+            <h3 class="mt-2 text-xl font-black text-white">Login required</h3>
+            <p class="mt-1 text-sm text-gray-400">Sign in with Google to use Vgameing Friends.</p>
+            <button type="button" onclick="openLogin()" class="mt-4 rounded-xl bg-neon-cyan px-5 py-3 text-sm font-black text-black">CONTINUE WITH GOOGLE</button>
+          </div>
+
+          <div id="friendsApp" class="grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] gap-5">
             <div class="rounded-2xl border border-neon-cyan/25 bg-neon-card p-5 sm:p-6">
-              <h3 class="text-xl font-black text-neon-cyan">➕ Add a Friend</h3>
-              <p class="mt-1 text-xs text-gray-500">Just enter their Gamer Tag.</p>
+              <h3 class="text-xl font-black text-neon-cyan">➕ Send Friend Request</h3>
+              <p class="mt-1 text-xs text-gray-500">Enter an existing player's exact Gamer Tag.</p>
               <form id="friendForm" class="mt-5 space-y-3">
                 <input id="friendTagInput" required maxlength="20" autocomplete="off" placeholder="e.g. Steve123" class="w-full rounded-xl bg-[#090912] border border-gray-800 p-3 text-sm text-white outline-none focus:border-neon-cyan">
-                <button type="submit" class="w-full rounded-xl bg-neon-cyan py-3 text-sm font-black text-black hover:brightness-110">ADD FRIEND</button>
-                <p id="friendStatus" aria-live="polite" class="text-xs text-gray-400 min-h-[18px]"></p>
+                <button type="submit" class="w-full rounded-xl bg-neon-cyan py-3 text-sm font-black text-black hover:brightness-110">SEND REQUEST</button>
+                <p id="friendStatus" aria-live="polite" class="text-xs text-gray-400 min-h-[36px]"></p>
               </form>
+              <div class="mt-5 rounded-xl border border-gray-800 bg-[#090912] p-3 text-[11px] text-gray-500">
+                🚫 Bad, hateful, sexual, or abusive Gamer Tags are not allowed.
+              </div>
             </div>
 
-            <div class="rounded-2xl border border-neon-purple/25 bg-neon-card p-5 sm:p-6">
-              <div class="flex items-center justify-between gap-3">
-                <div>
-                  <h3 class="text-xl font-black text-neon-purple">🟣 Friend List</h3>
-                  <p id="friendCount" class="text-xs text-gray-500 mt-1">0 friends</p>
+            <div class="space-y-5">
+              <div class="rounded-2xl border border-neon-purple/25 bg-neon-card p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div><h3 class="text-xl font-black text-neon-purple">📨 Incoming Requests</h3><p id="incomingFriendCount" class="text-xs text-gray-500 mt-1">0 pending</p></div>
+                  <button type="button" onclick="loadFriendNetwork()" class="rounded-lg border border-gray-700 px-3 py-2 text-xs font-bold text-gray-300 hover:border-neon-cyan hover:text-neon-cyan">↻ Refresh</button>
                 </div>
-                <button type="button" onclick="renderFriends()" class="rounded-lg border border-gray-700 px-3 py-2 text-xs font-bold text-gray-300 hover:border-neon-cyan hover:text-neon-cyan">↻ Refresh</button>
+                <div id="incomingFriendsList" class="mt-4 space-y-2"></div>
               </div>
-              <div id="friendsList" class="mt-4 space-y-2"></div>
+
+              <div class="rounded-2xl border border-neon-green/25 bg-neon-card p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div><h3 class="text-xl font-black text-neon-green">👥 My Friends</h3><p id="friendCount" class="text-xs text-gray-500 mt-1">0 friends</p></div>
+                </div>
+                <div id="friendsList" class="mt-4 space-y-2"></div>
+              </div>
             </div>
           </div>
         </section>
@@ -495,7 +521,7 @@
                             );
                             vgSupabase.auth.getSession().then(function(result){
                                 const session = result && result.data && result.data.session;
-                                if(session && session.user) applyOAuthUser(session.user);
+                                if(session && session.user) { window.vgAuthUser=session.user; applyOAuthUser(session.user); }
                             });
                             vgSupabase.auth.onAuthStateChange(function(event, session){
                                 if(session && session.user) applyOAuthUser(session.user);
@@ -516,6 +542,7 @@
             const tag = document.getElementById("displayUserTag");
             if(tag) tag.innerText = currentUser;
             closeLogin();
+            if(window.vgEnsureProfile) window.vgEnsureProfile(user);
         }
         function openLogin(){
             const modal=document.getElementById("loginModal");
@@ -2132,61 +2159,185 @@
 
 <script>
 (function(){
-  const friendKey = "vg_friends_v1";
-  function readFriends(){
-    try { return JSON.parse(localStorage.getItem(friendKey) || "[]") || []; }
-    catch(e){ return []; }
+  const BAD_TAG_WORDS = [
+    "fuck","fucker","fucking","shit","sh1t","bitch","b1tch","asshole","a55hole",
+    "bastard","dick","d1ck","pussy","porn","nazi","nigger","nigga","cunt","whore",
+    "slut","rape","rapist","sex","kill","kys","suicide"
+  ];
+
+  function cleanTag(name){
+    const value=String(name||"").trim();
+    if(!/^[A-Za-z0-9_]{3,20}$/.test(value)) return false;
+    const lower=value.toLowerCase();
+    return !BAD_TAG_WORDS.some(function(word){ return lower.includes(word); });
   }
-  function saveFriends(list){ localStorage.setItem(friendKey, JSON.stringify(list)); }
+  function escapeHtml(value){
+    return String(value??"").replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]);});
+  }
+  function isLoggedIn(){ return !!(vgSupabase && vgSupabase.auth && window.vgAuthUser); }
 
-  window.renderFriends = function(){
-    const list = readFriends();
-    const box = document.getElementById("friendsList");
-    const count = document.getElementById("friendCount");
-    if(count) count.textContent = list.length + (list.length === 1 ? " friend" : " friends");
-    if(!box) return;
-    if(!list.length){
-      box.innerHTML = '<div class="rounded-xl border border-gray-800 bg-[#090912] p-5 text-sm text-gray-500">No friends yet. Add a Gamer Tag above. 👥</div>';
-      return;
+  window.vgAuthUser = window.vgAuthUser || null;
+  window.vgProfile = window.vgProfile || null;
+
+  async function getProfile(user){
+    if(!vgSupabase || !user) return null;
+    const result=await vgSupabase.from("vg_profiles").select("user_id,gamer_tag").eq("user_id",user.id).maybeSingle();
+    if(result.error) throw result.error;
+    return result.data;
+  }
+
+  async function saveProfile(user, tag){
+    if(!cleanTag(tag)) throw new Error("That Gamer Tag is not allowed. Use 3–20 letters, numbers, or underscores, with no bad words.");
+    const result=await vgSupabase.from("vg_profiles").upsert({user_id:user.id,gamer_tag:tag,updated_at:new Date().toISOString()},{onConflict:"user_id"}).select("user_id,gamer_tag").single();
+    if(result.error){
+      if(result.error.code==="23505") throw new Error("That Gamer Tag is already taken.");
+      throw result.error;
     }
-    box.innerHTML = list.map(function(name, index){
-      return '<div class="flex items-center justify-between gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3">' +
-        '<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div>' +
-        '<div><div class="font-bold text-white">' + safeText(name) + '</div><div class="text-[10px] text-neon-green">FRIEND</div></div></div>' +
-        '<button type="button" onclick="removeFriend(' + index + ')" class="text-[10px] text-gray-500 hover:text-neon-pink">REMOVE</button></div>';
-    }).join("");
+    window.vgProfile=result.data;
+    currentUser=result.data.gamer_tag;
+    localStorage.setItem("vgaming_current_user",currentUser);
+    const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
+    return result.data;
+  }
+
+  async function ensureProfile(user){
+    window.vgAuthUser=user||null;
+    if(!user) { window.vgProfile=null; return null; }
+    try{
+      let profile=await getProfile(user);
+      if(!profile){
+        let candidate=String((user.user_metadata||{}).preferred_username || (user.user_metadata||{}).user_name || "").replace(/[^A-Za-z0-9_]/g,"").slice(0,20);
+        if(candidate.length<3 || !cleanTag(candidate)) candidate="";
+        if(candidate){
+          try{ profile=await saveProfile(user,candidate); }
+          catch(e){ profile=null; }
+        }
+        if(!profile){
+          openGamerTagSetup();
+        }
+      }else{
+        window.vgProfile=profile;
+        currentUser=profile.gamer_tag;
+        localStorage.setItem("vgaming_current_user",currentUser);
+        const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
+      }
+      return profile;
+    }catch(e){
+      console.warn("Vgameing profile load failed:",e);
+      return null;
+    }
+  }
+
+  window.openGamerTagSetup=function(){
+    const m=document.getElementById("gamerTagModal"); if(m) m.classList.remove("hidden");
+    const input=document.getElementById("gamerTagSetupInput"); if(input) input.focus();
   };
 
-  window.removeFriend = function(index){
-    const list = readFriends();
-    if(index >= 0 && index < list.length) list.splice(index, 1);
-    saveFriends(list);
-    renderFriends();
+  window.submitGamerTagSetup=async function(){
+    const input=document.getElementById("gamerTagSetupInput");
+    const status=document.getElementById("gamerTagSetupStatus");
+    const tag=(input.value||"").trim();
+    if(!vgAuthUser){ if(status) status.textContent="⚠️ Login with Google first."; return; }
+    if(!cleanTag(tag)){ if(status) status.textContent="⚠️ Bad/invalid Gamer Tag. Use 3–20 letters, numbers, or underscores."; return; }
+    if(status) status.textContent="Checking…";
+    try{
+      await saveProfile(vgAuthUser,tag);
+      if(status) status.textContent="✅ Gamer Tag created!";
+      document.getElementById("gamerTagModal")?.classList.add("hidden");
+      loadFriendNetwork();
+    }catch(e){ if(status) status.textContent="⚠️ "+(e.message||"Could not create Gamer Tag."); }
   };
 
-  document.getElementById("friendForm")?.addEventListener("submit", function(event){
+  window.loadFriendNetwork=async function(){
+    const gate=document.getElementById("friendsAuthGate"), app=document.getElementById("friendsApp");
+    if(!gate||!app) return;
+    if(!isLoggedIn()){
+      gate.classList.remove("hidden"); app.classList.add("hidden"); return;
+    }
+    if(!window.vgProfile){ gate.classList.add("hidden"); app.classList.add("hidden"); openGamerTagSetup(); return; }
+    gate.classList.add("hidden"); app.classList.remove("hidden");
+    const incoming=document.getElementById("incomingFriendsList"), friends=document.getElementById("friendsList");
+    if(incoming) incoming.innerHTML='<div class="text-xs text-gray-500">Loading requests…</div>';
+    if(friends) friends.innerHTML='<div class="text-xs text-gray-500">Loading friends…</div>';
+    try{
+      const [incomingRes, acceptedRes]=await Promise.all([
+        vgSupabase.from("vg_friend_requests").select("id,requester_id,created_at").eq("addressee_id",vgAuthUser.id).eq("status","pending").order("created_at",{ascending:false}),
+        vgSupabase.from("vg_friend_requests").select("id,requester_id,addressee_id,created_at").or("requester_id.eq."+vgAuthUser.id+",addressee_id.eq."+vgAuthUser.id).eq("status","accepted").order("created_at",{ascending:false})
+      ]);
+      if(incomingRes.error) throw incomingRes.error;
+      if(acceptedRes.error) throw acceptedRes.error;
+      const reqs=incomingRes.data||[], acc=acceptedRes.data||[];
+      const ids=[...new Set(reqs.map(x=>x.requester_id).concat(acc.map(x=>x.requester_id===vgAuthUser.id?x.addressee_id:x.requester_id)))];
+      let profiles=[];
+      if(ids.length){
+        const pr=await vgSupabase.from("vg_profiles").select("user_id,gamer_tag").in("user_id",ids);
+        if(pr.error) throw pr.error;
+        profiles=pr.data||[];
+      }
+      const byId={}; profiles.forEach(p=>byId[p.user_id]=p.gamer_tag);
+      const count=document.getElementById("incomingFriendCount"); if(count) count.textContent=reqs.length+" pending";
+      if(incoming){
+        incoming.innerHTML=reqs.length?reqs.map(function(x){
+          return '<div class="flex items-center justify-between gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div><div class="font-bold text-white">'+escapeHtml(byId[x.requester_id]||"Player")+'</div><div class="text-[10px] text-neon-purple">WANTS TO BE YOUR FRIEND</div></div><div class="flex gap-2"><button onclick="respondFriendRequest(\''+x.id+'\',\'accepted\')" class="rounded-lg bg-neon-green px-3 py-2 text-[10px] font-black text-black">ACCEPT</button><button onclick="respondFriendRequest(\''+x.id+'\',\'declined\')" class="rounded-lg border border-gray-700 px-3 py-2 text-[10px] font-black text-gray-300">DECLINE</button></div></div>';
+        }).join(""):'<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">No pending requests.</div>';
+      }
+      if(document.getElementById("friendCount")) document.getElementById("friendCount").textContent=acc.length+(acc.length===1?" friend":" friends");
+      if(friends){
+        friends.innerHTML=acc.length?acc.map(function(x){
+          const other=x.requester_id===vgAuthUser.id?x.addressee_id:x.requester_id;
+          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div><div class="font-bold text-white">'+escapeHtml(byId[other]||"Player")+'</div><div class="text-[10px] text-neon-green">FRIEND</div></div></div>';
+        }).join(""):'<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">No accepted friends yet.</div>';
+      }
+    }catch(e){
+      console.error("Friend network load failed:",e);
+      if(incoming) incoming.innerHTML='<div class="text-xs text-neon-pink">⚠️ Could not load friend requests.</div>';
+      if(friends) friends.innerHTML='<div class="text-xs text-neon-pink">⚠️ Could not load friends.</div>';
+    }
+  };
+
+  window.respondFriendRequest=async function(id,status){
+    if(!isLoggedIn()) return;
+    const result=await vgSupabase.from("vg_friend_requests").update({status:status,updated_at:new Date().toISOString()}).eq("id",id).eq("addressee_id",vgAuthUser.id);
+    if(result.error){ alert("Could not update request: "+result.error.message); return; }
+    loadFriendNetwork();
+  };
+
+  document.getElementById("friendForm")?.addEventListener("submit",async function(event){
     event.preventDefault();
-    const input = document.getElementById("friendTagInput");
-    const status = document.getElementById("friendStatus");
-    const name = (input.value || "").trim();
-    if(!name) return;
-    if(name.toLowerCase() === String(currentUser || "").toLowerCase()){
-      status.textContent = "⚠️ You cannot add yourself.";
-      return;
-    }
-    const list = readFriends();
-    if(list.some(function(x){ return x.toLowerCase() === name.toLowerCase(); })){
-      status.textContent = "⚠️ That friend is already in your list.";
-      return;
-    }
-    list.unshift(name);
-    saveFriends(list);
-    input.value = "";
-    status.textContent = "✅ " + name + " added to your friends!";
-    renderFriends();
+    const input=document.getElementById("friendTagInput"), status=document.getElementById("friendStatus");
+    const tag=(input.value||"").trim();
+    if(!isLoggedIn()){ status.textContent="⚠️ Login with Google first."; openLogin(); return; }
+    if(!window.vgProfile){ status.textContent="⚠️ Create your Gamer Tag first."; openGamerTagSetup(); return; }
+    if(!tag){ return; }
+    if(tag.toLowerCase()===window.vgProfile.gamer_tag.toLowerCase()){ status.textContent="⚠️ You cannot add yourself."; return; }
+    if(!cleanTag(tag)){ status.textContent="⚠️ That Gamer Tag is not allowed."; return; }
+    status.textContent="Searching for player…";
+    try{
+      const pr=await vgSupabase.from("vg_profiles").select("user_id,gamer_tag").ilike("gamer_tag",tag).maybeSingle();
+      if(pr.error) throw pr.error;
+      if(!pr.data){ status.textContent="⚠️ No existing Vgameing player has that Gamer Tag."; return; }
+      const existing=await vgSupabase.from("vg_friend_requests").select("id,status,requester_id,addressee_id").or("and(requester_id.eq."+vgAuthUser.id+",addressee_id.eq."+pr.data.user_id+"),and(requester_id.eq."+pr.data.user_id+",addressee_id.eq."+vgAuthUser.id+")").maybeSingle();
+      if(existing.error) throw existing.error;
+      if(existing.data){
+        status.textContent=existing.data.status==="accepted"?"⚠️ You are already friends.":existing.data.status==="pending"?"⚠️ A request already exists.":"⚠️ A previous request already exists.";
+        return;
+      }
+      const ins=await vgSupabase.from("vg_friend_requests").insert({requester_id:vgAuthUser.id,addressee_id:pr.data.user_id,status:"pending"});
+      if(ins.error){
+        if(ins.error.code==="23505") status.textContent="⚠️ A request already exists.";
+        else throw ins.error;
+        return;
+      }
+      input.value="";
+      status.textContent="✅ Friend request sent to "+pr.data.gamer_tag+"!";
+    }catch(e){ console.error(e); status.textContent="⚠️ "+(e.message||"Could not send request."); }
   });
 
-  window.addEventListener("DOMContentLoaded", renderFriends);
+  window.addEventListener("DOMContentLoaded",function(){
+    setTimeout(function(){ if(vgAuthUser) ensureProfile(vgAuthUser); loadFriendNetwork(); },400);
+  });
+  window.vgEnsureProfile=ensureProfile;
+  window.vgCleanTag=cleanTag;
 })();
 </script>
 
