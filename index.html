@@ -2466,6 +2466,7 @@
     activeFriendChatUserId=friendId; activeFriendChatTag=friendTag||"Player";
     document.getElementById("vgChatFriendName").textContent=activeFriendChatTag;
     document.getElementById("vgFriendChatModal").classList.remove("hidden");
+    const taskbar=document.getElementById("vgTaskbar"); if(taskbar) taskbar.style.display="none";
     document.getElementById("vgFriendChatModal").classList.add("flex");
     document.getElementById("vgFriendChatInput").focus();
     await loadFriendMessages();
@@ -2480,6 +2481,7 @@
   window.closeFriendChat=function(){
     const modal=document.getElementById("vgFriendChatModal");
     if(modal){modal.classList.add("hidden");modal.classList.remove("flex");}
+    const taskbar=document.getElementById("vgTaskbar"); if(taskbar) taskbar.style.display="";
     if(friendChatChannel){vgSupabase.removeChannel(friendChatChannel);friendChatChannel=null;}
     activeFriendChatUserId=null; activeFriendChatTag="";
   };
