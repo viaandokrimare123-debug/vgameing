@@ -137,20 +137,7 @@
     </div>
 
     <!-- Main Container -->
-    <style>
-#vgVoiceCallModal{display:none;position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:14px}
-#vgVoiceCallModal.open{display:flex}.vg-voice-card{width:min(460px,100%);background:#0b0a14;border:1px solid rgba(0,243,255,.35);border-radius:22px;padding:26px;text-align:center;box-shadow:0 0 45px rgba(0,243,255,.2)}
-.vg-voice-avatar{width:90px;height:90px;border-radius:50%;margin:12px auto 18px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00f3ff,#b000ff);color:#000;font-size:36px;font-weight:900}
-.vg-voice-actions{display:flex;justify-content:center;gap:10px;margin-top:22px}.vg-voice-actions button{border:1px solid #393044;background:#15131f;color:#fff;border-radius:11px;padding:11px 16px;font-weight:800;font-size:12px;cursor:pointer}.vg-voice-end{background:#ff1744!important;border-color:#ff1744!important}
-</style>
-<div id="vgVoiceCallModal"><div class="vg-voice-card">
-<button type="button" onclick="vgHangupCall()" class="float-right text-gray-500 hover:text-white text-xl">×</button>
-<div class="text-xs font-black tracking-[.2em] text-neon-cyan">VGAMEING // VOICE CALL</div><div class="vg-voice-avatar">📞</div>
-<div id="vgCallTitle" class="text-2xl font-black text-white">Vgameing Call</div><div id="vgCallStatus" class="text-sm text-gray-400 mt-2">Ready</div>
-<div id="vgIncomingCallBox" class="hidden"><div class="text-sm text-gray-400 mt-5">Incoming call from</div><div id="vgIncomingCaller" class="text-xl font-black text-neon-cyan mt-1">Player</div><div class="vg-voice-actions"><button type="button" onclick="vgDeclineIncoming()">DECLINE</button><button type="button" onclick="vgAcceptIncoming()" class="bg-neon-green text-black border-neon-green">ACCEPT 📞</button></div></div>
-<div id="vgActiveCallBox" class="hidden"><div class="vg-voice-actions"><button type="button" onclick="vgToggleMute()" id="vgMuteBtn">🎙️ Mute</button><button type="button" onclick="vgHangupCall()" class="vg-voice-end">📵 END CALL</button></div></div>
-</div></div>
-<main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
 
         <!-- 1. HOME TAB -->
         <section id="tab-home" class="space-y-12">
@@ -355,6 +342,22 @@
             </div>
           </div>
         </section>
+
+<!-- FRIEND TEXT CHAT -->
+<div id="vgFriendChatModal" class="hidden fixed inset-0 z-[80] bg-black/90 backdrop-blur-md items-center justify-center p-4">
+  <div class="w-full max-w-lg h-[min(680px,90vh)] rounded-2xl border border-neon-cyan/40 bg-neon-card shadow-2xl flex flex-col overflow-hidden">
+    <div class="flex items-center justify-between p-4 border-b border-gray-800">
+      <div><div class="text-xs text-neon-cyan font-black tracking-widest">VGAMEING // FRIEND CHAT</div><div id="vgChatFriendName" class="text-xl font-black text-white">Player</div></div>
+      <button type="button" onclick="closeFriendChat()" class="text-gray-400 hover:text-white text-2xl">×</button>
+    </div>
+    <div id="vgFriendMessages" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+    <div id="vgFriendChatStatus" class="px-4 text-xs text-gray-500 min-h-[18px]"></div>
+    <form id="vgFriendChatForm" class="p-3 border-t border-gray-800 flex gap-2">
+      <input id="vgFriendChatInput" maxlength="1000" autocomplete="off" placeholder="Type a message…" class="flex-1 rounded-xl bg-[#090912] border border-gray-800 p-3 text-sm text-white outline-none focus:border-neon-cyan">
+      <button type="submit" class="rounded-xl bg-neon-cyan px-4 py-3 text-sm font-black text-black">SEND</button>
+    </form>
+  </div>
+</div>
 
         <!-- VGAMEING COMMUNITY HUB -->
         <section id="tab-community" class="hidden space-y-7 max-w-6xl mx-auto">
@@ -2289,44 +2292,6 @@
     }catch(e){ if(status) status.textContent="⚠️ "+(e.message||"Could not create Gamer Tag."); }
   };
 
-  // Realtime online presence for Friends + voice calls.
-  let vgPresenceChannel=null;
-  const vgOnlineUserIds=new Set();
-  let vgPresenceUserId=null;
-  function vgRefreshOnlineIds(){
-    vgOnlineUserIds.clear();
-    if(!vgPresenceChannel) return;
-    const state=vgPresenceChannel.presenceState();
-    Object.keys(state||{}).forEach(function(key){
-      (state[key]||[]).forEach(function(meta){
-        const id=meta?.user_id || key;
-        if(id) vgOnlineUserIds.add(String(id));
-      });
-    });
-  }
-  async function startVgPresence(user){
-    if(!vgSupabase||!user) return;
-    if(vgPresenceUserId===user.id && vgPresenceChannel) return;
-    await stopVgPresence();
-    vgPresenceUserId=user.id;
-    vgPresenceChannel=vgSupabase.channel("vgameing-online-presence",{config:{presence:{key:String(user.id)}}});
-    vgPresenceChannel.on("presence",{event:"sync"},function(){vgRefreshOnlineIds();loadFriendNetwork();});
-    vgPresenceChannel.on("presence",{event:"join"},function(){vgRefreshOnlineIds();loadFriendNetwork();});
-    vgPresenceChannel.on("presence",{event:"leave"},function(){vgRefreshOnlineIds();loadFriendNetwork();});
-    vgPresenceChannel.subscribe(async function(status){
-      if(status==="SUBSCRIBED"){
-        try{await vgPresenceChannel.track({user_id:String(user.id),gamer_tag:window.vgProfile?.gamer_tag||""});}catch(e){console.warn("Vgameing presence track failed:",e);}
-      }
-    });
-  }
-  async function stopVgPresence(){
-    vgOnlineUserIds.clear(); vgPresenceUserId=null;
-    if(vgPresenceChannel){try{await vgPresenceChannel.untrack();}catch(e){} try{await vgSupabase.removeChannel(vgPresenceChannel);}catch(e){} vgPresenceChannel=null;}
-  }
-  window.vgIsUserOnline=function(userId){return vgOnlineUserIds.has(String(userId));};
-  window.vgStartPresence=startVgPresence;
-  window.vgStopPresence=stopVgPresence;
-
   window.loadFriendNetwork=async function(){
     const gate=document.getElementById("friendsAuthGate"), app=document.getElementById("friendsApp");
     if(!gate||!app) return;
@@ -2374,12 +2339,8 @@
       if(friends){
         friends.innerHTML=acc.length?acc.map(function(x){
           const other=x.requester_id===vgAuthUser.id?x.addressee_id:x.requester_id;
-          const online=window.vgIsUserOnline(other);
           const friendTag=escapeHtml(byId[other]||"Player");
-          const callButton=online
-            ? '<button type="button" onclick="startVoiceCall(\\''+other+'\\',\\''+friendTag+'\\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black hover:opacity-90">📞 CALL</button>'
-            : '<button type="button" disabled title="This player is offline" class="rounded-lg bg-gray-700 px-3 py-2 text-[10px] font-black text-gray-400 cursor-not-allowed opacity-60">📞 OFFLINE</button>';
-          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div class="min-w-0 flex-1"><div class="font-bold text-white">'+friendTag+'</div><div class="text-[10px] '+(online?'text-neon-green':'text-gray-500')+'">'+(online?'🟢 ONLINE':'⚫ OFFLINE')+'</div></div>'+callButton+'</div>';
+          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div class="min-w-0 flex-1"><div class="font-bold text-white">'+friendTag+'</div><div class="text-[10px] text-neon-green">💬 FRIEND</div></div><button type="button" onclick="openFriendChat(\\''+other+'\\',\\''+friendTag+'\\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black hover:opacity-90">💬 MESSAGE</button></div>';
         }).join(""):'<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">No accepted friends yet.</div>';
       }
     }catch(e){
@@ -2388,6 +2349,67 @@
       if(friends) friends.innerHTML='<div class="text-xs text-neon-pink">⚠️ Could not load friends.</div>';
     }
   };
+
+  let activeFriendChatUserId=null;
+  let activeFriendChatTag="";
+  let friendChatChannel=null;
+
+  function renderFriendMessages(rows){
+    const box=document.getElementById("vgFriendMessages");
+    if(!box)return;
+    if(!rows?.length){box.innerHTML='<div class="text-center text-xs text-gray-500 py-10">No messages yet. Say hi 👋</div>';return;}
+    box.innerHTML=rows.map(function(m){
+      const mine=m.sender_id===vgAuthUser.id;
+      const safe=escapeHtml(m.message).replace(/\n/g,"<br>");
+      const time=new Date(m.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+      return '<div class="flex '+(mine?'justify-end':'justify-start')+'"><div class="max-w-[82%] rounded-2xl px-3 py-2 '+(mine?'bg-neon-purple text-white':'bg-[#171522] border border-gray-800 text-gray-200')+'"><div class="text-sm break-words">'+safe+'</div><div class="text-[9px] opacity-60 mt-1 text-right">'+time+'</div></div></div>';
+    }).join("");
+    box.scrollTop=box.scrollHeight;
+  }
+
+  async function loadFriendMessages(){
+    if(!activeFriendChatUserId||!vgAuthUser)return;
+    const box=document.getElementById("vgFriendMessages");
+    if(box)box.innerHTML='<div class="text-xs text-gray-500 text-center py-10">Loading messages…</div>';
+    const uid=vgAuthUser.id, other=activeFriendChatUserId;
+    const q=await vgSupabase.from("vg_friend_messages").select("id,sender_id,receiver_id,message,created_at").or("and(sender_id.eq."+uid+",receiver_id.eq."+other+"),and(sender_id.eq."+other+",receiver_id.eq."+uid+")").order("created_at",{ascending:true}).limit(200);
+    if(q.error){if(box)box.innerHTML='<div class="text-xs text-neon-pink text-center py-10">⚠️ '+escapeHtml(q.error.message)+'</div>';return;}
+    renderFriendMessages(q.data||[]);
+  }
+
+  window.openFriendChat=async function(friendId,friendTag){
+    if(!isLoggedIn()||!window.vgProfile){openLogin();return;}
+    activeFriendChatUserId=friendId; activeFriendChatTag=friendTag||"Player";
+    document.getElementById("vgChatFriendName").textContent=activeFriendChatTag;
+    document.getElementById("vgFriendChatModal").classList.remove("hidden");
+    document.getElementById("vgFriendChatModal").classList.add("flex");
+    document.getElementById("vgFriendChatInput").focus();
+    await loadFriendMessages();
+    if(friendChatChannel)await vgSupabase.removeChannel(friendChatChannel);
+    friendChatChannel=vgSupabase.channel("vg-friend-chat-"+[vgAuthUser.id,friendId].sort().join("-"))
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"vg_friend_messages"},function(payload){
+        const m=payload.new;
+        if((m.sender_id===vgAuthUser.id&&m.receiver_id===activeFriendChatUserId)||(m.sender_id===activeFriendChatUserId&&m.receiver_id===vgAuthUser.id))loadFriendMessages();
+      }).subscribe(function(status,err){if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Friend chat realtime:",status,err);});
+  };
+
+  window.closeFriendChat=function(){
+    const modal=document.getElementById("vgFriendChatModal");
+    if(modal){modal.classList.add("hidden");modal.classList.remove("flex");}
+    if(friendChatChannel){vgSupabase.removeChannel(friendChatChannel);friendChatChannel=null;}
+    activeFriendChatUserId=null; activeFriendChatTag="";
+  };
+
+  document.getElementById("vgFriendChatForm")?.addEventListener("submit",async function(event){
+    event.preventDefault();
+    const input=document.getElementById("vgFriendChatInput"), status=document.getElementById("vgFriendChatStatus");
+    const message=(input.value||"").trim();
+    if(!message||!activeFriendChatUserId||!vgAuthUser)return;
+    status.textContent="Sending…";
+    const result=await vgSupabase.from("vg_friend_messages").insert({sender_id:vgAuthUser.id,receiver_id:activeFriendChatUserId,message});
+    if(result.error){status.textContent="⚠️ "+result.error.message;return;}
+    input.value=""; status.textContent=""; await loadFriendMessages(); input.focus();
+  });
 
   window.respondFriendRequest=async function(id,status){
     if(!isLoggedIn()) return;
@@ -2434,29 +2456,7 @@
   window.vgCleanTag=cleanTag;
 })();
 </script>
-<script>
-(function(){
-let callPc=null,callStream=null,currentCall=null,incomingCall=null,seenSignals=new Set(),pendingIce=[],polling=false;
-const $=id=>document.getElementById(id),modal=$("vgVoiceCallModal"),incoming=$("vgIncomingCallBox"),active=$("vgActiveCallBox");
-const logged=()=>typeof isLoggedIn==="function"&&isLoggedIn()&&window.vgAuthUser;
-const open=()=>modal?.classList.add("open"),close=()=>modal?.classList.remove("open"),status=t=>{if($("vgCallStatus"))$("vgCallStatus").textContent=t},title=t=>{if($("vgCallTitle"))$("vgCallTitle").textContent="📞 "+t};
-async function signal(kind,payload){if(!currentCall||!logged())return;const r=await vgSupabase.from("vg_call_signals").insert({call_id:currentCall.id,sender_id:vgAuthUser.id,kind,payload});if(r.error)throw r.error}
-async function media(){if(callStream)return callStream;if(!navigator.mediaDevices?.getUserMedia)throw new Error("Microphone is not supported here.");callStream=await navigator.mediaDevices.getUserMedia({video:false,audio:true});return callStream}
-function pc(){if(callPc)callPc.close();callPc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});pendingIce=[];callPc.onicecandidate=e=>{if(e.candidate)signal("ice",e.candidate.toJSON()).catch(console.error)};callPc.onconnectionstatechange=()=>{if(callPc.connectionState==="connected")status("Connected");else if(["failed","disconnected"].includes(callPc.connectionState))status("Connection interrupted")};if(callStream)callStream.getTracks().forEach(t=>callPc.addTrack(t,callStream));return callPc}
-async function addIce(c){if(!callPc)return;if(callPc.remoteDescription?.type)await callPc.addIceCandidate(c);else pendingIce.push(c)}
-async function flushIce(){const q=pendingIce.splice(0);for(const c of q){try{await callPc.addIceCandidate(c)}catch(e){}}}
-window.startVoiceCall=async function(friendId,friendTag){if(!logged()){openLogin();return}if(!window.vgIsUserOnline?.(friendId)){alert(friendTag+" is offline. You can call only when they are online.");return}if(currentCall){alert("You are already in a call.");return}try{title("Calling "+friendTag);status("Requesting microphone…");await media();pc();const s=await vgSupabase.from("vg_call_sessions").insert({caller_id:vgAuthUser.id,callee_id:friendId,status:"ringing"}).select("id,caller_id,callee_id").single();if(s.error)throw s.error;currentCall=s.data;const offer=await callPc.createOffer();await callPc.setLocalDescription(offer);await signal("offer",{type:offer.type,sdp:offer.sdp});incoming.classList.add("hidden");active.classList.remove("hidden");open();status("Ringing "+friendTag+"…")}catch(e){console.error(e);alert("Could not start call: "+(e.message||"Microphone permission denied."));cleanup(true)}};
-window.vgAcceptIncoming=async function(){if(!incomingCall||!logged())return;try{currentCall=incomingCall;incomingCall=null;title("Vgameing Voice Call");status("Starting microphone…");await media();pc();const q=await vgSupabase.from("vg_call_signals").select("id,payload").eq("call_id",currentCall.id).eq("kind","offer").order("created_at",{ascending:true});if(q.error)throw q.error;const offer=q.data?.[0]?.payload;if(!offer)throw new Error("Call offer was not found.");await callPc.setRemoteDescription(offer);await flushIce();const u=await vgSupabase.from("vg_call_sessions").update({status:"accepted"}).eq("id",currentCall.id).eq("callee_id",vgAuthUser.id);if(u.error)throw u.error;const answer=await callPc.createAnswer();await callPc.setLocalDescription(answer);await signal("answer",{type:answer.type,sdp:answer.sdp});incoming.classList.add("hidden");active.classList.remove("hidden");open();status("Connecting…")}catch(e){console.error(e);alert("Could not accept call: "+e.message);cleanup(true)}};
-window.vgDeclineIncoming=async function(){if(!incomingCall)return;const id=incomingCall.id;incomingCall=null;await vgSupabase.from("vg_call_sessions").update({status:"declined",ended_at:new Date().toISOString()}).eq("id",id).eq("callee_id",vgAuthUser.id);close()};
-window.vgHangupCall=async function(){const id=currentCall?.id;if(id&&logged())await vgSupabase.from("vg_call_sessions").update({status:"ended",ended_at:new Date().toISOString()}).eq("id",id);if(id)try{await signal("hangup",{reason:"ended"})}catch(e){}cleanup(true)};
-window.vgToggleMute=function(){const t=callStream?.getAudioTracks()?.[0];if(!t)return;t.enabled=!t.enabled;$("vgMuteBtn").textContent=t.enabled?"🎙️ Mute":"🔇 Unmute"};
-function cleanup(hide){if(callPc){callPc.close();callPc=null}if(callStream){callStream.getTracks().forEach(t=>t.stop());callStream=null}currentCall=null;pendingIce=[];seenSignals.clear();if(hide){incomingCall=null;incoming.classList.add("hidden");active.classList.add("hidden");close()}}
-async function processSignals(){if(!logged())return;const ids=[];if(currentCall)ids.push(currentCall.id);if(incomingCall)ids.push(incomingCall.id);if(!ids.length)return;const q=await vgSupabase.from("vg_call_signals").select("id,call_id,sender_id,kind,payload").in("call_id",ids).order("created_at",{ascending:true});if(q.error)return;for(const x of q.data||[]){if(x.sender_id===vgAuthUser.id||seenSignals.has(x.id))continue;seenSignals.add(x.id);if(!currentCall||x.call_id!==currentCall.id)continue;try{if(x.kind==="answer"&&callPc&&!callPc.remoteDescription?.type){await callPc.setRemoteDescription(x.payload);await flushIce();status("Connecting…")}else if(x.kind==="ice")await addIce(x.payload);else if(x.kind==="hangup"){status("The other player ended the call.");setTimeout(()=>cleanup(true),500)}}catch(e){console.warn(e)}}}
-async function pollIncoming(){if(!logged()||currentCall||incomingCall)return;const q=await vgSupabase.from("vg_call_sessions").select("id,caller_id,created_at").eq("callee_id",vgAuthUser.id).eq("status","ringing").order("created_at",{ascending:false}).limit(1);if(q.error||!q.data?.length)return;const call=q.data[0];if(Date.now()-new Date(call.created_at).getTime()>120000){await vgSupabase.from("vg_call_sessions").update({status:"ended",ended_at:new Date().toISOString()}).eq("id",call.id).eq("callee_id",vgAuthUser.id);return}const p=await vgSupabase.from("vg_profiles").select("gamer_tag").eq("user_id",call.caller_id).maybeSingle();incomingCall={...call,callerTag:p.data?.gamer_tag||"Player"};$("vgIncomingCaller").textContent=incomingCall.callerTag;incoming.classList.remove("hidden");active.classList.add("hidden");title("Incoming Voice Call");status("Incoming call");open()}
-async function pollSessions(){if(!logged()||!currentCall)return;const q=await vgSupabase.from("vg_call_sessions").select("status").eq("id",currentCall.id).maybeSingle();if(q.data?.status==="declined"||q.data?.status==="ended"){status(q.data.status==="declined"?"Call declined":"Call ended");setTimeout(()=>cleanup(true),500)}}
-async function tick(){if(polling)return;polling=true;try{await pollIncoming();await pollSessions();await processSignals()}finally{polling=false}}setInterval(tick,1000);window.addEventListener("beforeunload",()=>{try{callStream?.getTracks().forEach(t=>t.stop());callPc?.close()}catch(e){}});
-})();
-</script>
+
 
 <script>
 (function(){
