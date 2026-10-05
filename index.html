@@ -129,7 +129,7 @@
     <!-- GAMER TAG SETUP -->
     <div id="gamerTagModal" class="hidden fixed inset-0 z-[70] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
       <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-7 max-w-md w-full space-y-5 neon-glow-cyan">
-        <div><div class="text-2xl font-black text-white">🎮 Create your Gamer Tag</div><p class="text-xs text-gray-400 mt-2">This is the name other Vgameing players will use to find you. 3–20 letters, numbers, or underscores.</p></div>
+        <div><div class="text-2xl font-black text-white">🎮 Set your Gamer Tag</div><p class="text-xs text-gray-400 mt-2">This is your Vgameing name. You only need to set it once. You can change it later from Friends.</p></div>
         <input id="gamerTagSetupInput" maxlength="20" autocomplete="off" placeholder="e.g. VianGamer123" class="w-full rounded-xl bg-[#090912] border border-gray-800 p-3 text-sm text-white outline-none focus:border-neon-cyan">
         <button type="button" onclick="submitGamerTagSetup()" class="w-full rounded-xl bg-neon-cyan py-3 text-sm font-black text-black">SAVE GAMER TAG</button>
         <div id="gamerTagSetupStatus" class="text-xs text-gray-400 min-h-[18px]"></div>
@@ -313,7 +313,7 @@
             <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(0,243,255,.12),transparent_35%),radial-gradient(circle_at_85%_75%,rgba(176,0,255,.14),transparent_35%)]"></div>
             <div class="relative">
               <span class="text-[10px] font-black tracking-[.25em] text-neon-cyan">VGAMEING // FRIEND NETWORK</span>
-              <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">👥 <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">Friends</span></h2>
+              <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">👥 <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink">Friends</span></h2><button type="button" onclick="openGamerTagSetup()" class="mt-4 rounded-lg border border-gray-700 px-3 py-2 text-xs font-bold text-gray-300 hover:border-neon-cyan hover:text-neon-cyan">✏️ Change Gamer Tag</button>
               <p class="mt-3 text-sm text-gray-400">Google login required. Send requests only to existing Vgameing players — they must accept before you become friends.</p>
             </div>
           </div>
@@ -2201,8 +2201,11 @@
     return result.data;
   }
 
+  let profileEnsurePromise=null;
+
   async function saveProfile(user, tag){
     if(!cleanTag(tag)) throw new Error("That Gamer Tag is not allowed. Use 3–20 letters, numbers, or underscores, with no bad words.");
+    const previous=window.vgProfile?.gamer_tag || null;
     const result=await vgSupabase.from("vg_profiles").upsert({user_id:user.id,gamer_tag:tag,updated_at:new Date().toISOString()},{onConflict:"user_id"}).select("user_id,gamer_tag").single();
     if(result.error){
       if(result.error.code==="23505") throw new Error("That Gamer Tag is already taken.");
@@ -2212,35 +2215,48 @@
     currentUser=result.data.gamer_tag;
     localStorage.setItem("vgaming_current_user",currentUser);
     const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
+    if(previous && previous!==currentUser){
+      try{
+        const boards=JSON.parse(localStorage.getItem("vgaming_leaderboards")||"{}");
+        Object.keys(boards).forEach(function(game){
+          (boards[game]||[]).forEach(function(item){ if(item.name===previous) item.name=currentUser; });
+        });
+        localStorage.setItem("vgaming_leaderboards",JSON.stringify(boards));
+      }catch(e){}
+    }
     return result.data;
   }
 
   async function ensureProfile(user){
     window.vgAuthUser=user||null;
-    if(!user) { window.vgProfile=null; return null; }
-    try{
-      let profile=await getProfile(user);
-      if(!profile){
-        let candidate=String((user.user_metadata||{}).preferred_username || (user.user_metadata||{}).user_name || "").replace(/[^A-Za-z0-9_]/g,"").slice(0,20);
-        if(candidate.length<3 || !cleanTag(candidate)) candidate="";
-        if(candidate){
-          try{ profile=await saveProfile(user,candidate); }
-          catch(e){ profile=null; }
-        }
+    if(!user){ window.vgProfile=null; profileEnsurePromise=null; return null; }
+    if(profileEnsurePromise) return profileEnsurePromise;
+    profileEnsurePromise=(async function(){
+      try{
+        let profile=await getProfile(user);
         if(!profile){
-          openGamerTagSetup();
+          let candidate=String((user.user_metadata||{}).preferred_username || (user.user_metadata||{}).user_name || "").replace(/[^A-Za-z0-9_]/g,"").slice(0,20);
+          if(candidate.length<3 || !cleanTag(candidate)) candidate="";
+          if(candidate){
+            try{ profile=await saveProfile(user,candidate); }catch(e){ profile=null; }
+          }
+          if(!profile && window.vgAuthUser?.id===user.id && !window.vgProfile) openGamerTagSetup();
         }
-      }else{
-        window.vgProfile=profile;
-        currentUser=profile.gamer_tag;
-        localStorage.setItem("vgaming_current_user",currentUser);
-        const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
+        if(profile){
+          window.vgProfile=profile;
+          currentUser=profile.gamer_tag;
+          localStorage.setItem("vgaming_current_user",currentUser);
+          const tagEl=document.getElementById("displayUserTag"); if(tagEl) tagEl.innerText=currentUser;
+        }
+        return profile;
+      }catch(e){
+        console.warn("Vgameing profile load failed:",e);
+        return null;
+      }finally{
+        profileEnsurePromise=null;
       }
-      return profile;
-    }catch(e){
-      console.warn("Vgameing profile load failed:",e);
-      return null;
-    }
+    })();
+    return profileEnsurePromise;
   }
 
   window.openGamerTagSetup=function(){
