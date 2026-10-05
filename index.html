@@ -105,6 +105,7 @@
                 <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="leaderboard">Leaderboard</button>
                 <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
                 <button onclick="switchTab('settings')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="settings">Settings</button>
+                <button id="adminNavBtn" onclick="switchTab('admin')" class="nav-btn hidden px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="admin">Admin</button>
             </nav>
 
             <div id="vgAuthBadge" class="hidden md:flex items-center gap-3 bg-neon-card border border-neon-cyan/30 px-3 py-1.5 rounded-xl">
@@ -142,6 +143,23 @@
 
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- ADMIN TAB -->
+        <section id="tab-admin" class="hidden space-y-6">
+          <div class="rounded-2xl border border-neon-pink/30 bg-neon-card p-6 sm:p-8">
+            <div class="flex items-center gap-3 mb-6"><div class="text-3xl">🛡️</div><div><h2 class="text-2xl font-black text-white">Vgameing Admin</h2><p class="text-xs text-gray-500">Private admin dashboard — only your admin account can access these stats.</p></div></div>
+            <div id="adminStatsGate" class="rounded-xl border border-gray-800 bg-[#090912] p-5 text-sm text-gray-400">🔒 Admin access required.</div>
+            <div id="adminStatsPanel" class="hidden grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div class="rounded-xl border border-neon-cyan/25 bg-[#090912] p-5"><div class="text-xs text-gray-500">TOTAL ACCOUNTS</div><div id="adminTotalUsers" class="text-3xl font-black text-neon-cyan mt-2">—</div></div>
+              <div class="rounded-xl border border-neon-green/25 bg-[#090912] p-5"><div class="text-xs text-gray-500">USERS WHO LOGGED IN</div><div id="adminSignedInUsers" class="text-3xl font-black text-neon-green mt-2">—</div></div>
+              <div class="rounded-xl border border-neon-purple/25 bg-[#090912] p-5"><div class="text-xs text-gray-500">PROFILES</div><div id="adminProfiles" class="text-3xl font-black text-neon-purple mt-2">—</div></div>
+              <div class="rounded-xl border border-neon-yellow/25 bg-[#090912] p-5"><div class="text-xs text-gray-500">FRIENDSHIPS</div><div id="adminFriends" class="text-3xl font-black text-neon-yellow mt-2">—</div></div>
+              <div class="rounded-xl border border-neon-pink/25 bg-[#090912] p-5"><div class="text-xs text-gray-500">MESSAGES</div><div id="adminMessages" class="text-3xl font-black text-neon-pink mt-2">—</div></div>
+            </div>
+            <button id="adminRefreshBtn" type="button" onclick="loadAdminStats()" class="hidden mt-5 rounded-xl bg-neon-cyan px-5 py-3 text-sm font-black text-black">↻ REFRESH STATS</button>
+            <div id="adminStatsStatus" class="mt-3 text-xs text-gray-500"></div>
+          </div>
+        </section>
 
         <!-- SETTINGS TAB -->
         <section id="tab-settings" class="hidden space-y-6">
@@ -573,6 +591,7 @@
                                 } else {
                                     updateVgAuthUI(null);
             updateSettingsUI();
+            updateAdminUI();
                                 }
                             });
                             vgSupabase.auth.onAuthStateChange(function(event, session){
@@ -622,6 +641,7 @@
             if(tag) tag.innerText = currentUser;
             updateVgAuthUI(user);
             updateSettingsUI();
+            updateAdminUI();
             closeLogin();
             if(window.vgEnsureProfile) window.vgEnsureProfile(user).then(function(profile){if(profile&&window.vgStartPresence)window.vgStartPresence(user); window.dispatchEvent(new Event("vg-auth-ready"));});
         }
@@ -805,6 +825,27 @@
             updateVgAuthUI(null);
             createGuestSession();
             alert("👋 Signed out! You are now " + currentUser + ".");
+        }
+
+        async function loadAdminStats(){
+            const gate=document.getElementById("adminStatsGate"), panel=document.getElementById("adminStatsPanel"), refresh=document.getElementById("adminRefreshBtn"), status=document.getElementById("adminStatsStatus");
+            if(!gate||!panel)return;
+            if(!window.vgAuthUser){gate.textContent="🔒 Login required.";panel.classList.add("hidden");refresh.classList.add("hidden");return;}
+            const result=await vgSupabase.rpc("vg_admin_stats");
+            if(result.error){gate.textContent="🔒 Admin access required.";panel.classList.add("hidden");refresh.classList.add("hidden");status.textContent="";return;}
+            const s=result.data||{};
+            gate.classList.add("hidden");panel.classList.remove("hidden");refresh.classList.remove("hidden");
+            document.getElementById("adminTotalUsers").textContent=s.total_users??"0";
+            document.getElementById("adminSignedInUsers").textContent=s.signed_in_users??"0";
+            document.getElementById("adminProfiles").textContent=s.profiles??"0";
+            document.getElementById("adminFriends").textContent=s.friends??"0";
+            document.getElementById("adminMessages").textContent=s.messages??"0";
+            status.textContent="Updated just now.";
+        }
+        function updateAdminUI(){
+            const btn=document.getElementById("adminNavBtn");
+            if(!btn)return;
+            if(window.vgAuthUser){ btn.classList.remove("hidden"); loadAdminStats(); } else btn.classList.add("hidden");
         }
 
         function updateSettingsUI(){
