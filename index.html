@@ -2257,7 +2257,12 @@
     return profileEnsurePromise;
   }
 
+  let gamerTagSetupForUser=null;
   window.openGamerTagSetup=function(){
+    const userId=window.vgAuthUser?.id || null;
+    if(!userId) return;
+    if(gamerTagSetupForUser===userId) return;
+    gamerTagSetupForUser=userId;
     const m=document.getElementById("gamerTagModal"); if(m) m.classList.remove("hidden");
     const input=document.getElementById("gamerTagSetupInput"); if(input) input.focus();
   };
@@ -2271,6 +2276,7 @@
     if(status) status.textContent="Checking…";
     try{
       await saveProfile(vgAuthUser,tag);
+      gamerTagSetupForUser=null;
       if(status) status.textContent="✅ Gamer Tag created!";
       document.getElementById("gamerTagModal")?.classList.add("hidden");
       loadFriendNetwork();
@@ -2283,7 +2289,16 @@
     if(!isLoggedIn()){
       gate.classList.remove("hidden"); app.classList.add("hidden"); return;
     }
-    if(!window.vgProfile){ gate.classList.add("hidden"); app.classList.add("hidden"); openGamerTagSetup(); return; }
+    // On refresh OAuth/session restoration can finish after this page loads.
+    // Wait for the real Supabase profile before deciding whether a Gamer Tag is needed.
+    if(window.vgAuthUser && !window.vgProfile){
+      try{ await ensureProfile(window.vgAuthUser); }catch(e){ console.warn("Vgameing profile restore failed:",e); }
+    }
+    if(!window.vgProfile){
+      gate.classList.add("hidden"); app.classList.add("hidden");
+      if(window.vgAuthUser) openGamerTagSetup();
+      return;
+    }
     gate.classList.add("hidden"); app.classList.remove("hidden");
     const incoming=document.getElementById("incomingFriendsList"), friends=document.getElementById("friendsList");
     if(incoming) incoming.innerHTML='<div class="text-xs text-gray-500">Loading requests…</div>';
@@ -2363,7 +2378,7 @@
   });
 
   window.addEventListener("DOMContentLoaded",function(){
-    setTimeout(function(){ if(vgAuthUser) ensureProfile(vgAuthUser); loadFriendNetwork(); },400);
+    setTimeout(function(){ loadFriendNetwork(); },400);
   });
   window.vgEnsureProfile=ensureProfile;
   window.vgCleanTag=cleanTag;
