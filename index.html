@@ -2300,7 +2300,7 @@
       if(friends){
         friends.innerHTML=acc.length?acc.map(function(x){
           const other=x.requester_id===vgAuthUser.id?x.addressee_id:x.requester_id;
-          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div><div class="font-bold text-white">'+escapeHtml(byId[other]||"Player")+'</div><div class="text-[10px] text-neon-green">FRIEND</div></div><button type="button" onclick="startVideoCall(\'"+other+"\',\'"+escapeHtml(byId[other]||"Player")+"\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black">🎥 CALL</button></div>';
+          return '<div class="flex items-center gap-3 rounded-xl border border-gray-800 bg-[#090912] p-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-black font-black">👤</div><div><div class="font-bold text-white">'+escapeHtml(byId[other]||"Player")+'</div><div class="text-[10px] text-neon-green">FRIEND</div></div><button type="button" onclick="startVideoCall(\''+other+'\',\''+escapeHtml(byId[other]||"Player")+'\')" class="rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black">🎥 CALL</button></div>';
         }).join(""):'<div class="rounded-xl border border-gray-800 bg-[#090912] p-4 text-xs text-gray-500">No accepted friends yet.</div>';
       }
     }catch(e){
