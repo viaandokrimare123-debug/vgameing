@@ -899,7 +899,6 @@
             const refresh=document.getElementById("adminRefreshBtn");
             const usersPanel=document.getElementById("adminUsersPanel");
             if(!btn)return;
-            // Being logged in is not enough: verify admin access through the protected RPC.
             btn.classList.add("hidden");
             if(panel) panel.classList.add("hidden");
             if(refresh) refresh.classList.add("hidden");
@@ -909,27 +908,24 @@
                 gate.textContent=window.vgAuthUser ? "🔐 Checking admin access…" : "🔒 Login required.";
             }
             if(!window.vgAuthUser || !vgSupabase)return;
-            const result=await vgSupabase.rpc("vg_admin_stats");
-            if(result.error){
+            try{
+                const check=await vgSupabase.from("vg_admins").select("user_id").eq("user_id",window.vgAuthUser.id).maybeSingle();
+                if(check.error || !check.data){
+                    console.warn("Vgameing admin check:",check.error||"not an admin");
+                    if(gate) gate.textContent="🔒 Admin access required.";
+                    return;
+                }
+                btn.classList.remove("hidden");
+                if(gate) gate.classList.add("hidden");
+                if(panel) panel.classList.remove("hidden");
+                if(refresh) refresh.classList.remove("hidden");
+                if(usersPanel) usersPanel.classList.remove("hidden");
+                await loadAdminStats();
+            }catch(e){
+                console.error("Vgameing admin check failed:",e);
                 if(gate) gate.textContent="🔒 Admin access required.";
-                return;
             }
-            btn.classList.remove("hidden");
-            if(gate) gate.classList.add("hidden");
-            if(panel) panel.classList.remove("hidden");
-            if(refresh) refresh.classList.remove("hidden");
-            if(usersPanel) usersPanel.classList.remove("hidden");
-            const s=result.data||{};
-            document.getElementById("adminTotalUsers").textContent=s.total_users??"0";
-            document.getElementById("adminSignedInUsers").textContent=s.signed_in_users??"0";
-            document.getElementById("adminProfiles").textContent=s.profiles??"0";
-            document.getElementById("adminFriends").textContent=s.friends??"0";
-            document.getElementById("adminMessages").textContent=s.messages??"0";
-            const status=document.getElementById("adminStatsStatus");
-            if(status) status.textContent="Updated just now.";
-            loadAdminUsers();
         }
-
         function updateSettingsUI(){
             const gate=document.getElementById("settingsAuthGate"), account=document.getElementById("settingsAccount");
             if(!gate||!account)return;
