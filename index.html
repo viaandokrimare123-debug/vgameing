@@ -2479,7 +2479,11 @@
     loadFriendNetwork();
   };
 
-  document.getElementById("friendForm")?.addEventListener("submit",async function(event){
+  function initFriendNetworkUI(){
+    const form=document.getElementById("friendForm");
+    if(form && !form.dataset.vgBound){
+      form.dataset.vgBound="1";
+      form.addEventListener("submit",async function(event){
     event.preventDefault();
     const input=document.getElementById("friendTagInput"), status=document.getElementById("friendStatus");
     const tag=(input.value||"").trim();
@@ -2508,9 +2512,15 @@
       input.value="";
       status.textContent="✅ Friend request sent to "+pr.data.gamer_tag+"!";
     }catch(e){ console.error(e); status.textContent="⚠️ "+(e.message||"Could not send request."); }
-  });
+      });
+    }
+    loadFriendNetwork();
+  }
 
-  window.addEventListener("DOMContentLoaded",function(){
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initFriendNetworkUI,{once:true});
+  else initFriendNetworkUI();
+
+  window.addEventListener("vg-auth-ready",function(){ loadFriendNetwork(); });
     setTimeout(function(){ loadFriendNetwork(); },400);
   });
   window.vgEnsureProfile=ensureProfile;
