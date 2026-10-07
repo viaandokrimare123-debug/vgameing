@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="vgameing-build" content="2026-10-05-2205">
+    <meta name="vgameing-build" content="2026-10-07-settings-v1">
+    <meta name="theme-color" content="#00f3ff">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -37,6 +38,8 @@
         .neon-glow-pink { box-shadow: 0 0 20px rgba(255, 0, 85, 0.25); }
         .neon-glow-green { box-shadow: 0 0 20px rgba(0, 255, 102, 0.25); }
         .neon-text-glow { text-shadow: 0 0 10px rgba(0, 243, 255, 0.6); }
+        .vg-setting-card{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}.vg-setting-card:hover{transform:translateY(-2px)}
+        .vg-setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(0,0,0,.14);font-size:12px;color:#d1d5db}.vg-setting-row>span:first-child{font-weight:700}.vg-toggle{width:44px;height:24px;border-radius:999px;background:#374151;border:1px solid #4b5563;position:relative;flex:0 0 auto;cursor:pointer;transition:.2s}.vg-toggle:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#9ca3af;transition:.2s}.vg-toggle.on{background:var(--vg-accent,#00f3ff);border-color:var(--vg-accent,#00f3ff)}.vg-toggle.on:after{left:23px;background:#050509}.vg-select{background:#090912;border:1px solid #374151;border-radius:8px;padding:6px 8px;color:#e5e7eb;font-size:11px;max-width:145px}.vg-avatar{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#090912;border:1px solid rgba(0,243,255,.3);font-size:22px}.vg-light{background:#eef2ff!important;color:#111827!important}.vg-light .bg-neon-dark,.vg-light .bg-neon-card{background:#ffffff!important}.vg-light .text-white{color:#111827!important}.vg-light .text-gray-100,.vg-light .text-gray-200,.vg-light .text-gray-300{color:#374151!important}.vg-light .text-gray-400,.vg-light .text-gray-500{color:#6b7280!important}.vg-light .border-gray-800,.vg-light .border-gray-700{border-color:#d1d5db!important}.vg-light .vg-setting-row{background:rgba(255,255,255,.75);border-color:#dbe1ea}.vg-no-neon .neon-glow-cyan,.vg-no-neon .neon-glow-pink,.vg-no-neon .neon-glow-green{box-shadow:none!important}.vg-no-neon .neon-text-glow{text-shadow:none!important}.vg-no-anim *{animation:none!important;transition:none!important}
     </style>
 </head>
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
@@ -163,15 +166,72 @@
 
         <!-- SETTINGS TAB -->
         <section id="tab-settings" class="hidden space-y-6">
-          <div class="rounded-2xl border border-neon-cyan/25 bg-neon-card p-6 sm:p-8">
-            <div class="flex items-center gap-3 mb-6"><div class="text-3xl">⚙️</div><div><h2 class="text-2xl font-black text-white">Account Settings</h2><p class="text-xs text-gray-500">Manage your Vgameing profile. More account options can be added here later.</p></div></div>
-            <div id="settingsAuthGate" class="rounded-xl border border-gray-800 bg-[#090912] p-5 text-sm text-gray-400">🔒 Login with Google to manage your account. <button type="button" onclick="openLogin()" class="ml-2 rounded-lg bg-neon-cyan px-3 py-2 text-xs font-black text-black">LOGIN</button></div>
-            <div id="settingsAccount" class="hidden space-y-5">
-              <div class="rounded-xl border border-gray-800 bg-[#090912] p-5"><div class="text-[10px] uppercase tracking-widest text-gray-500">GAMER TAG</div><div class="mt-1 text-lg font-black text-neon-cyan" id="settingsCurrentTag">Loading…</div><button type="button" onclick="openGamerTagChange()" class="mt-3 rounded-lg border border-neon-purple/50 px-4 py-2 text-xs font-black text-neon-purple">✏️ CHANGE GAMER TAG</button></div>
-              <div class="rounded-xl border border-gray-800 bg-[#090912] p-5"><div class="text-[10px] uppercase tracking-widest text-gray-500">GOOGLE ACCOUNT</div><div class="mt-1 text-sm text-gray-300 break-all" id="settingsEmail">—</div><div class="mt-2 text-[10px] text-neon-green">✓ SIGNED IN & VERIFIED</div></div>
-              <div class="rounded-xl border border-gray-800 bg-[#090912] p-5"><div class="text-[10px] uppercase tracking-widest text-gray-500">ACCOUNT</div><div class="mt-2 text-xs text-gray-400">More settings coming later: profile details, preferences, account controls and other Vgameing features.</div></div>
+          <div class="vg-settings-hero rounded-2xl border border-neon-cyan/30 bg-neon-card p-6 sm:p-8 neon-glow-cyan overflow-hidden">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div><div class="flex items-center gap-3"><div class="text-4xl">⚙️</div><div><h2 class="text-3xl font-black text-white">Vgameing Settings</h2><p class="text-xs text-gray-400 mt-1">Gaming control panel • Your preferences are saved on this device.</p></div></div></div>
+              <div id="settingsSavedBadge" class="rounded-full border border-neon-green/30 bg-neon-green/10 px-3 py-1.5 text-[10px] font-black text-neon-green">● SETTINGS READY</div>
             </div>
           </div>
+
+          <div id="settingsAuthGate" class="rounded-2xl border border-gray-800 bg-[#090912] p-5 text-sm text-gray-400">🔒 Login with Google to manage account settings. <button type="button" onclick="openLogin()" class="ml-2 rounded-lg bg-neon-cyan px-3 py-2 text-xs font-black text-black">LOGIN</button></div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="vg-setting-card rounded-2xl border border-neon-cyan/25 bg-neon-card p-5">
+              <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-black text-white">🎨 Appearance</h3><p class="text-[10px] text-gray-500">Customize the Vgameing look.</p></div><span class="text-xl">✨</span></div>
+              <div class="space-y-3">
+                <div class="vg-setting-row"><span>🌙 Dark / Light mode</span><button id="setThemeBtn" type="button" class="vg-toggle" onclick="toggleVgTheme()"></button></div>
+                <div class="vg-setting-row"><span>🎨 Accent color</span><div class="flex items-center gap-2"><input id="setAccentColor" type="color" value="#00f3ff" class="w-11 h-8 rounded cursor-pointer bg-transparent" onchange="setVgAccent(this.value)"><span id="setAccentValue" class="text-[10px] font-mono text-neon-cyan">#00F3FF</span></div></div>
+                <div class="vg-setting-row"><span>✨ Neon effects</span><button id="setNeonBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('neon')"></button></div>
+                <div class="vg-setting-row"><span>🔊 Sound effects</span><button id="setSoundBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('sound')"></button></div>
+                <div class="vg-setting-row"><span>🎮 Gaming UI animations</span><button id="setAnimBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('animations')"></button></div>
+              </div>
+            </div>
+
+            <div class="vg-setting-card rounded-2xl border border-neon-purple/25 bg-neon-card p-5">
+              <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-black text-white">👤 Account</h3><p class="text-[10px] text-gray-500">Profile, rewards and access.</p></div><span id="settingsAvatar" class="vg-avatar">🎮</span></div>
+              <div id="settingsAccount" class="space-y-3">
+                <div class="vg-setting-row"><span>Username</span><div class="flex items-center gap-2"><b id="settingsCurrentTag" class="text-neon-cyan">Guest</b><button type="button" onclick="openGamerTagChange()" class="text-[10px] text-neon-purple hover:text-white">✏️ CHANGE</button></div></div>
+                <div class="vg-setting-row"><span>Profile picture / avatar</span><select id="setAvatar" onchange="setVgAvatar(this.value)" class="bg-[#090912] border border-gray-700 rounded-lg px-2 py-1 text-lg"><option>🎮</option><option>⛏️</option><option>⚡</option><option>🔥</option><option>👑</option><option>🐲</option><option>💎</option><option>🧊</option></select></div>
+                <div class="vg-setting-row"><span>V-Coins balance</span><b id="settingsCoins" class="text-neon-yellow">0 🪙</b></div>
+                <div class="vg-setting-row"><span>Achievements</span><button type="button" onclick="showVgAchievements()" class="text-[10px] font-black text-neon-yellow">🏆 VIEW</button></div>
+                <div class="vg-setting-row"><span>Google account</span><span id="settingsEmail" class="text-xs text-gray-400 max-w-[55%] truncate">Not logged in</span></div>
+                <div class="flex gap-2 pt-2"><button type="button" onclick="signOut()" class="flex-1 rounded-lg border border-neon-pink/50 px-3 py-2 text-xs font-black text-neon-pink">↪ LOG OUT</button><button type="button" onclick="requestVgDeleteAccount()" class="flex-1 rounded-lg border border-red-500/40 px-3 py-2 text-xs font-black text-red-400">🗑️ DELETE ACCOUNT</button></div>
+              </div>
+            </div>
+
+            <div class="vg-setting-card rounded-2xl border border-neon-yellow/25 bg-neon-card p-5">
+              <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-black text-white">🔔 Notifications</h3><p class="text-[10px] text-gray-500">Choose what Vgameing can notify you about.</p></div><span>🔔</span></div>
+              <div class="space-y-3">
+                <div class="vg-setting-row"><span>🏆 Achievement unlocked</span><button id="setNotifAchievementBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('notifAchievement')"></button></div>
+                <div class="vg-setting-row"><span>📈 Leaderboard rank changed</span><button id="setNotifRankBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('notifRank')"></button></div>
+                <div class="vg-setting-row"><span>🎯 Challenge completed</span><button id="setNotifChallengeBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('notifChallenge')"></button></div>
+                <div class="vg-setting-row"><span>🆕 New seed added</span><button id="setNotifSeedBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('notifSeed')"></button></div>
+                <div class="vg-setting-row"><span>🔔 Enable/disable notifications</span><button id="setNotifMasterBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('notifications')"></button></div>
+              </div>
+            </div>
+
+            <div class="vg-setting-card rounded-2xl border border-neon-green/25 bg-neon-card p-5">
+              <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-black text-white">🌱 Minecraft</h3><p class="text-[10px] text-gray-500">Default choices for seeds and tools.</p></div><span>🌱</span></div>
+              <div class="space-y-3">
+                <div class="vg-setting-row"><span>Edition</span><select id="setEdition" onchange="saveVgPref('edition',this.value)" class="vg-select"><option value="java">☕ Java</option><option value="bedrock">🪨 Bedrock</option></select></div>
+                <div class="vg-setting-row"><span>Minecraft version</span><select id="setMcVersion" onchange="saveVgPref('mcVersion',this.value)" class="vg-select"><option>Latest</option><option>1.21.11</option><option>1.21.10</option><option>1.21.8</option><option>1.20.6</option><option>1.20.1</option></select></div>
+                <div class="vg-setting-row"><span>Default seed search version</span><select id="setSeedVersion" onchange="saveVgPref('seedVersion',this.value)" class="vg-select"><option>Latest</option><option>1.21</option><option>1.20</option><option>1.19</option></select></div>
+                <div class="vg-setting-row"><span>Show coordinates</span><button id="setCoordsBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('coordinates')"></button></div>
+                <div class="vg-setting-row"><span>Show verified seeds only</span><button id="setVerifiedSeedsBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('verifiedSeeds')"></button></div>
+              </div>
+            </div>
+
+            <div class="vg-setting-card rounded-2xl border border-neon-pink/25 bg-neon-card p-5">
+              <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-black text-white">🔒 Privacy & Security</h3><p class="text-[10px] text-gray-500">Control what other players can see.</p></div><span>🔐</span></div>
+              <div class="space-y-3">
+                <div class="vg-setting-row"><span>Public profile</span><button id="setPublicProfileBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('publicProfile')"></button></div>
+                <div class="vg-setting-row"><span>Show username on leaderboard</span><button id="setLeaderboardNameBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('leaderboardName')"></button></div>
+                <button type="button" onclick="clearVgLocalData()" class="w-full rounded-lg border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs font-black text-red-300 hover:bg-red-500/10">🗑️ CLEAR LOCAL GAME DATA</button>
+                <button type="button" onclick="showSessionInfo()" class="w-full rounded-lg border border-gray-700 px-3 py-2 text-xs font-black text-gray-300">🔐 SESSION / DEVICE INFO</button>
+              </div>
+            </div>
+          </div>
+          <div id="settingsStatus" class="text-center text-xs text-gray-500 min-h-[18px]"></div>
         </section>
 
         <!-- 1. HOME TAB -->
@@ -862,11 +922,45 @@
             await loadAdminStats();
         }
 
+        const VG_SETTINGS_KEY="vgaming_settings_v2";
+        const vgSettingsDefaults={theme:"dark",accent:"#00f3ff",neon:true,sound:true,animations:true,avatar:"🎮",notifications:true,notifAchievement:true,notifRank:true,notifChallenge:true,notifSeed:true,edition:"java",mcVersion:"Latest",seedVersion:"Latest",coordinates:false,verifiedSeeds:false,publicProfile:true,leaderboardName:true};
+        let vgSettings=Object.assign({},vgSettingsDefaults,JSON.parse(localStorage.getItem(VG_SETTINGS_KEY)||"{}"));
+        function saveVgSettings(){localStorage.setItem(VG_SETTINGS_KEY,JSON.stringify(vgSettings));}
+        function saveVgPref(key,value){vgSettings[key]=value;saveVgSettings();applyVgSettings();showSettingsSaved();}
+        function showSettingsSaved(){const el=document.getElementById("settingsStatus");if(el){el.textContent="✓ Setting saved on this device";clearTimeout(window._vgSetTimer);window._vgSetTimer=setTimeout(()=>el.textContent="",1800);}}
+        function applyVgSettings(){
+          document.body.classList.toggle("vg-light",vgSettings.theme==="light");
+          document.body.classList.toggle("vg-no-neon",!vgSettings.neon);
+          document.body.classList.toggle("vg-no-anim",!vgSettings.animations);
+          document.documentElement.style.setProperty("--vg-accent",vgSettings.accent||"#00f3ff");
+          const accent=vgSettings.accent||"#00f3ff";
+          const color=document.getElementById("setAccentColor");if(color)color.value=accent;
+          const val=document.getElementById("setAccentValue");if(val)val.textContent=accent.toUpperCase();
+          const map={neon:"setNeonBtn",sound:"setSoundBtn",animations:"setAnimBtn",notifications:"setNotifMasterBtn",notifAchievement:"setNotifAchievementBtn",notifRank:"setNotifRankBtn",notifChallenge:"setNotifChallengeBtn",notifSeed:"setNotifSeedBtn",coordinates:"setCoordsBtn",verifiedSeeds:"setVerifiedSeedsBtn",publicProfile:"setPublicProfileBtn",leaderboardName:"setLeaderboardNameBtn"};
+          Object.keys(map).forEach(k=>{const b=document.getElementById(map[k]);if(b)b.classList.toggle("on",!!vgSettings[k]);});
+          const themeBtn=document.getElementById("setThemeBtn");if(themeBtn){themeBtn.classList.toggle("on",vgSettings.theme==="light");themeBtn.title=vgSettings.theme==="light"?"Light mode":"Dark mode";}
+          const av=document.getElementById("settingsAvatar");if(av)av.textContent=vgSettings.avatar||"🎮";
+          const avSelect=document.getElementById("setAvatar");if(avSelect)avSelect.value=vgSettings.avatar||"🎮";
+          ["edition","mcVersion","seedVersion"].forEach(k=>{const el=document.getElementById(k==="edition"?"setEdition":k==="mcVersion"?"setMcVersion":"setSeedVersion");if(el)el.value=vgSettings[k];});
+          const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content=vgSettings.accent||"#00f3ff";
+        }
+        function toggleVgTheme(){vgSettings.theme=vgSettings.theme==="dark"?"light":"dark";saveVgSettings();applyVgSettings();showSettingsSaved();vgPlayUiSound();}
+        function toggleVgSetting(key){vgSettings[key]=!vgSettings[key];saveVgSettings();applyVgSettings();showSettingsSaved();if(key==="sound"&&vgSettings.sound)vgPlayUiSound();else if(vgSettings.sound)vgPlayUiSound();}
+        function setVgAccent(value){if(!/^#[0-9a-fA-F]{6}$/.test(value))return;vgSettings.accent=value;saveVgSettings();applyVgSettings();showSettingsSaved();if(vgSettings.sound)vgPlayUiSound();}
+        function setVgAvatar(value){vgSettings.avatar=value||"🎮";saveVgSettings();applyVgSettings();showSettingsSaved();}
+        function vgPlayUiSound(){if(!vgSettings.sound)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ac=new AC(),o=ac.createOscillator(),g=ac.createGain();o.frequency.value=660;o.type="sine";g.gain.setValueAtTime(.025,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.07);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.07);}catch(e){}}
+        function showVgAchievements(){alert("🏆 Vgameing Achievements\n\n🎯 First Score\n⚡ Lightning\n🎯 Sharpshooter\n🧟 Zombie Slayer\n🔥 On Fire\n👑 Champion\n💯 Century\n\nAchievements will unlock automatically as you play.");}
+        function clearVgLocalData(){if(!confirm("Clear local Vgameing game data? This removes local scores, missions, preferences and guest data from this browser."))return;["vgaming_leaderboards","vg_daily_missions_"+new Date().toISOString().slice(0,10),"vg_friends_v1"].forEach(k=>localStorage.removeItem(k));alert("🗑️ Local game data cleared. Your Google account and Supabase data are not deleted.");location.reload();}
+        function showSessionInfo(){const u=window.vgAuthUser;alert(u?"🔐 SESSION ACTIVE\n\nAccount: "+(u.email||"Google account")+"\n\nYour active Supabase session keeps you signed in on this device.":"🔒 No account session is active. Login with Google from Settings.");}
+        function requestVgDeleteAccount(){if(!window.vgAuthUser){openLogin();return;}alert("🛡️ Account deletion is protected. The Vgameing site does not expose a secret admin key in the browser. If you want your Google/Supabase account permanently deleted, use the account deletion process provided by Vgameing support/admin.");}
+        
         function updateSettingsUI(){
-            const gate=document.getElementById("settingsAuthGate"), account=document.getElementById("settingsAccount");
-            if(!gate||!account)return;
-            if(window.vgAuthUser){ gate.classList.add("hidden"); account.classList.remove("hidden"); document.getElementById("settingsCurrentTag").textContent=window.vgProfile?.gamer_tag||"Set a Gamer Tag"; document.getElementById("settingsEmail").textContent=window.vgAuthUser.email||"Google account"; }
-            else { gate.classList.remove("hidden"); account.classList.add("hidden"); }
+            const gate=document.getElementById("settingsAuthGate");
+            if(gate) gate.classList.toggle("hidden",!!window.vgAuthUser);
+            const tag=document.getElementById("settingsCurrentTag"), email=document.getElementById("settingsEmail");
+            if(tag) tag.textContent=window.vgProfile?.gamer_tag||"Guest";
+            if(email) email.textContent=window.vgAuthUser?.email||"Not logged in";
+            applyVgSettings();
         }
 
         // --- Navigation Controller ---
