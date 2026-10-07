@@ -227,6 +227,7 @@
                 <div class="vg-setting-row"><span>Public profile</span><button id="setPublicProfileBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('publicProfile')"></button></div>
                 <div class="vg-setting-row"><span>Show username on leaderboard</span><button id="setLeaderboardNameBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('leaderboardName')"></button></div>
                 <button type="button" onclick="clearVgLocalData()" class="w-full rounded-lg border border-red-500/30 bg-red-500/5 px-3 py-2 text-xs font-black text-red-300 hover:bg-red-500/10">🗑️ CLEAR LOCAL GAME DATA</button>
+                <button type="button" onclick="resetVgSettings()" class="w-full rounded-lg border border-neon-yellow/30 bg-neon-yellow/5 px-3 py-2 text-xs font-black text-neon-yellow hover:bg-neon-yellow/10">↻ RESET SETTINGS</button>
                 <button type="button" onclick="showSessionInfo()" class="w-full rounded-lg border border-gray-700 px-3 py-2 text-xs font-black text-gray-300">🔐 SESSION / DEVICE INFO</button>
               </div>
             </div>
@@ -949,6 +950,15 @@
         function toggleVgSetting(key){vgSettings[key]=!vgSettings[key];saveVgSettings();applyVgSettings();showSettingsSaved();if(key==="sound"&&vgSettings.sound)vgPlayUiSound();else if(vgSettings.sound)vgPlayUiSound();}
         function setVgAccent(value){if(!/^#[0-9a-fA-F]{6}$/.test(value))return;vgSettings.accent=value;saveVgSettings();applyVgSettings();showSettingsSaved();if(vgSettings.sound)vgPlayUiSound();}
         function setVgAvatar(value){vgSettings.avatar=value||"🎮";saveVgSettings();applyVgSettings();showSettingsSaved();}
+        function resetVgSettings(){
+          if(!confirm("Reset all Vgameing settings to their default values? Your account, leaderboard scores, friends, and other game data will NOT be deleted."))return;
+          vgSettings=Object.assign({},vgSettingsDefaults);
+          saveVgSettings();
+          applyVgSettings();
+          const status=document.getElementById("settingsStatus");
+          if(status) status.textContent="✓ Settings reset to defaults";
+          if(vgSettings.sound) vgPlayUiSound();
+        }
         function vgPlayUiSound(){if(!vgSettings.sound)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ac=new AC(),o=ac.createOscillator(),g=ac.createGain();o.frequency.value=660;o.type="sine";g.gain.setValueAtTime(.025,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.07);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.07);}catch(e){}}
         function showVgAchievements(){alert("🏆 Vgameing Achievements\n\n🎯 First Score\n⚡ Lightning\n🎯 Sharpshooter\n🧟 Zombie Slayer\n🔥 On Fire\n👑 Champion\n💯 Century\n\nAchievements will unlock automatically as you play.");}
         function clearVgLocalData(){if(!confirm("Clear local Vgameing game data? This removes local scores, missions, preferences and guest data from this browser."))return;["vgaming_leaderboards","vg_daily_missions_"+new Date().toISOString().slice(0,10),"vg_friends_v1"].forEach(k=>localStorage.removeItem(k));alert("🗑️ Local game data cleared. Your Google account and Supabase data are not deleted.");location.reload();}
