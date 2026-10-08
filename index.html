@@ -982,9 +982,9 @@
         }
         let vgMusicAudio=null,vgMusicIndex=0;
         const vgMusicTracks=[
-          {title:"Minecraft – Door",src:"music/1-02.%20Door.mp3"},
-          {title:"Minecraft – Moog City",src:"music/1-06.%20Moog%20City.mp3"},
-          {title:"Vgameing Gaming Background",src:"music/vgameing-background.mp3"}
+          {title:"Minecraft – Door",src:"assets/music/minecraft-door.mp3"},
+          {title:"Minecraft – Moog City",src:"assets/music/minecraft-moog-city.mp3"},
+          {title:"Vgameing Gaming Background",src:"assets/music/vgameing-background.mp3"}
         ];
         function vgMusicEnsure(){
           if(vgMusicAudio)return vgMusicAudio;
@@ -1053,8 +1053,10 @@
           if(window._vgMusicWaiting&&vgSettings.music){
             window._vgMusicWaiting=false;
             vgStartMusic();
+          }else if(vgSettings.music && (!vgMusicAudio || vgMusicAudio.paused)){
+            vgStartMusic();
           }
-        });
+        },{passive:true});
         document.addEventListener("click",function(e){
           const t=e.target.closest("button,a,select,input,[role=\"button\"]");
           if(t&&!t.closest("#vgMusicPanel")&&vgSettings.sound)vgPlayUiSound();
@@ -2223,7 +2225,7 @@
         let leaderboards = JSON.parse(localStorage.getItem('vgaming_leaderboards')) || { reaction: [], cps: [], zombie: [] };
         // Clean any old guest/local-only records and keep up to 28 visible ranks.
         ['reaction','cps','zombie'].forEach(function(g){
-            leaderboards[g]=(leaderboards[g]||[]).filter(function(item){ return !/^Guest\\s+\\d+$/i.test(String(item.name||'')); }).slice(0,28);
+            leaderboards[g]=(leaderboards[g]||[]).filter(function(item){ const n=String(item.name||'').trim().toLowerCase(); return n!=='guest' && !n.startsWith('guest '); }).slice(0,28);
         });
         let liveLeaderboardChannel = null;
         let leaderboardLoadPromise = null;
