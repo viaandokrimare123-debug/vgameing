@@ -11,6 +11,7 @@
     <title>V-Gaming Hub | Official Vgameing Gaming Hub</title>
     <!-- Tailwind CSS with Neon Theme Configuration -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <!-- EmailJS SDK for Real Email Delivery -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
@@ -40,6 +41,19 @@
         .neon-text-glow { text-shadow: 0 0 10px rgba(0, 243, 255, 0.6); }
         .vg-setting-card{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}.vg-setting-card:hover{transform:translateY(-2px)}
         .vg-setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(0,0,0,.14);font-size:12px;color:#d1d5db}.vg-setting-row>span:first-child{font-weight:700}.vg-toggle{width:44px;height:24px;border-radius:999px;background:#374151;border:1px solid #4b5563;position:relative;flex:0 0 auto;cursor:pointer;transition:.2s}.vg-toggle:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#9ca3af;transition:.2s}.vg-toggle.on{background:var(--vg-accent,#00f3ff);border-color:var(--vg-accent,#00f3ff)}.vg-toggle.on:after{left:23px;background:#050509}.vg-select{background:#090912;border:1px solid #374151;border-radius:8px;padding:6px 8px;color:#e5e7eb;font-size:11px;max-width:145px}.vg-avatar{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#090912;border:1px solid rgba(0,243,255,.3);font-size:22px}.vg-light{background:#eef2ff!important;color:#111827!important}.vg-light .bg-neon-dark,.vg-light .bg-neon-card{background:#ffffff!important}.vg-light .text-white{color:#111827!important}.vg-light .text-gray-100,.vg-light .text-gray-200,.vg-light .text-gray-300{color:#374151!important}.vg-light .text-gray-400,.vg-light .text-gray-500{color:#6b7280!important}.vg-light .border-gray-800,.vg-light .border-gray-700{border-color:#d1d5db!important}.vg-light .vg-setting-row{background:rgba(255,255,255,.75);border-color:#dbe1ea}.vg-no-neon .neon-glow-cyan,.vg-no-neon .neon-glow-pink,.vg-no-neon .neon-glow-green{box-shadow:none!important}.vg-no-neon .neon-text-glow{text-shadow:none!important}.vg-no-anim *{animation:none!important;transition:none!important}.vg-accent-enabled .text-neon-cyan{color:var(--vg-accent)!important}.vg-accent-enabled .border-neon-cyan{border-color:var(--vg-accent)!important}.vg-accent-enabled .bg-neon-cyan{background-color:var(--vg-accent)!important}.vg-accent-enabled .from-neon-cyan{--tw-gradient-from:var(--vg-accent)!important}.vg-accent-enabled .to-neon-cyan{--tw-gradient-to:var(--vg-accent)!important}.vg-accent-enabled .neon-glow-cyan{box-shadow:0 0 20px color-mix(in srgb,var(--vg-accent) 25%,transparent)}
+        /* Vgameing 1000X visual upgrade */
+        body{background-image:radial-gradient(circle at 15% 10%,rgba(0,243,255,.08),transparent 30%),radial-gradient(circle at 85% 20%,rgba(176,0,255,.08),transparent 28%),linear-gradient(180deg,#070711 0%,#0a0a12 55%,#07070d 100%);background-attachment:fixed}
+        body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 85%)}
+        main>section{animation:vgSectionIn .35s ease both}
+        @keyframes vgSectionIn{from{opacity:0;transform:translateY(10px) scale(.995)}to{opacity:1;transform:none}}
+        .vg-settings-hero,.vg-setting-card,.vg-music-card{backdrop-filter:blur(14px);background:linear-gradient(135deg,rgba(18,18,31,.92),rgba(10,10,18,.82))!important}
+        .vg-setting-card{position:relative;overflow:hidden}
+        .vg-setting-card:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 25%,rgba(255,255,255,.035),transparent 75%);transform:translateX(-100%);transition:transform .7s ease;pointer-events:none}
+        .vg-setting-card:hover:before{transform:translateX(100%)}
+        .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
+        #vgMusicPanel{box-shadow:0 0 45px rgba(0,243,255,.18),0 0 90px rgba(176,0,255,.08)}
+        .vg-no-neon #vgMusicPanel{box-shadow:none!important}
+        .vg-no-anim main>section{animation:none!important}
     </style>
 </head>
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
@@ -980,7 +994,8 @@
             o.start();o.stop(vgUiAudioContext.currentTime+.07);
           }catch(e){}
         }
-        let vgMusicAudio=null,vgMusicIndex=0;
+        let vgMusicAudio=null,vgMusicIndex=0,vgMusicZipPromise=null,vgMusicObjectUrls={};
+        const VG_MUSIC_ZIP_URL="https://raw.githubusercontent.com/viaandokrimare123-debug/vgameing/main/vgameing-music-assets.zip";
         const vgMusicTracks=[
           {title:"Minecraft – Door",src:"assets/music/minecraft-door.mp3"},
           {title:"Minecraft – Moog City",src:"assets/music/minecraft-moog-city.mp3"},
@@ -997,18 +1012,44 @@
           });
           return vgMusicAudio;
         }
-        function vgLoadMusic(i,play){
+        async function vgGetMusicUrl(path){
+          if(vgMusicObjectUrls[path])return vgMusicObjectUrls[path];
+          if(!window.JSZip)throw new Error("Music loader is still starting");
+          if(!vgMusicZipPromise){
+            vgMusicZipPromise=fetch(VG_MUSIC_ZIP_URL,{cache:"no-store"}).then(function(res){
+              if(!res.ok)throw new Error("Music pack HTTP "+res.status);
+              return res.arrayBuffer();
+            }).then(function(buf){return JSZip.loadAsync(buf);});
+          }
+          const zip=await vgMusicZipPromise;
+          const entry=zip.file(path);
+          if(!entry)throw new Error("Track not found in music pack: "+path);
+          const blob=await entry.async("blob");
+          const url=URL.createObjectURL(blob);
+          vgMusicObjectUrls[path]=url;
+          return url;
+        }
+        async function vgLoadMusic(i,play){
           const a=vgMusicEnsure();
           vgMusicIndex=((i%vgMusicTracks.length)+vgMusicTracks.length)%vgMusicTracks.length;
           const t=vgMusicTracks[vgMusicIndex];
-          a.src=t.src;
+          a.pause();
           a.volume=Number(vgSettings.musicVolume)||.12;
           const title=document.getElementById("vgMusicTitle");
           if(title)title.textContent=t.title;
-          if(play&&vgSettings.music){
-            const p=a.play();
-            if(p&&p.catch)p.catch(function(){window._vgMusicWaiting=true;});
+          try{
+            const src=await vgGetMusicUrl(t.src);
+            a.src=src;
+            a.load();
+            if(play&&vgSettings.music){
+              await a.play();
+              window._vgMusicWaiting=false;
+            }
+          }catch(err){
+            console.warn("Vgameing music load failed:",err);
+            if(play&&vgSettings.music)window._vgMusicWaiting=true;
           }
+          vgUpdateMusicUI();
         }
         function vgStartMusic(){
           const a=vgMusicEnsure();
@@ -1085,6 +1126,7 @@
 
         // --- Navigation Controller ---
         function switchTab(tabId) {
+            if(vgSettings.music) vgStartMusic();
             if(tabId === "friends" && !window.vgAuthUser){
                 openLogin();
                 return;
@@ -1104,6 +1146,7 @@
             });
 
             document.getElementById('navLinks').classList.add('hidden');
+            if(vgSettings.sound) vgPlayUiSound();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if(tabId !== 'arcade') stopActiveGame();
             if(vgSettings.music && (!vgMusicAudio || vgMusicAudio.paused)) vgStartMusic();
