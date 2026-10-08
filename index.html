@@ -54,9 +54,26 @@
         #vgMusicPanel{box-shadow:0 0 45px rgba(0,243,255,.18),0 0 90px rgba(176,0,255,.08)}
         .vg-no-neon #vgMusicPanel{box-shadow:none!important}
         .vg-no-anim main>section{animation:none!important}
-    </style>
+    
+        /* Vgameing professional polish + music permission */
+        .vg-pro-shell{position:relative}.vg-pro-shell:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(0,243,255,.045) 35%,transparent 55%,rgba(176,0,255,.045) 85%,transparent 100%);opacity:.8}
+        header{box-shadow:0 8px 35px rgba(0,0,0,.25)}
+        #navLinks .nav-btn{position:relative;border:1px solid transparent}#navLinks .nav-btn:hover{background:rgba(255,255,255,.035);border-color:rgba(0,243,255,.18);transform:translateY(-1px)}
+        main>section>div,.bg-neon-card{transition:box-shadow .25s ease,border-color .25s ease,transform .25s ease}main>section>div:hover{border-color:rgba(0,243,255,.22)}
+        .vg-music-consent{background:radial-gradient(circle at 50% 0%,rgba(0,243,255,.12),transparent 45%),rgba(5,5,12,.92)}.vg-consent-orb{box-shadow:0 0 35px rgba(0,243,255,.3),0 0 80px rgba(176,0,255,.15)}.vg-no-neon .vg-consent-orb{box-shadow:none}
+</style>
 </head>
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
+    <!-- MUSIC PERMISSION: browsers block unsolicited autoplay, so Vgameing asks once -->
+    <div id="vgMusicConsent" class="hidden fixed inset-0 z-[2147483646] bg-black/80 backdrop-blur-xl items-center justify-center p-4">
+      <div class="vg-music-consent vg-consent-orb w-full max-w-md rounded-3xl border border-neon-cyan/30 p-7 text-center space-y-5">
+        <div class="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-4xl">🎵</div>
+        <div><h2 class="text-2xl font-black text-white">Vgameing wants to play music</h2><p class="text-xs text-gray-400 mt-2 leading-5">Low-volume Minecraft music can play in the background while you browse Home, Challenges, Arcade and Seed Vault. You can mute it anytime from Settings or the Music button.</p></div>
+        <div class="flex gap-3"><button type="button" onclick="acceptVgMusicConsent()" class="flex-1 rounded-xl bg-neon-cyan py-3 text-sm font-black text-black hover:opacity-90">🎵 ENABLE MUSIC</button><button type="button" onclick="declineVgMusicConsent()" class="rounded-xl border border-gray-700 px-5 py-3 text-sm font-black text-gray-300 hover:border-gray-500">NOT NOW</button></div>
+        <div class="text-[9px] text-gray-600">Your choice is saved on this device.</div>
+      </div>
+    </div>
+
 
     <!-- ================= SECURE EMAIL VERIFICATION & SIGN-IN MODAL ================= -->
     <div id="authModal" style="display:none!important" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -938,8 +955,10 @@
         }
 
         const VG_SETTINGS_KEY="vgaming_settings_v2";
-        const vgSettingsDefaults={theme:"dark",accent:"#00f3ff",neon:true,music:true,musicVolume:0.12,sound:true,animations:true,avatar:"🎮",notifications:true,notifAchievement:true,notifRank:true,notifChallenge:true,notifSeed:true,edition:"java",mcVersion:"Latest",seedVersion:"Latest",coordinates:false,verifiedSeeds:false,publicProfile:true,leaderboardName:true};
+        const vgSettingsDefaults={theme:"dark",accent:"#00f3ff",neon:true,music:false,musicVolume:0.14,sound:true,animations:true,avatar:"🎮",notifications:true,notifAchievement:true,notifRank:true,notifChallenge:true,notifSeed:true,edition:"java",mcVersion:"Latest",seedVersion:"Latest",coordinates:false,verifiedSeeds:false,publicProfile:true,leaderboardName:true};
         let vgSettings=Object.assign({},vgSettingsDefaults,JSON.parse(localStorage.getItem(VG_SETTINGS_KEY)||"{}"));
+        const VG_MUSIC_CONSENT_KEY="vgaming_music_consent_v1";
+        if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes") vgSettings.music=false;
         function saveVgSettings(){localStorage.setItem(VG_SETTINGS_KEY,JSON.stringify(vgSettings));}
         function saveVgPref(key,value){vgSettings[key]=value;saveVgSettings();applyVgSettings();showSettingsSaved();}
         function showSettingsSaved(){const el=document.getElementById("settingsStatus");if(el){el.textContent="✓ Setting saved on this device";clearTimeout(window._vgSetTimer);window._vgSetTimer=setTimeout(()=>el.textContent="",1800);}}
@@ -1052,6 +1071,7 @@
           vgUpdateMusicUI();
         }
         function vgStartMusic(){
+          if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes"){vgSettings.music=false;saveVgSettings();vgUpdateMusicUI();return;}
           const a=vgMusicEnsure();
           if(!vgSettings.music){vgPauseMusic();return;}
           a.volume=Number(vgSettings.musicVolume)||.12;
@@ -1082,6 +1102,12 @@
           const panel=document.getElementById("vgMusicPanel");
           if(panel)panel.classList.toggle("hidden");
         }
+        function showVgMusicConsent(){const m=document.getElementById("vgMusicConsent");if(m){m.classList.remove("hidden");m.classList.add("flex");}}
+        function hideVgMusicConsent(){const m=document.getElementById("vgMusicConsent");if(m){m.classList.add("hidden");m.classList.remove("flex");}}
+        function acceptVgMusicConsent(){localStorage.setItem(VG_MUSIC_CONSENT_KEY,"yes");vgSettings.music=true;saveVgSettings();hideVgMusicConsent();vgStartMusic();vgUpdateMusicUI();}
+        function declineVgMusicConsent(){localStorage.setItem(VG_MUSIC_CONSENT_KEY,"no");vgSettings.music=false;saveVgSettings();vgPauseMusic();hideVgMusicConsent();vgUpdateMusicUI();}
+        function initVgMusicConsent(){if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)===null)showVgMusicConsent();else if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes")vgSettings.music=false;vgUpdateMusicUI();}
+
         function vgSetMusicVolume(v){
           vgSettings.musicVolume=Math.min(.25,Math.max(0,Number(v)||0));
           saveVgSettings();
@@ -1119,8 +1145,10 @@
           if(!vgSettings.music)return;
           vgGetMusicUrl(vgMusicTracks[vgMusicIndex].src).catch(function(e){console.warn("Music preload:",e);});
         }
-        setTimeout(vgWarmMusic,500);
+        setTimeout(vgWarmMusic,900);
+        setTimeout(initVgMusicConsent,650);
         function vgPlayMusicFromPanel(){
+          if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes"){showVgMusicConsent();return;}
           vgSettings.music=true;
           saveVgSettings();
           vgStartMusic();
@@ -1144,7 +1172,7 @@
 
         // --- Navigation Controller ---
         function switchTab(tabId) {
-            if(vgSettings.music) vgStartMusic();
+            if(vgSettings.music && localStorage.getItem(VG_MUSIC_CONSENT_KEY)==="yes") vgStartMusic();
             if(tabId === "friends" && !window.vgAuthUser){
                 openLogin();
                 return;
@@ -1167,7 +1195,7 @@
             if(vgSettings.sound) vgPlayUiSound();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if(tabId !== 'arcade') stopActiveGame();
-            if(vgSettings.music && (!vgMusicAudio || vgMusicAudio.paused)) vgStartMusic();
+            if(vgSettings.music && localStorage.getItem(VG_MUSIC_CONSENT_KEY)==="yes" && (!vgMusicAudio || vgMusicAudio.paused)) vgStartMusic();
         }
 
         function toggleMobileMenu() {
