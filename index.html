@@ -1115,6 +1115,11 @@
           const t=e.target.closest("button,a,select,input,[role=\"button\"]");
           if(t&&!t.closest("#vgMusicPanel")&&vgSettings.sound)vgPlayUiSound();
         });
+        function vgWarmMusic(){
+          if(!vgSettings.music)return;
+          vgGetMusicUrl(vgMusicTracks[vgMusicIndex].src).catch(function(e){console.warn("Music preload:",e);});
+        }
+        setTimeout(vgWarmMusic,500);
         function vgPlayMusicFromPanel(){
           vgSettings.music=true;
           saveVgSettings();
