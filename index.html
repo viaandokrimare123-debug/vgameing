@@ -1103,7 +1103,8 @@
 
             document.getElementById('navLinks').classList.add('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            if(tabId !== 'arcade') stopActiveGame();\n            if(vgSettings.music && (!vgMusicAudio || vgMusicAudio.paused)) vgStartMusic();
+            if(tabId !== 'arcade') stopActiveGame();
+            if(vgSettings.music && (!vgMusicAudio || vgMusicAudio.paused)) vgStartMusic();
         }
 
         function toggleMobileMenu() {
