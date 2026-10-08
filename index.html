@@ -1053,11 +1053,24 @@
         }
         function vgStartMusic(){
           const a=vgMusicEnsure();
-          if(!a.src)vgLoadMusic(vgMusicIndex,false);
+          if(!vgSettings.music){vgPauseMusic();return;}
           a.volume=Number(vgSettings.musicVolume)||.12;
-          if(vgSettings.music){
+          const current=vgMusicTracks[vgMusicIndex];
+          const readyUrl=vgMusicObjectUrls[current.src];
+          if(readyUrl){
+            if(a.src!==readyUrl){a.src=readyUrl;a.load();}
             const p=a.play();
-            if(p&&p.catch)p.catch(function(){window._vgMusicWaiting=true;});
+            if(p&&p.then)p.then(function(){window._vgMusicWaiting=false;}).catch(function(){window._vgMusicWaiting=true;});
+          }else{
+            window._vgMusicWaiting=true;
+            vgLoadMusic(vgMusicIndex,false).then(function(){
+              if(vgSettings.music&&vgMusicObjectUrls[current.src]){
+                a.src=vgMusicObjectUrls[current.src];
+                a.load();
+                const p=a.play();
+                if(p&&p.catch)p.catch(function(){window._vgMusicWaiting=true;});
+              }
+            }).catch(function(){});
           }
           vgUpdateMusicUI();
         }
