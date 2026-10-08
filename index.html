@@ -954,12 +954,16 @@
           if(!confirm("Reset all Vgameing settings to their default values? Your account, leaderboard scores, friends, and other game data will NOT be deleted."))return;
           vgSettings=Object.assign({},vgSettingsDefaults);
           saveVgSettings();
+          if(vgMusicAudio){ vgMusicAudio.pause(); vgMusicAudio.currentTime=0; }
+          vgMusicIndex=0;
           applyVgSettings();
+          vgLoadMusic(0,false);
           const status=document.getElementById("settingsStatus");
           if(status) status.textContent="✓ Settings reset to defaults";
           if(vgSettings.sound) vgPlayUiSound();
         }
-        let vgUiAudioContext=null;\n        function vgPlayUiSound(){if(!vgSettings.sound)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!vgUiAudioContext)vgUiAudioContext=new AC();if(vgUiAudioContext.state==="suspended")vgUiAudioContext.resume();const o=vgUiAudioContext.createOscillator(),g=vgUiAudioContext.createGain();o.frequency.value=660;o.type="sine";g.gain.setValueAtTime(.022,vgUiAudioContext.currentTime);g.gain.exponentialRampToValueAtTime(.001,vgUiAudioContext.currentTime+.07);o.connect(g);g.connect(vgUiAudioContext.destination);o.start();o.stop(vgUiAudioContext.currentTime+.07);}catch(e){}}
+        let vgUiAudioContext=null;
+        function vgPlayUiSound(){if(!vgSettings.sound)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!vgUiAudioContext)vgUiAudioContext=new AC();if(vgUiAudioContext.state==="suspended")vgUiAudioContext.resume();const o=vgUiAudioContext.createOscillator(),g=vgUiAudioContext.createGain();o.frequency.value=660;o.type="sine";g.gain.setValueAtTime(.022,vgUiAudioContext.currentTime);g.gain.exponentialRampToValueAtTime(.001,vgUiAudioContext.currentTime+.07);o.connect(g);g.connect(vgUiAudioContext.destination);o.start();o.stop(vgUiAudioContext.currentTime+.07);}catch(e){}}
         let vgMusicAudio=null,vgMusicIndex=0;
         const vgMusicTracks=[{title:"Minecraft – Door",src:"music/1-02.%20Door.mp3"},{title:"Minecraft – Moog City",src:"music/1-06.%20Moog%20City.mp3"},{title:"Vgameing Gaming Background",src:"music/vgameing-background.mp3"}];
         function vgMusicEnsure(){if(vgMusicAudio)return vgMusicAudio;vgMusicAudio=new Audio();vgMusicAudio.preload="auto";vgMusicAudio.volume=Number(vgSettings.musicVolume)||.12;vgMusicAudio.addEventListener("ended",function(){vgMusicIndex=(vgMusicIndex+1)%vgMusicTracks.length;vgLoadMusic(vgMusicIndex,true);});return vgMusicAudio;}
