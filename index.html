@@ -61,6 +61,10 @@
         #navLinks .nav-btn{position:relative;border:1px solid transparent}#navLinks .nav-btn:hover{background:rgba(255,255,255,.035);border-color:rgba(0,243,255,.18);transform:translateY(-1px)}
         main>section>div,.bg-neon-card{transition:box-shadow .25s ease,border-color .25s ease,transform .25s ease}main>section>div:hover{border-color:rgba(0,243,255,.22)}
         .vg-music-consent{background:radial-gradient(circle at 50% 0%,rgba(0,243,255,.12),transparent 45%),rgba(5,5,12,.92)}.vg-consent-orb{box-shadow:0 0 35px rgba(0,243,255,.3),0 0 80px rgba(176,0,255,.15)}.vg-no-neon .vg-consent-orb{box-shadow:none}
+        .vg-verified-tick{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#1687f8;color:#fff;font-size:11px;font-weight:1000;line-height:1;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(22,135,248,.18),0 0 16px rgba(22,135,248,.55);cursor:help;vertical-align:middle}.vg-verified-tick.hidden{display:none}.vg-verified-tick:hover{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 0 3px rgba(22,135,248,.2),0 0 24px rgba(22,135,248,.8)}
+        .vg-hero-shine{position:relative;overflow:hidden}.vg-hero-shine:after{content:"";position:absolute;inset:-80% -20%;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.07) 50%,transparent 58%);transform:translateX(-55%) rotate(8deg);animation:vgShine 7s linear infinite;pointer-events:none}@keyframes vgShine{to{transform:translateX(55%) rotate(8deg)}}
+        .vg-glass{background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(18px)}
+        .vg-float{animation:vgFloat 5s ease-in-out infinite}@keyframes vgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 </style>
 </head>
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
@@ -142,10 +146,10 @@
                 <button id="adminNavBtn" onclick="switchTab('admin')" class="nav-btn hidden px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="admin">Admin</button>
             </nav>
 
-            <div id="vgAuthBadge" class="hidden md:flex items-center gap-3 bg-neon-card border border-neon-cyan/30 px-3 py-1.5 rounded-xl">
+            <div id="vgAuthBadge" class="hidden md:flex items-center gap-3 vg-glass px-3 py-1.5 rounded-xl shadow-lg">
                 <div id="vgAuthDot" class="w-2 h-2 rounded-full bg-gray-500"></div>
                 <span id="displayUserTag" class="text-xs font-bold text-neon-cyan">Player</span>
-                <span id="vgVerifiedBadge" class="hidden text-[9px] font-black text-neon-green border border-neon-green/40 rounded px-1.5 py-0.5">✓ VERIFIED</span>
+                <span id="vgVerifiedBadge" title="Verified Vgameing account" aria-label="Verified Vgameing account" class="hidden vg-verified-tick">✓</span>
                 <button id="vgLoginButton" onclick="openLogin()" class="text-[10px] text-neon-green hover:text-white transition ml-1">[Login]</button>
                 <button id="vgSignOutButton" onclick="signOut()" class="hidden text-[10px] text-gray-400 hover:text-neon-pink transition ml-1">[Sign Out]</button>
             </div>
@@ -1014,11 +1018,11 @@
           }catch(e){}
         }
         let vgMusicAudio=null,vgMusicIndex=0,vgMusicZipPromise=null,vgMusicObjectUrls={};
-        const VG_MUSIC_ZIP_URL="https://raw.githubusercontent.com/viaandokrimare123-debug/vgameing/main/vgameing-music-assets.zip";
+        // Music lives directly in the repo's /music folder — no ZIP loader needed.
         const vgMusicTracks=[
-          {title:"Minecraft – Door",src:"assets/music/minecraft-door.mp3"},
-          {title:"Minecraft – Moog City",src:"assets/music/minecraft-moog-city.mp3"},
-          {title:"Vgameing Gaming Background",src:"assets/music/vgameing-background.mp3"}
+          {title:"Minecraft – Door",src:"music/1-02. Door.mp3"},
+          {title:"Minecraft – Moog City",src:"music/1-06. Moog City.mp3"},
+          {title:"Vgameing Gaming Background",src:"music/vgameing-background.mp3"}
         ];
         function vgMusicEnsure(){
           if(vgMusicAudio)return vgMusicAudio;
@@ -1032,66 +1036,25 @@
           return vgMusicAudio;
         }
         async function vgGetMusicUrl(path){
-          if(vgMusicObjectUrls[path])return vgMusicObjectUrls[path];
-          if(!window.JSZip)throw new Error("Music loader is still starting");
-          if(!vgMusicZipPromise){
-            vgMusicZipPromise=fetch(VG_MUSIC_ZIP_URL,{cache:"no-store"}).then(function(res){
-              if(!res.ok)throw new Error("Music pack HTTP "+res.status);
-              return res.arrayBuffer();
-            }).then(function(buf){return JSZip.loadAsync(buf);});
-          }
-          const zip=await vgMusicZipPromise;
-          const entry=zip.file(path);
-          if(!entry)throw new Error("Track not found in music pack: "+path);
-          const blob=await entry.async("blob");
-          const url=URL.createObjectURL(blob);
-          vgMusicObjectUrls[path]=url;
-          return url;
+          // Return the real repo path directly. This fixes the old ZIP/path mismatch.
+          return path;
         }
-        async function vgLoadMusic(i,play){
-          const a=vgMusicEnsure();
-          vgMusicIndex=((i%vgMusicTracks.length)+vgMusicTracks.length)%vgMusicTracks.length;
-          const t=vgMusicTracks[vgMusicIndex];
-          a.pause();
-          a.volume=Number(vgSettings.musicVolume)||.12;
-          const title=document.getElementById("vgMusicTitle");
-          if(title)title.textContent=t.title;
-          try{
-            const src=await vgGetMusicUrl(t.src);
-            a.src=src;
-            a.load();
-            if(play&&vgSettings.music){
-              await a.play();
-              window._vgMusicWaiting=false;
-            }
-          }catch(err){
-            console.warn("Vgameing music load failed:",err);
-            if(play&&vgSettings.music)window._vgMusicWaiting=true;
-          }
-          vgUpdateMusicUI();
-        }
-        function vgStartMusic(){
+                function vgStartMusic(){
           if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes"){vgSettings.music=false;saveVgSettings();vgUpdateMusicUI();return;}
           const a=vgMusicEnsure();
           if(!vgSettings.music){vgPauseMusic();return;}
-          a.volume=Number(vgSettings.musicVolume)||.12;
           const current=vgMusicTracks[vgMusicIndex];
-          const readyUrl=vgMusicObjectUrls[current.src];
-          if(readyUrl){
-            if(a.src!==readyUrl){a.src=readyUrl;a.load();}
-            const p=a.play();
-            if(p&&p.then)p.then(function(){window._vgMusicWaiting=false;}).catch(function(){window._vgMusicWaiting=true;});
-          }else{
+          a.volume=Number(vgSettings.musicVolume)||.12;
+          a.src=current.src;
+          a.load();
+          // This function is called directly by the ENABLE MUSIC / Music button click.
+          // Calling play() here (without an await before it) preserves the browser's user gesture.
+          const p=a.play();
+          if(p&&p.then)p.then(function(){window._vgMusicWaiting=false;}).catch(function(err){
+            console.warn("Vgameing music play blocked:",err);
             window._vgMusicWaiting=true;
-            vgLoadMusic(vgMusicIndex,false).then(function(){
-              if(vgSettings.music&&vgMusicObjectUrls[current.src]){
-                a.src=vgMusicObjectUrls[current.src];
-                a.load();
-                const p=a.play();
-                if(p&&p.catch)p.catch(function(){window._vgMusicWaiting=true;});
-              }
-            }).catch(function(){});
-          }
+            vgUpdateMusicUI();
+          });
           vgUpdateMusicUI();
         }
         function vgPauseMusic(){
