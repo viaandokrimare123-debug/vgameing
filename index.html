@@ -66,6 +66,9 @@
         #vgElitePanel:not(.open), #vgSeedModal:not(.open) { display: none !important; pointer-events: none !important; }
         #vgElitePanel.open { display: block !important; pointer-events: auto; }
         #vgSeedModal.open { display: flex !important; pointer-events: auto; }
+        #vgElitePanel { position: fixed; inset: 0; z-index: 10000; overflow-y: auto; }
+        #vgElitePanel .vg-elite-grid { position: relative; min-width: 0; }
+        #tab-seeds, #tab-boss-fight, #tab-youtube, #tab-shorts, #tab-community, #tab-friends, #tab-tools, #tab-leaderboard, #tab-quiz { overflow: clip; }
         #tab-seeds #seedsGrid { width: 100%; min-width: 0; }
         #tab-boss-fight #bossFightApp { width: 100%; min-width: 0; }
         #tab-seeds #seedsGrid { display: grid; min-height: 1px; }
@@ -163,7 +166,8 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
                 <button onclick="switchTab('friends')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="friends">Friends</button>
                 <button onclick="switchTab('tools')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="tools">Tools</button>
                 <button onclick="switchTab('leaderboard')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="leaderboard">Leaderboard</button>
-                <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos & Shorts</button>
+                <button onclick="switchTab('youtube')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="youtube">Videos</button>
+                <button onclick="switchTab('shorts')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="shorts">Shorts</button>
                 <button onclick="switchTab('settings')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="settings">Settings</button>
                 <button id="adminNavBtn" onclick="switchTab('admin')" class="nav-btn hidden px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="admin">Admin</button>
             </nav>
@@ -661,13 +665,22 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
             </div>
         </section>
 
-        <!-- 7. YOUTUBE TAB -->
-        <section id="tab-youtube" class="hidden space-y-6 max-w-6xl mx-auto">
+        <!-- VIDEOS TAB: independent content container -->
+        <section id="tab-youtube" class="hidden space-y-6 max-w-6xl mx-auto" aria-labelledby="videosHeading">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black text-neon-pink">📺 @travelwithme123m Videos & Shorts</h2>
-                <p class="text-xs sm:text-sm text-gray-400">Directly view official video thumbnails, titles, and watch links from your channel.</p>
+                <h2 id="videosHeading" class="text-3xl font-black text-neon-pink">📺 V-Gaming Videos</h2>
+                <p class="text-xs sm:text-sm text-gray-400">Watch the featured Minecraft videos from the channel.</p>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6" id="youtubeThumbnailsGrid"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="youtubeThumbnailsGrid"></div>
+        </section>
+
+        <!-- SHORTS TAB: isolated from the Videos grid -->
+        <section id="tab-shorts" class="hidden space-y-6 max-w-6xl mx-auto" aria-labelledby="shortsHeading">
+            <div class="text-center space-y-2">
+                <h2 id="shortsHeading" class="text-3xl font-black text-neon-cyan">⚡ V-Gaming Shorts</h2>
+                <p class="text-xs sm:text-sm text-gray-400">Quick Minecraft builds, seeds, and cinematic clips.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="shortsThumbnailsGrid"></div>
         </section>
 
     </main>
@@ -1118,7 +1131,6 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
             // Friendly aliases keep older buttons/links working without leaving the previous tab visible.
             const aliases = {
                 videos: 'youtube',
-                shorts: 'youtube',
                 'videos-shorts': 'youtube',
                 daily: 'quiz',
                 'daily-quiz': 'quiz',
@@ -1230,29 +1242,37 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
         ];
 
         function renderThumbnailsAndVideos() {
-            let cardsHtml = channelUploads.map(vid => `
-                <div class="bg-neon-card border border-neon-pink/30 rounded-2xl overflow-hidden flex flex-col justify-between neon-glow-pink transition hover:scale-[1.01]">
-                    <div class="relative group">
-                        <img src="https://img.youtube.com/vi/${vid.id}/hqdefault.jpg" alt="${vid.title}" class="w-full h-44 object-cover">
-                        <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-neon-pink border border-neon-pink/30">${vid.badge}</div>
-                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="px-4 py-2 rounded-xl bg-neon-pink text-white font-extrabold text-xs shadow-lg">▶ Watch on YouTube</span>
-                        </a>
-                    </div>
-                    <div class="p-4 space-y-3 flex flex-col justify-between flex-grow">
-                        <div>
-                            <span class="text-[10px] font-mono text-gray-400 uppercase">${vid.type}</span>
-                            <h3 class="text-sm font-bold text-white mt-0.5">${vid.title}</h3>
+            function cardMarkup(vid, isShort) {
+                const watchUrl = 'https://www.youtube.com/watch?v=' + encodeURIComponent(vid.id);
+                return `
+                    <article class="bg-neon-card border border-neon-pink/30 rounded-2xl overflow-hidden flex flex-col justify-between neon-glow-pink transition hover:scale-[1.01]">
+                        <div class="relative group">
+                            <img src="https://img.youtube.com/vi/${vid.id}/hqdefault.jpg" alt="${vid.title}" loading="lazy" class="w-full h-44 object-cover">
+                            <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-neon-pink border border-neon-pink/30">${vid.badge}</div>
+                            <a href="${watchUrl}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center" aria-label="Watch ${vid.title} on YouTube">
+                                <span class="px-4 py-2 rounded-xl bg-neon-pink text-white font-extrabold text-xs shadow-lg">▶ Watch on YouTube</span>
+                            </a>
                         </div>
-                        <a href="https://www.youtube.com/watch?v=${vid.id}" target="_blank" class="w-full text-center py-2 rounded bg-neon-pink/20 hover:bg-neon-pink text-neon-pink hover:text-black font-bold text-xs transition border border-neon-pink/40">Watch Video &rarr;</a>
-                    </div>
-                </div>
-            `).join('');
-
-            let homeGrid = document.getElementById('homeThumbnailsGrid');
-            let ytGrid = document.getElementById('youtubeThumbnailsGrid');
-            if(homeGrid) homeGrid.innerHTML = cardsHtml;
-            if(ytGrid) ytGrid.innerHTML = cardsHtml;
+                        <div class="p-4 space-y-3 flex flex-col justify-between flex-grow">
+                            <div>
+                                <span class="text-[10px] font-mono text-gray-400 uppercase">${vid.type}</span>
+                                <h3 class="text-sm font-bold text-white mt-0.5">${vid.title}</h3>
+                            </div>
+                            <a href="${watchUrl}" target="_blank" rel="noopener noreferrer" class="w-full text-center py-2 rounded bg-neon-pink/20 hover:bg-neon-pink text-neon-pink hover:text-black font-bold text-xs transition border border-neon-pink/40">${isShort ? 'Watch Short' : 'Watch Video'} &rarr;</a>
+                        </div>
+                    </article>`;
+            }
+            const shortItems = channelUploads.filter(vid => /short/i.test(vid.type) || /short/i.test(vid.badge));
+            const videoItems = channelUploads.filter(vid => !shortItems.includes(vid));
+            const allCards = channelUploads.map(vid => cardMarkup(vid, shortItems.includes(vid))).join('');
+            const videoCards = videoItems.map(vid => cardMarkup(vid, false)).join('');
+            const shortCards = shortItems.map(vid => cardMarkup(vid, true)).join('');
+            const homeGrid = document.getElementById('homeThumbnailsGrid');
+            const videoGrid = document.getElementById('youtubeThumbnailsGrid');
+            const shortsGrid = document.getElementById('shortsThumbnailsGrid');
+            if (homeGrid) homeGrid.innerHTML = allCards || '<p class="text-sm text-gray-400">No featured uploads yet.</p>';
+            if (videoGrid) videoGrid.innerHTML = videoCards || '<p class="text-sm text-gray-400">No videos available yet.</p>';
+            if (shortsGrid) shortsGrid.innerHTML = shortCards || '<p class="text-sm text-gray-400">No Shorts available yet.</p>';
         }
 
         // --- Challenge Generator ---
