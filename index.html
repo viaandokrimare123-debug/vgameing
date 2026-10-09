@@ -51,9 +51,7 @@
         .vg-setting-card:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 25%,rgba(255,255,255,.035),transparent 75%);transform:translateX(-100%);transition:transform .7s ease;pointer-events:none}
         .vg-setting-card:hover:before{transform:translateX(100%)}
         .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
-        #vgMusicPanel{box-shadow:0 0 45px rgba(0,243,255,.18),0 0 90px rgba(176,0,255,.08)}
-        .vg-no-neon #vgMusicPanel{box-shadow:none!important}
-        .vg-no-anim main>section{animation:none!important}
+        .vg-no-neon .vg-no-anim main>section{animation:none!important}
     
         /* Vgameing professional polish + music permission */
         .vg-pro-shell{position:relative}.vg-pro-shell:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(0,243,255,.045) 35%,transparent 55%,rgba(176,0,255,.045) 85%,transparent 100%);opacity:.8}
@@ -68,17 +66,6 @@
 </style>
 </head>
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
-    <!-- MUSIC PERMISSION: browsers block unsolicited autoplay, so Vgameing asks once -->
-    <div id="vgMusicConsent" class="hidden fixed inset-0 z-[2147483646] bg-black/80 backdrop-blur-xl items-center justify-center p-4">
-      <div class="vg-music-consent vg-consent-orb w-full max-w-md rounded-3xl border border-neon-cyan/30 p-7 text-center space-y-5">
-        <div class="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center text-4xl">🎵</div>
-        <div><h2 class="text-2xl font-black text-white">Vgameing wants to play music</h2><p class="text-xs text-gray-400 mt-2 leading-5">Low-volume Minecraft music can play in the background while you browse Home, Challenges, Arcade and Seed Vault. You can mute it anytime from Settings or the Music button.</p></div>
-        <div class="flex gap-3"><button type="button" onclick="acceptVgMusicConsent()" class="flex-1 rounded-xl bg-neon-cyan py-3 text-sm font-black text-black hover:opacity-90">🎵 ENABLE MUSIC</button><button type="button" onclick="declineVgMusicConsent()" class="rounded-xl border border-gray-700 px-5 py-3 text-sm font-black text-gray-300 hover:border-gray-500">NOT NOW</button></div>
-        <div class="text-[9px] text-gray-600">Your choice is saved on this device.</div>
-      </div>
-    </div>
-
-
     <!-- ================= SECURE EMAIL VERIFICATION & SIGN-IN MODAL ================= -->
     <div id="authModal" style="display:none!important" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-neon-card border border-neon-cyan/40 rounded-2xl p-8 max-w-md w-full space-y-6 neon-glow-cyan text-center">
@@ -217,7 +204,7 @@
                 <div class="vg-setting-row"><span>🌙 Dark / Light mode</span><button id="setThemeBtn" type="button" class="vg-toggle" onclick="toggleVgTheme()"></button></div>
                 <div class="vg-setting-row"><span>🎨 Accent color</span><div class="flex items-center gap-2"><input id="setAccentColor" type="color" value="#00f3ff" class="w-11 h-8 rounded cursor-pointer bg-transparent" onchange="setVgAccent(this.value)"><span id="setAccentValue" class="text-[10px] font-mono text-neon-cyan">#00F3FF</span></div></div>
                 <div class="vg-setting-row"><span>✨ Neon effects</span><button id="setNeonBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('neon')"></button></div>
-                <div class="vg-setting-row"><span>🔊 Sound effects</span><button id="setSoundBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('sound')"></button></div><div class="vg-setting-row"><span>🎵 Background music</span><button id="setMusicBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('music')"></button></div>
+                <div class="vg-setting-row"><span>🔊 Sound effects</span><button id="setSoundBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('sound')"></button></div>
                 <div class="vg-setting-row"><span>🎮 Gaming UI animations</span><button id="setAnimBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('animations')"></button></div>
               </div>
             </div>
@@ -959,10 +946,9 @@
         }
 
         const VG_SETTINGS_KEY="vgaming_settings_v2";
-        const vgSettingsDefaults={theme:"dark",accent:"#00f3ff",neon:true,music:false,musicVolume:0.14,sound:true,animations:true,avatar:"🎮",notifications:true,notifAchievement:true,notifRank:true,notifChallenge:true,notifSeed:true,edition:"java",mcVersion:"Latest",seedVersion:"Latest",coordinates:false,verifiedSeeds:false,publicProfile:true,leaderboardName:true};
+        const vgSettingsDefaults={theme:"dark",accent:"#00f3ff",neon:true,sound:true,animations:true,avatar:"🎮",notifications:true,notifAchievement:true,notifRank:true,notifChallenge:true,notifSeed:true,edition:"java",mcVersion:"Latest",seedVersion:"Latest",coordinates:false,verifiedSeeds:false,publicProfile:true,leaderboardName:true};
         let vgSettings=Object.assign({},vgSettingsDefaults,JSON.parse(localStorage.getItem(VG_SETTINGS_KEY)||"{}"));
-        const VG_MUSIC_CONSENT_KEY="vgaming_music_consent_v1";
-        if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes") vgSettings.music=false;
+        delete vgSettings.music; delete vgSettings.musicVolume;
         function saveVgSettings(){localStorage.setItem(VG_SETTINGS_KEY,JSON.stringify(vgSettings));}
         function saveVgPref(key,value){vgSettings[key]=value;saveVgSettings();applyVgSettings();showSettingsSaved();}
         function showSettingsSaved(){const el=document.getElementById("settingsStatus");if(el){el.textContent="✓ Setting saved on this device";clearTimeout(window._vgSetTimer);window._vgSetTimer=setTimeout(()=>el.textContent="",1800);}}
@@ -975,7 +961,7 @@
           const accent=vgSettings.accent||"#00f3ff";
           const color=document.getElementById("setAccentColor");if(color)color.value=accent;
           const val=document.getElementById("setAccentValue");if(val)val.textContent=accent.toUpperCase();
-          const map={neon:"setNeonBtn",sound:"setSoundBtn",music:"setMusicBtn",animations:"setAnimBtn",notifications:"setNotifMasterBtn",notifAchievement:"setNotifAchievementBtn",notifRank:"setNotifRankBtn",notifChallenge:"setNotifChallengeBtn",notifSeed:"setNotifSeedBtn",coordinates:"setCoordsBtn",verifiedSeeds:"setVerifiedSeedsBtn",publicProfile:"setPublicProfileBtn",leaderboardName:"setLeaderboardNameBtn"};
+          const map={neon:"setNeonBtn",sound:"setSoundBtn",animations:"setAnimBtn",notifications:"setNotifMasterBtn",notifAchievement:"setNotifAchievementBtn",notifRank:"setNotifRankBtn",notifChallenge:"setNotifChallengeBtn",notifSeed:"setNotifSeedBtn",coordinates:"setCoordsBtn",verifiedSeeds:"setVerifiedSeedsBtn",publicProfile:"setPublicProfileBtn",leaderboardName:"setLeaderboardNameBtn"};
           Object.keys(map).forEach(k=>{const b=document.getElementById(map[k]);if(b)b.classList.toggle("on",!!vgSettings[k]);});
           const themeBtn=document.getElementById("setThemeBtn");if(themeBtn){themeBtn.classList.toggle("on",vgSettings.theme==="light");themeBtn.title=vgSettings.theme==="light"?"Light mode":"Dark mode";}
           const av=document.getElementById("settingsAvatar");if(av)av.textContent=vgSettings.avatar||"🎮";
@@ -983,140 +969,31 @@
           ["edition","mcVersion","seedVersion"].forEach(k=>{const el=document.getElementById(k==="edition"?"setEdition":k==="mcVersion"?"setMcVersion":"setSeedVersion");if(el)el.value=vgSettings[k];});
           const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content=vgSettings.accent||"#00f3ff";
         }
-        function toggleVgTheme(){vgSettings.theme=vgSettings.theme==="dark"?"light":"dark";saveVgSettings();applyVgSettings();showSettingsSaved();vgPlayUiSound();}
-        function toggleVgSetting(key){vgSettings[key]=!vgSettings[key];saveVgSettings();applyVgSettings();showSettingsSaved();if(key==="music"){if(vgSettings.music)vgStartMusic();else vgPauseMusic();}else if(vgSettings.sound)vgPlayUiSound();}
-        function setVgAccent(value){if(!/^#[0-9a-fA-F]{6}$/.test(value))return;vgSettings.accent=value;saveVgSettings();applyVgSettings();showSettingsSaved();if(vgSettings.sound)vgPlayUiSound();}
-        function setVgAvatar(value){vgSettings.avatar=value||"🎮";saveVgSettings();applyVgSettings();showSettingsSaved();}
+        function toggleVgTheme(){vgSettings.theme=vgSettings.theme==="dark"?"light":"dark";saveVgSettings();applyVgSettings();showSettingsSaved();vgPlayUiSound("toggle");}
+        function toggleVgSetting(key){vgSettings[key]=!vgSettings[key];saveVgSettings();applyVgSettings();showSettingsSaved();if(vgSettings.sound)vgPlayUiSound("toggle");}
+        function setVgAccent(value){if(!/^#[0-9a-fA-F]{6}$/.test(value))return;vgSettings.accent=value;saveVgSettings();applyVgSettings();showSettingsSaved();vgPlayUiSound("toggle");}
+        function setVgAvatar(value){vgSettings.avatar=value||"🎮";saveVgSettings();applyVgSettings();showSettingsSaved();vgPlayUiSound("toggle");}
         function resetVgSettings(){
           if(!confirm("Reset all Vgameing settings to their default values? Your account, leaderboard scores, friends, and other game data will NOT be deleted."))return;
-          vgSettings=Object.assign({},vgSettingsDefaults);
-          saveVgSettings();
-          if(typeof vgPauseMusic==="function")vgPauseMusic();
-          vgMusicIndex=0;
-          applyVgSettings();
-          vgLoadMusic(0,false);
-          const status=document.getElementById("settingsStatus");
-          if(status) status.textContent="✓ Settings reset to defaults";
-          if(vgSettings.sound) vgPlayUiSound();
+          vgSettings=Object.assign({},vgSettingsDefaults);saveVgSettings();applyVgSettings();
+          const status=document.getElementById("settingsStatus");if(status)status.textContent="✓ Settings reset to defaults";
+          vgPlayUiSound("success");
         }
         let vgUiAudioContext=null;
-        function vgPlayUiSound(){
+        function vgPlayUiSound(type){
           if(!vgSettings.sound)return;
           try{
-            const AC=window.AudioContext||window.webkitAudioContext;
-            if(!AC)return;
+            const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
             if(!vgUiAudioContext)vgUiAudioContext=new AC();
-            if(vgUiAudioContext.state==="suspended")vgUiAudioContext.resume();
-            const o=vgUiAudioContext.createOscillator();
-            const g=vgUiAudioContext.createGain();
-            o.frequency.value=660;
-            o.type="sine";
-            g.gain.setValueAtTime(.022,vgUiAudioContext.currentTime);
-            g.gain.exponentialRampToValueAtTime(.001,vgUiAudioContext.currentTime+.07);
-            o.connect(g);g.connect(vgUiAudioContext.destination);
-            o.start();o.stop(vgUiAudioContext.currentTime+.07);
+            const ctx=vgUiAudioContext;if(ctx.state==="suspended")ctx.resume();
+            const patterns={click:[[620,.045,.018]],toggle:[[520,.05,.025],[780,.07,.022]],success:[[523,.09,.04],[659,.09,.04],[784,.16,.045]],win:[[523,.10,.045],[659,.10,.045],[784,.10,.045],[1046,.25,.05]],lose:[[330,.14,.04],[262,.22,.04]],login:[[587,.08,.035],[784,.13,.04]],error:[[220,.12,.04],[180,.18,.035]],challenge:[[659,.08,.035],[880,.12,.04]]};
+            const notes=patterns[type]||patterns.click;let offset=0;
+            notes.forEach(function(n){const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=n[0];g.gain.setValueAtTime(.0001,ctx.currentTime+offset);g.gain.exponentialRampToValueAtTime(n[2],ctx.currentTime+offset+.012);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+offset+n[1]);o.connect(g);g.connect(ctx.destination);o.start(ctx.currentTime+offset);o.stop(ctx.currentTime+offset+n[1]+.02);offset+=n[1]*.72;});
           }catch(e){}
         }
-        let vgMusicAudio=null,vgMusicIndex=0,vgMusicZipPromise=null,vgMusicObjectUrls={};
-        // Music lives directly in the repo's /music folder — no ZIP loader needed.
-        const vgMusicTracks=[
-          {title:"Minecraft – Door",src:"music/1-02. Door.mp3"},
-          {title:"Minecraft – Moog City",src:"music/1-06. Moog City.mp3"},
-          {title:"Vgameing Gaming Background",src:"music/vgameing-background.mp3"}
-        ];
-        function vgMusicEnsure(){
-          if(vgMusicAudio)return vgMusicAudio;
-          vgMusicAudio=new Audio();
-          vgMusicAudio.preload="auto";
-          vgMusicAudio.volume=Number(vgSettings.musicVolume)||.12;
-          vgMusicAudio.addEventListener("ended",function(){
-            vgMusicIndex=(vgMusicIndex+1)%vgMusicTracks.length;
-            vgLoadMusic(vgMusicIndex,true);
-          });
-          return vgMusicAudio;
-        }
-        async function vgGetMusicUrl(path){
-          // Return the real repo path directly. This fixes the old ZIP/path mismatch.
-          return path;
-        }
-                function vgStartMusic(){
-          if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes"){vgSettings.music=false;saveVgSettings();vgUpdateMusicUI();return;}
-          const a=vgMusicEnsure();
-          if(!vgSettings.music){vgPauseMusic();return;}
-          const current=vgMusicTracks[vgMusicIndex];
-          a.volume=Number(vgSettings.musicVolume)||.12;
-          a.src=current.src;
-          a.load();
-          // This function is called directly by the ENABLE MUSIC / Music button click.
-          // Calling play() here (without an await before it) preserves the browser's user gesture.
-          const p=a.play();
-          if(p&&p.then)p.then(function(){window._vgMusicWaiting=false;}).catch(function(err){
-            console.warn("Vgameing music play blocked:",err);
-            window._vgMusicWaiting=true;
-            vgUpdateMusicUI();
-          });
-          vgUpdateMusicUI();
-        }
-        function vgPauseMusic(){
-          if(vgMusicAudio)vgMusicAudio.pause();
-          vgUpdateMusicUI();
-        }
-        function vgToggleMusicPanel(){
-          const panel=document.getElementById("vgMusicPanel");
-          if(panel)panel.classList.toggle("hidden");
-        }
-        function showVgMusicConsent(){const m=document.getElementById("vgMusicConsent");if(m){m.classList.remove("hidden");m.classList.add("flex");}}
-        function hideVgMusicConsent(){const m=document.getElementById("vgMusicConsent");if(m){m.classList.add("hidden");m.classList.remove("flex");}}
-        function acceptVgMusicConsent(){localStorage.setItem(VG_MUSIC_CONSENT_KEY,"yes");vgSettings.music=true;saveVgSettings();hideVgMusicConsent();vgStartMusic();vgUpdateMusicUI();}
-        function declineVgMusicConsent(){localStorage.setItem(VG_MUSIC_CONSENT_KEY,"no");vgSettings.music=false;saveVgSettings();vgPauseMusic();hideVgMusicConsent();vgUpdateMusicUI();}
-        function initVgMusicConsent(){if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)===null)showVgMusicConsent();else if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes")vgSettings.music=false;vgUpdateMusicUI();}
-
-        function vgSetMusicVolume(v){
-          vgSettings.musicVolume=Math.min(.25,Math.max(0,Number(v)||0));
-          saveVgSettings();
-          if(vgMusicAudio)vgMusicAudio.volume=vgSettings.musicVolume;
-          const o=document.getElementById("vgMusicVolumeValue");
-          if(o)o.textContent=Math.round(vgSettings.musicVolume*100)+"%";
-        }
-        function vgNextMusic(){
-          vgSettings.music=true;
-          saveVgSettings();
-          vgLoadMusic(vgMusicIndex+1,true);
-          vgUpdateMusicUI();
-        }
-        function vgUpdateMusicUI(){
-          const b=document.getElementById("setMusicBtn");
-          if(b)b.classList.toggle("on",!!vgSettings.music);
-          const s=document.getElementById("vgMusicStatus");
-          if(s)s.textContent=vgSettings.music?"🎵 MUSIC ON":"🔇 MUSIC OFF";
-          const o=document.getElementById("vgMusicVolumeValue");
-          if(o)o.textContent=Math.round((Number(vgSettings.musicVolume)||.12)*100)+"%";
-        }
-        document.addEventListener("pointerdown",function(){
-          if(window._vgMusicWaiting&&vgSettings.music){
-            window._vgMusicWaiting=false;
-            vgStartMusic();
-          }else if(vgSettings.music && (!vgMusicAudio || vgMusicAudio.paused)){
-            vgStartMusic();
-          }
-        },{passive:true});
-        document.addEventListener("click",function(e){
-          const t=e.target.closest("button,a,select,input,[role=\"button\"]");
-          if(t&&!t.closest("#vgMusicPanel")&&vgSettings.sound)vgPlayUiSound();
-        });
-        function vgWarmMusic(){
-          if(!vgSettings.music)return;
-          vgGetMusicUrl(vgMusicTracks[vgMusicIndex].src).catch(function(e){console.warn("Music preload:",e);});
-        }
-        setTimeout(vgWarmMusic,900);
-        setTimeout(initVgMusicConsent,650);
-        function vgPlayMusicFromPanel(){
-          if(localStorage.getItem(VG_MUSIC_CONSENT_KEY)!=="yes"){showVgMusicConsent();return;}
-          vgSettings.music=true;
-          saveVgSettings();
-          vgStartMusic();
-          vgUpdateMusicUI();
-        }
+        window.vgPlaySound=function(type){vgPlayUiSound(type||"click");};
+        document.addEventListener("click",function(e){const t=e.target.closest("button,a,select,[role='button']");if(t&&vgSettings.sound&&!t.matches("[data-sound='silent']"))vgPlayUiSound("click");});
+        function vgUpdateMusicUI(){}
         function showVgAchievements(){alert("🏆 Vgameing Achievements\n\n🎯 First Score\n⚡ Lightning\n🎯 Sharpshooter\n🧟 Zombie Slayer\n🔥 On Fire\n👑 Champion\n💯 Century\n\nAchievements will unlock automatically as you play.");}
         function clearVgLocalData(){if(!confirm("Clear local Vgameing game data? This removes local scores, missions, preferences and guest data from this browser."))return;["vgaming_leaderboards","vg_daily_missions_"+new Date().toISOString().slice(0,10),"vg_friends_v1"].forEach(k=>localStorage.removeItem(k));alert("🗑️ Local game data cleared. Your Google account and Supabase data are not deleted.");location.reload();}
         function showSessionInfo(){const u=window.vgAuthUser;alert(u?"🔐 SESSION ACTIVE\n\nAccount: "+(u.email||"Google account")+"\n\nYour active Supabase session keeps you signed in on this device.":"🔒 No account session is active. Login with Google from Settings.");}
@@ -1135,7 +1012,6 @@
 
         // --- Navigation Controller ---
         function switchTab(tabId) {
-            if(vgSettings.music && localStorage.getItem(VG_MUSIC_CONSENT_KEY)==="yes") vgStartMusic();
             if(tabId === "friends" && !window.vgAuthUser){
                 openLogin();
                 return;
@@ -1158,7 +1034,6 @@
             if(vgSettings.sound) vgPlayUiSound();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if(tabId !== 'arcade') stopActiveGame();
-            if(vgSettings.music && localStorage.getItem(VG_MUSIC_CONSENT_KEY)==="yes" && (!vgMusicAudio || vgMusicAudio.paused)) vgStartMusic();
         }
 
         function toggleMobileMenu() {
@@ -1224,6 +1099,7 @@
         }
 
         function generateChallenge() {
+            vgPlayUiSound("challenge");
             let rand = challengesList[Math.floor(Math.random() * challengesList.length)];
             document.getElementById('challengeText').innerText = `"${rand.text}"`;
             document.getElementById('challengeDifficulty').innerText = `Difficulty: ${rand.diff}`;
@@ -2398,7 +2274,7 @@
                 gameTimeout = setTimeout(() => { state = 'ready'; start = performance.now(); arena.className = "h-64 sm:h-80 bg-green-950/80 rounded-xl border border-neon-green flex items-center justify-center relative cursor-pointer"; arena.innerHTML = `<span class="text-neon-green font-black text-2xl">CLICK NOW!</span>`; }, 2000);
                 arena.onclick = () => {
                     if (state === 'waiting') { clearTimeout(gameTimeout); arena.innerHTML = `<span class="text-yellow-400">Too soon!</span>`; state = 'fail'; }
-                    else if (state === 'ready') { let t = Math.round(performance.now() - start); arena.onclick = null; submitScore('reaction', t); }
+                    else if (state === 'ready') { let t = Math.round(performance.now() - start); arena.onclick = null; vgPlayUiSound(t<300?'win':'lose'); submitScore('reaction', t); }
                 };
             } else if (type === 'cps') {
                 arena.className = "h-64 sm:h-80 bg-neon-card rounded-xl border border-neon-pink/40 flex items-center justify-center relative cursor-pointer";
@@ -2410,7 +2286,7 @@
                         arena.innerHTML = `<div id="cCount" class="text-4xl font-black text-white">1</div>`;
                         gameInterval = setInterval(() => {
                             let left = (5.0 - (Date.now() - start)/1000).toFixed(1);
-                            if (left <= 0) { clearInterval(gameInterval); arena.onclick = null; submitScore('cps', Number((clicks/5.0).toFixed(2))); }
+                            if (left <= 0) { clearInterval(gameInterval); arena.onclick = null; vgPlayUiSound(clicks>=30?'win':'lose'); submitScore('cps', Number((clicks/5.0).toFixed(2))); }
                         }, 50);
                     } else { clicks++; document.getElementById('cCount').innerText = clicks; }
                 };
@@ -2427,7 +2303,7 @@
                     arena.appendChild(z);
                     setTimeout(() => { if(z.parentNode) z.remove(); }, 1200);
                 }, 700);
-                gameTimeout = setTimeout(() => { active = false; clearInterval(sp); arena.onclick = null; submitScore('zombie', kills); }, 10000);
+                gameTimeout = setTimeout(() => { active = false; clearInterval(sp); arena.onclick = null; vgPlayUiSound(kills>=20?'win':'lose'); submitScore('zombie', kills); }, 10000);
             }
         }
 
@@ -2643,15 +2519,10 @@
   <button class="vg-task-btn" onclick="switchTab('arcade')"><span>🎮</span>Arcade</button>
   <button class="vg-task-btn" onclick="switchTab('seeds')"><span>🌱</span>Seeds</button>
   <button class="vg-task-btn" onclick="switchTab('community')"><span>🧩</span>Community</button>
-  <button class="vg-task-btn" onclick="switchTab('leaderboard')"><span>🏆</span>Ranks</button>  <button class="vg-task-btn" type="button" onclick="vgToggleMusicPanel()"><span>🎵</span>Music</button>
+  <button class="vg-task-btn" onclick="switchTab('leaderboard')"><span>🏆</span>Ranks</button>
   <div class="vg-task-divider"></div>
   <button class="vg-task-btn vg-ai-task" type="button" onclick="document.getElementById('vgChatButton').click()"><span>🤖</span>AI</button>
 </nav>
-<div id="vgMusicPanel" class="hidden fixed right-4 bottom-24 z-[2147483001] w-[min(380px,calc(100vw-32px))] rounded-2xl border border-neon-cyan/30 bg-[#0b0a14]/95 backdrop-blur-xl p-4 shadow-2xl neon-glow-cyan">
-<div class="flex items-center justify-between gap-3"><div><div class="text-sm font-black text-white">🎵 Vgameing Music</div><div id="vgMusicTitle" class="text-[10px] text-gray-400 mt-1">Minecraft – Door</div></div><button type="button" onclick="vgToggleMusicPanel()" class="text-gray-400 hover:text-white">✕</button></div>
-<div class="mt-3 flex gap-2"><button type="button" onclick="vgPlayMusicFromPanel()" class="flex-1 rounded-lg bg-neon-cyan px-3 py-2 text-[10px] font-black text-black">▶ PLAY</button><button type="button" onclick="vgPauseMusic()" class="flex-1 rounded-lg border border-gray-700 px-3 py-2 text-[10px] font-black text-gray-300">⏸ PAUSE</button><button type="button" onclick="vgNextMusic()" class="rounded-lg border border-neon-purple/40 px-3 py-2 text-[10px] font-black text-neon-purple">NEXT ▶</button></div>
-<div class="mt-3 flex items-center gap-2"><span class="text-[10px] text-gray-500">🔊 LOW</span><input type="range" min="0" max="25" value="12" oninput="vgSetMusicVolume(this.value/100)" class="flex-1"><span id="vgMusicVolumeValue" class="text-[10px] font-mono text-neon-cyan">12%</span></div>
-<div class="mt-2 flex items-center justify-between gap-2"><span id="vgMusicStatus" class="text-[10px] text-neon-green">🎵 MUSIC ON</span><button type="button" onclick="toggleVgSetting('music')" class="text-[10px] font-black text-gray-400 hover:text-white">MUSIC ON/OFF</button></div></div>
 <!-- ================= END VGAMEING GAMING TASKBAR ================= -->
 
 <script>
