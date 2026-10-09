@@ -68,7 +68,16 @@
         #navLinks .nav-btn{position:relative;border:1px solid transparent}#navLinks .nav-btn:hover{background:rgba(255,255,255,.035);border-color:rgba(0,243,255,.18);transform:translateY(-1px)}
         main>section>div,.bg-neon-card{transition:box-shadow .25s ease,border-color .25s ease,transform .25s ease}main>section>div:hover{border-color:rgba(0,243,255,.22)}
         .vg-music-consent{background:radial-gradient(circle at 50% 0%,rgba(0,243,255,.12),transparent 45%),rgba(5,5,12,.92)}.vg-consent-orb{box-shadow:0 0 35px rgba(0,243,255,.3),0 0 80px rgba(176,0,255,.15)}.vg-no-neon .vg-consent-orb{box-shadow:none}
-        .vg-verified-tick{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#1687f8;color:#fff;font-size:11px;font-weight:1000;line-height:1;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(22,135,248,.18),0 0 16px rgba(22,135,248,.55);cursor:help;vertical-align:middle}.vg-verified-tick.hidden{display:none}.vg-verified-tick:hover{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 0 3px rgba(22,135,248,.2),0 0 24px rgba(22,135,248,.8)}
+        .vg-verified-tick{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#1687f8;color:#fff;font-size:11px;font-weight:1000;line-height:1;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(22,135,248,.18),0 0 16px rgba(22,135,248,.55);cursor:help;vertical-align:middle}.vg-verified-tick.hidden{display:none}
+/* Keep the main game tabs visible when routing has activated them. */
+main > #tab-seeds:not(.hidden),
+main > #tab-boss-fight:not(.hidden) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+main > #tab-seeds:not(.hidden) #seedsGrid { display: grid !important; min-height: 1px; }
+main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; visibility: visible !important; }.vg-verified-tick:hover{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 0 3px rgba(22,135,248,.2),0 0 24px rgba(22,135,248,.8)}
         .vg-hero-shine{position:relative;overflow:hidden}.vg-hero-shine:after{content:"";position:absolute;inset:-80% -20%;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.07) 50%,transparent 58%);transform:translateX(-55%) rotate(8deg);animation:vgShine 7s linear infinite;pointer-events:none}@keyframes vgShine{to{transform:translateX(55%) rotate(8deg)}}
         .vg-glass{background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(18px)}
         .vg-float{animation:vgFloat 5s ease-in-out infinite}@keyframes vgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -1088,41 +1097,78 @@
 
         // --- Navigation Controller ---
         function switchTab(tabId) {
-            window.vgActiveTab=tabId;
-            if(tabId === "friends" && !window.vgAuthUser){
-                openLogin();
-                return;
-            }
-            if(tabId === "admin" && !window.vgAuthUser){
-                openLogin();
-                return;
-            }
-            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            const targetSection = document.getElementById(`tab-${tabId}`);
+            const targetSection = document.getElementById('tab-' + tabId);
             if (!targetSection) {
-                console.warn('[Vgameing] Unknown tab:', tabId);
-                return;
+                console.warn('[Vgameing] Unknown tab; no section found:', tabId);
+                return false;
             }
+
+            if ((tabId === 'friends' || tabId === 'admin') && !window.vgAuthUser) {
+                if (typeof window.openLogin === 'function') window.openLogin();
+                return false;
+            }
+
+            window.vgActiveTab = tabId;
+
+            // Hide only the main tab sections, then reveal the requested target.
+            document.querySelectorAll('main > section[id^="tab-"]').forEach(function (section) {
+                section.classList.add('hidden');
+                section.setAttribute('aria-hidden', 'true');
+            });
             targetSection.classList.remove('hidden');
-            if (tabId === 'seeds' && typeof renderSeeds === 'function') {
-                renderSeeds(seedCollection);
+            targetSection.setAttribute('aria-hidden', 'false');
+
+            // Explicitly restore layout for Seed Vault and Boss Fight after removing .hidden.
+            if (tabId === 'seeds' || tabId === 'boss-fight') {
+                targetSection.style.display = 'block';
+                targetSection.style.visibility = 'visible';
+                targetSection.style.opacity = '1';
             }
-            if (tabId === 'boss-fight' && typeof window.initBossFight === 'function') {
-                window.initBossFight();
+
+            if (tabId === 'seeds' && typeof window.renderSeeds === 'function') {
+                try {
+                    if (typeof seedCollection !== 'undefined') window.renderSeeds(seedCollection);
+                    else window.renderSeeds();
+                } catch (error) {
+                    console.error('[Vgameing] Seed Vault render failed:', error);
+                }
             }
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white";
-                if(btn.dataset.tab === tabId) {
-                    btn.className = "nav-btn px-3 py-1.5 rounded transition text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30";
+
+            if (tabId === 'boss-fight') {
+                if (typeof window.initBossFight === 'function') {
+                    try {
+                        window.initBossFight();
+                    } catch (error) {
+                        console.error('[Vgameing] Boss Fight initialization failed:', error);
+                    }
+                } else {
+                    console.warn('[Vgameing] initBossFight is not available yet; retrying after script load.');
+                    window.setTimeout(function () {
+                        if (window.vgActiveTab === 'boss-fight' && typeof window.initBossFight === 'function') {
+                            window.initBossFight();
+                        }
+                    }, 0);
+                }
+            }
+
+            document.querySelectorAll('.nav-btn').forEach(function (button) {
+                button.className = 'nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white';
+                if (button.dataset.tab === tabId) {
+                    button.className = 'nav-btn px-3 py-1.5 rounded transition text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30';
                 }
             });
 
-            document.getElementById('navLinks').classList.add('hidden');
-            if(vgSettings.sound) vgPlayUiSound();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            if(tabId !== 'arcade') stopActiveGame();
-            if(vgMusicAllowedOnTab(tabId)) vgStartMusic(); else vgPauseMusic();
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks) navLinks.classList.add('hidden');
+            if (window.vgSettings && window.vgSettings.sound && typeof window.vgPlayUiSound === 'function') window.vgPlayUiSound();
+            if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (tabId !== 'arcade' && typeof window.stopActiveGame === 'function') window.stopActiveGame();
+            if (typeof window.vgMusicAllowedOnTab === 'function') {
+                if (window.vgMusicAllowedOnTab(tabId)) {
+                    if (typeof window.vgStartMusic === 'function') window.vgStartMusic();
+                } else if (typeof window.vgPauseMusic === 'function') window.vgPauseMusic();
+            }
+            return true;
         }
 
         function toggleMobileMenu() {
