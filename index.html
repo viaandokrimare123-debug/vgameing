@@ -58,6 +58,10 @@
         .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
         .vg-no-neon .vg-no-anim main>section{animation:none!important}
     
+        /* Seed Vault active-tab visibility safeguard */
+        #tab-seeds:not(.hidden) { display: block !important; visibility: visible !important; opacity: 1 !important; }
+        #tab-seeds #seedsGrid { display: grid; min-height: 1px; }
+        #tab-seeds #seedSearchInput { display: block; visibility: visible; }
         /* Vgameing professional polish + music permission */
         .vg-pro-shell{position:relative}.vg-pro-shell:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(0,243,255,.045) 35%,transparent 55%,rgba(176,0,255,.045) 85%,transparent 100%);opacity:.8}
         header{box-shadow:0 8px 35px rgba(0,0,0,.25)}
@@ -136,6 +140,7 @@
                 <button onclick="switchTab('challenges')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="challenges">Challenges</button>
                 <button onclick="switchTab('quiz')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="quiz">Quiz</button>
                 <button onclick="switchTab('arcade')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="arcade">Arcade</button>
+                <button onclick="switchTab('boss-fight')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="boss-fight">Boss Fight</button>
                 <button onclick="switchTab('seeds')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="seeds">Seeds</button>
                 <button onclick="switchTab('community')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="community">Community+</button>
                 <button onclick="switchTab('friends')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="friends">Friends</button>
@@ -378,6 +383,22 @@
             </div>
             <input type="text" id="seedSearchInput" oninput="filterSeeds()" placeholder="Search by structure, biome, or keyword..." class="w-full bg-neon-card border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neon-green">
             <div id="seedsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- BOSS FIGHT TAB -->
+        <section id="tab-boss-fight" class="hidden space-y-6 max-w-5xl mx-auto">
+          <div class="rounded-3xl border border-neon-pink/40 bg-gradient-to-br from-[#190916] via-[#100b1b] to-[#07121b] p-6 sm:p-9 neon-glow-pink">
+            <div class="text-[10px] font-black tracking-[.25em] text-neon-pink">VGAMEING // RAID PROTOCOL</div>
+            <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">⚔️ BOSS FIGHT <span class="text-neon-pink">ONLINE</span></h2>
+            <p class="mt-3 text-sm text-gray-300">Fight the Ender Titan. Attack, heal, and survive its turns to claim victory.</p>
+          </div>
+          <div id="bossFightApp" class="rounded-2xl border border-neon-pink/30 bg-neon-card p-5 sm:p-7 space-y-5">
+            <div class="flex items-center justify-between gap-3"><div><div class="text-xs font-black tracking-widest text-gray-400">BOSS HP</div><div id="bossFightHpText" class="text-sm font-black text-neon-pink">1000 / 1000</div></div><div id="bossFightStatus" role="status" aria-live="polite" class="text-xs text-gray-300">Prepare for battle.</div></div>
+            <div class="h-4 overflow-hidden rounded-full border border-neon-pink/30 bg-black/50"><div id="bossFightHpBar" class="h-full w-full bg-gradient-to-r from-neon-pink to-neon-purple transition-all duration-300"></div></div>
+            <div id="bossFightArena" class="min-h-48 rounded-2xl border border-gray-800 bg-[radial-gradient(circle_at_50%_30%,#38133b,#100b1b_55%,#05060b)] flex flex-col items-center justify-center p-6 text-center"><div id="bossFightBoss" class="text-7xl sm:text-8xl select-none" aria-label="Ender Titan boss">👾</div><div class="mt-3 text-xl font-black text-white">ENDER TITAN</div><p class="mt-1 text-xs text-gray-400">A corrupted guardian from the End dimension.</p></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><button id="bossAttackBtn" type="button" class="rounded-xl bg-neon-pink px-4 py-3 font-black text-white hover:brightness-110">⚔️ ATTACK</button><button id="bossHealBtn" type="button" class="rounded-xl border border-neon-green/40 bg-neon-green/10 px-4 py-3 font-black text-neon-green hover:bg-neon-green/20">💚 HEAL (+35)</button><button id="bossRestartBtn" type="button" class="rounded-xl border border-gray-700 px-4 py-3 font-black text-gray-200 hover:border-neon-cyan">↻ RESTART RAID</button></div>
+            <div class="grid grid-cols-2 gap-3"><div class="rounded-xl border border-gray-800 bg-black/20 p-3"><div class="text-[10px] font-bold text-gray-500">YOUR HP</div><div id="bossPlayerHpText" class="mt-1 text-xl font-black text-neon-green">100 / 100</div></div><div class="rounded-xl border border-gray-800 bg-black/20 p-3"><div class="text-[10px] font-bold text-gray-500">RAID LOG</div><div id="bossFightLog" class="mt-1 text-xs text-gray-300">The Ender Titan is waiting…</div></div></div>
+          </div>
         </section>
 
         <!-- 6. MINECRAFT TOOLS + DAILY MISSIONS -->
@@ -1077,7 +1098,18 @@
                 return;
             }
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const targetSection = document.getElementById(`tab-${tabId}`);
+            if (!targetSection) {
+                console.warn('[Vgameing] Unknown tab:', tabId);
+                return;
+            }
+            targetSection.classList.remove('hidden');
+            if (tabId === 'seeds' && typeof renderSeeds === 'function') {
+                renderSeeds(seedCollection);
+            }
+            if (tabId === 'boss-fight' && typeof window.initBossFight === 'function') {
+                window.initBossFight();
+            }
             
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.className = "nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white";
@@ -3345,6 +3377,7 @@ function renderMobTable() {
 })();
 </script>
 
+<script src="./boss-fight.js" defer></script>
 </body>
 </html>
 
