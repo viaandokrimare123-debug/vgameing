@@ -146,6 +146,8 @@
         } catch (_) {}
       } else if (state.defeated) {
         setStatus('The Ender Dragon is already defeated for this event cycle.');
+      } else if (state.accepted === false) {
+        setStatus('Strike rate-limited — wait a moment before attacking again.', true);
       } else {
         setStatus('⚔️ Strike registered! ' + Number(state.total_clicks).toLocaleString() + ' / ' + TARGET.toLocaleString() + ' global attacks.');
       }
