@@ -3225,5 +3225,116 @@ function renderMobTable() {
 </script>
 <!-- END VGAMEING FIRST-VISIT ONBOARDING -->
 
+
+<!-- VGAMEING VCOIN ECONOMY + OWNER CONSOLE -->
+<style>
+#vgCoinLauncher{position:fixed;left:18px;bottom:20px;z-index:80;border:1px solid #facc15aa;border-radius:16px;background:linear-gradient(135deg,#17142b,#080812);color:#facc15;padding:12px 15px;font:900 12px/1.2 system-ui;box-shadow:0 0 24px #facc1533;cursor:pointer}
+#vgCoinLauncher:hover{box-shadow:0 0 28px #facc1588;transform:translateY(-2px)}
+#vgCoinOverlay{position:fixed;inset:0;z-index:120;background:#02020bed;backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
+#vgCoinOverlay.vg-open{display:flex}
+#vgCoinPanel{width:min(920px,100%);max-height:90vh;overflow:auto;background:radial-gradient(ellipse at top right,#251447,#090912 60%);border:1px solid #00f3ff66;border-radius:22px;padding:20px;color:#f8fafc;box-shadow:0 0 70px #7000ff33}
+.vgce-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px}
+.vgce-card{border:1px solid #ffffff1c;border-radius:15px;padding:14px;background:#ffffff07}
+.vgce-btn{border:1px solid #00f3ff66;background:#00f3ff12;color:#bdfaff;border-radius:10px;padding:9px 12px;font-weight:900;font-size:11px;cursor:pointer}
+.vgce-btn:hover{background:#00f3ff24}
+.vgce-btn.gold{border-color:#facc1588;color:#ffe98c;background:#facc1512}
+.vgce-muted{color:#9ca3af;font-size:12px}
+#vgCoinStatus{min-height:22px;color:#a5f3fc;font-size:12px;margin:8px 0}
+#vgLiveBroadcast{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:140;width:min(850px,calc(100% - 24px));border:1px solid #00f3ff99;border-radius:13px;padding:12px 44px 12px 14px;background:linear-gradient(90deg,#091b2b,#1a0b2b);color:#e0fcff;box-shadow:0 0 30px #00f3ff35;font:800 13px/1.4 system-ui}
+#vgLiveBroadcast button{position:absolute;right:10px;top:8px;background:transparent;color:#fff;border:0;font-size:20px;cursor:pointer}
+#vgOwnerCrown{display:none;color:#fff;text-shadow:0 0 7px #fff,0 0 14px #ff00d4,0 0 22px #00f3ff;animation:vgCrownPulse 2s ease-in-out infinite}
+@keyframes vgCrownPulse{50%{filter:hue-rotate(120deg);text-shadow:0 0 8px #facc15,0 0 20px #ff00d4}}
+@media(max-width:600px){#vgCoinLauncher{left:10px;bottom:12px;padding:10px 12px}#vgCoinPanel{padding:13px}}
+</style>
+<button id="vgCoinLauncher" type="button">🪙 V-COINS <span id="vgCoinLauncherBalance">LOGIN</span></button>
+<div id="vgLiveBroadcast" role="status" aria-live="polite"><span id="vgLiveBroadcastText"></span><button type="button" aria-label="Dismiss announcement" onclick="document.getElementById('vgLiveBroadcast').style.display='none'">×</button></div>
+<div id="vgCoinOverlay" aria-hidden="true">
+ <div id="vgCoinPanel" role="dialog" aria-modal="true" aria-label="Vgameing V-Coin economy">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+   <div><div style="font-size:10px;font-weight:1000;letter-spacing:.22em;color:#00f3ff">VGAMEING // PLAYER ECONOMY</div><h2 style="font-size:25px;font-weight:1000;margin:3px 0">V-COIN EXCHANGE <span style="color:#facc15">✦</span></h2><div class="vgce-muted">Earn coins, unlock cosmetics, build your legend.</div></div>
+   <button class="vgce-btn" id="vgCoinClose">✕ CLOSE</button>
+  </div>
+  <div class="vgce-grid" style="margin-top:16px">
+   <div class="vgce-card"><div class="vgce-muted">YOUR BALANCE</div><div id="vgCoinBigBalance" style="font-size:30px;font-weight:1000;color:#facc15">— 🪙</div><div id="vgCoinAccountLabel" class="vgce-muted">Login to sync your wallet</div></div>
+   <div class="vgce-card"><div class="vgce-muted">ACCOUNT STATUS</div><div id="vgCoinRole" style="font-size:18px;font-weight:1000;margin:5px 0">PLAYER</div><div id="vgCoinOwnerNote" class="vgce-muted">Rewards sync to your account.</div></div>
+  </div>
+  <div id="vgCoinStatus" role="status"></div>
+  <section style="margin-top:15px"><h3 style="font-weight:1000;font-size:16px;margin-bottom:10px">⚡ DAILY MISSIONS</h3>
+   <div class="vgce-grid">
+    <div class="vgce-card"><div style="font-size:22px">🌅</div><b>Daily Login</b><p class="vgce-muted">Daily check-in · +30 coins</p><button class="vgce-btn gold" onclick="vgClaimMission('first_login')">CLAIM +30</button></div>
+    <div class="vgce-card"><div style="font-size:22px">🌱</div><b>Seed Explorer</b><p class="vgce-muted">Explore the Seed Vault · +40 coins</p><button class="vgce-btn gold" onclick="vgClaimMission('seed_explorer')">CLAIM +40</button></div>
+    <div class="vgce-card"><div style="font-size:22px">🎮</div><b>Arcade Player</b><p class="vgce-muted">Play an arcade game · +50 coins</p><button class="vgce-btn gold" onclick="vgClaimMission('arcade_player')">CLAIM +50</button></div>
+    <div class="vgce-card"><div style="font-size:22px">🧠</div><b>Quiz Master</b><p class="vgce-muted">Complete your Minecraft quiz · +50 coins</p><button class="vgce-btn gold" onclick="vgClaimMission('quiz_master')">CLAIM +50</button></div>
+   </div><p class="vgce-muted" style="margin-top:8px">Daily rewards are limited to one claim per mission per UTC day. Arcade score rewards are capped once per game per day.</p>
+  </section>
+  <section style="margin-top:20px"><h3 style="font-weight:1000;font-size:16px;margin-bottom:10px">🛍️ CUSTOMIZATION SHOP</h3>
+   <div class="vgce-grid">
+    <div class="vgce-card"><div style="font-size:24px">🐲</div><b>Dragon Avatar</b><p class="vgce-muted">250 V-Coins</p><button class="vgce-btn" onclick="vgBuyItem('avatar_dragon')">UNLOCK</button></div>
+    <div class="vgce-card"><div style="font-size:24px">💎</div><b>Diamond Avatar</b><p class="vgce-muted">180 V-Coins</p><button class="vgce-btn" onclick="vgBuyItem('avatar_diamond')">UNLOCK</button></div>
+    <div class="vgce-card"><div style="font-size:24px">👑</div><b>Crown Avatar</b><p class="vgce-muted">500 V-Coins</p><button class="vgce-btn" onclick="vgBuyItem('avatar_crown')">UNLOCK</button></div>
+    <div class="vgce-card"><div style="font-size:24px;color:#00f3ff">✦</div><b>Cyan Chat Color</b><p class="vgce-muted">120 V-Coins</p><button class="vgce-btn" onclick="vgBuyItem('chat_cyan')">UNLOCK</button></div>
+    <div class="vgce-card"><div style="font-size:24px;color:#ff4fd8">✦</div><b>Pink Chat Color</b><p class="vgce-muted">120 V-Coins</p><button class="vgce-btn" onclick="vgBuyItem('chat_pink')">UNLOCK</button></div>
+    <div class="vgce-card"><div style="font-size:24px">🏆</div><b>Legend Flair</b><p class="vgce-muted">400 V-Coins</p><button class="vgce-btn" onclick="vgBuyItem('flair_legend')">UNLOCK</button></div>
+    <div class="vgce-card"><div style="font-size:24px">🎁</div><b>Mystery Crate</b><p class="vgce-muted">50 V-Coins · random cosmetic</p><button class="vgce-btn gold" onclick="vgOpenCrate()">OPEN CRATE</button></div>
+   </div>
+   <div class="vgce-card" style="margin-top:12px"><b>🎒 Your Inventory</b><div id="vgCoinInventory" class="vgce-muted" style="margin-top:7px">Login to view your unlocked cosmetics.</div><button class="vgce-btn" style="margin-top:8px" onclick="vgLoadInventory()">REFRESH INVENTORY</button></div>
+  </section>
+  <section id="vgOwnerAdminSection" style="display:none;margin-top:20px;border:1px solid #ff4fd866;border-radius:17px;padding:14px;background:linear-gradient(120deg,#ff00d40a,#00f3ff0a)">
+   <h3 style="font-weight:1000;font-size:17px;color:#ffd8fa">👑 VGAMEING OWNER CONSOLE</h3>
+   <p class="vgce-muted" style="margin:4px 0 12px">Owner-only server-checked controls for your account.</p>
+   <label for="vgBroadcastInput" class="vgce-muted">GLOBAL LIVE BROADCAST (max 240 characters)</label>
+   <textarea id="vgBroadcastInput" maxlength="240" rows="2" placeholder="e.g. New verified seeds just dropped!" style="width:100%;margin:6px 0 8px;padding:10px;border:1px solid #ff4fd866;border-radius:10px;background:#080812;color:white"></textarea>
+   <button class="vgce-btn gold" onclick="vgSendBroadcast()">📡 SEND TO ALL PLAYERS</button>
+   <div id="vgAdminBroadcastHistory" class="vgce-muted" style="margin-top:12px">Recent broadcasts will appear here.</div>
+   <p class="vgce-muted" style="margin-top:12px">Owner tools are server-authorized. Seed/post moderation, bans, and leaderboard resets are not enabled in this release.</p>
+  </section>
+  <div class="vgce-muted" style="margin-top:14px">Vgameing Economy · Account-bound balance and inventory. Do not share account access.</div>
+ </div>
+</div>
+<script>
+(function(){
+ const OWNER_EMAIL="viaandokrimare123@gmail.com";
+ const $=id=>document.getElementById(id);
+ let vgEconomyOwner=false, vgEconomyBusy=false;
+ function setStatus(message,error=false){const el=$("vgCoinStatus");if(el){el.textContent=message;el.style.color=error?"#fda4af":"#a5f3fc";}}
+ function client(){return typeof vgSupabase!=="undefined"&&vgSupabase?vgSupabase:null;}
+ async function call(action,payload={}){const sb=client();if(!sb||!window.vgAuthUser)throw new Error("Login with Google first to use V-Coins.");const {data,error}=await sb.functions.invoke("vgameing-economy",{body:{action,...payload}});if(error)throw new Error(error.message||"Economy service is unavailable.");if(data&&data.error)throw new Error(data.error);return data;}
+ function show(){ $("vgCoinOverlay").classList.add("vg-open");$("vgCoinOverlay").setAttribute("aria-hidden","false");vgRefreshWallet(); }
+ function hide(){ $("vgCoinOverlay").classList.remove("vg-open");$("vgCoinOverlay").setAttribute("aria-hidden","true"); }
+ async function vgRefreshWallet(){
+   if(!window.vgAuthUser){$("vgCoinLauncherBalance").textContent="LOGIN";$("vgCoinBigBalance").textContent="Login required";$("vgCoinAccountLabel").textContent="Use the site login first";$("vgCoinRole").textContent="GUEST";$("vgCoinOwnerNote").textContent="Sign in to save progress."; $("vgOwnerAdminSection").style.display="none";return;}
+   try{const data=await call("get_wallet");vgEconomyOwner=!!data.owner;
+     const balance=data.unlimited?"∞ UNLIMITED":String(data.balance??0)+" 🪙";
+     $("vgCoinLauncherBalance").textContent=data.unlimited?"∞":String(data.balance??0);
+     $("vgCoinBigBalance").textContent=balance;
+     $("vgCoinAccountLabel").textContent=window.vgAuthUser.email||"Signed-in player";
+     $("vgCoinRole").textContent=data.owner?"👑 OWNER":"PLAYER";
+     $("vgCoinOwnerNote").textContent=data.owner?"Unlimited shop access enabled.":"Earn coins with daily missions and arcade rewards.";
+     $("vgOwnerAdminSection").style.display=data.owner?"block":"none";
+     const verified=$("vgVerifiedBadge");
+     const tag=$("displayUserTag");
+     if(data.owner){if(verified){verified.classList.remove("hidden");verified.style.display="inline-block";verified.textContent="♛";verified.title="Vgameing Owner";verified.setAttribute("aria-label","Vgameing Owner");}if(tag){tag.innerHTML=tag.textContent.replace(/</g,"&lt;").replace(/>/g,"&gt;")+' <span id="vgOwnerCrown" style="display:inline;color:#fff">♛</span>';}}
+     else if(verified){verified.textContent="✓";verified.title="Verified Vgameing account";verified.setAttribute("aria-label","Verified Vgameing account");verified.style.display="";}
+     if(data.owner)await vgLoadBroadcastHistory();
+     await vgLoadInventory();
+   }catch(e){$("vgCoinLauncherBalance").textContent="RETRY";setStatus(e.message,true);}
+ }
+ async function vgClaimMission(id){if(vgEconomyBusy)return;vgEconomyBusy=true;try{const r=await call("claim_mission",{mission_id:id});setStatus("+"+r.reward+" V-Coins earned!");await vgRefreshWallet();}catch(e){setStatus(e.message,true);}finally{vgEconomyBusy=false;}}
+ async function vgBuyItem(id){if(vgEconomyBusy)return;vgEconomyBusy=true;try{const r=await call("spend",{item_id:id});setStatus("Unlocked "+(r.item.value||r.item.id)+"! Added to your inventory.");await vgRefreshWallet();}catch(e){setStatus(e.message,true);}finally{vgEconomyBusy=false;}}
+ async function vgOpenCrate(){if(vgEconomyBusy)return;vgEconomyBusy=true;try{const r=await call("mystery_crate");setStatus("🎁 "+r.item.rarity+" drop: "+r.item.value+" · Added to inventory!");await vgRefreshWallet();}catch(e){setStatus(e.message,true);}finally{vgEconomyBusy=false;}}
+ async function vgLoadInventory(){if(!window.vgAuthUser){$("vgCoinInventory").textContent="Login to view inventory.";return;}try{const sb=client();const {data,error}=await sb.from("vg_inventory").select("item_id,item_type,item_value,quantity").eq("user_id",window.vgAuthUser.id).order("updated_at",{ascending:false});if(error)throw error;$("vgCoinInventory").textContent=data&&data.length?data.map(x=>x.item_value+" ×"+x.quantity+" ("+x.item_type+")").join(" · "):"No cosmetics unlocked yet."; }catch(e){$("vgCoinInventory").textContent="Inventory unavailable: "+e.message;}}
+ async function vgSendBroadcast(){const input=$("vgBroadcastInput");try{const r=await call("broadcast",{message:input.value});input.value="";setStatus("📡 Broadcast sent to connected players.");showBroadcast(r.broadcast.message);await vgLoadBroadcastHistory();}catch(e){setStatus(e.message,true);}}
+ async function vgLoadBroadcastHistory(){try{const sb=client();const {data,error}=await sb.from("vg_broadcasts").select("id,message,created_at").eq("active",true).order("created_at",{ascending:false}).limit(5);if(error)throw error;$("vgAdminBroadcastHistory").innerHTML=data&&data.length?data.map(x=>'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;border-top:1px solid #ffffff18;padding:7px 0"><span>'+String(x.message).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</span><button class="vgce-btn" onclick="vgStopBroadcast('+x.id+')">DISMISS</button></div>').join(""):"No active broadcasts.";}catch(e){$("vgAdminBroadcastHistory").textContent="Could not load broadcasts.";}}
+ async function vgStopBroadcast(id){try{await call("deactivate_broadcast",{id});setStatus("Broadcast dismissed.");await vgLoadBroadcastHistory();}catch(e){setStatus(e.message,true);}}
+ function showBroadcast(message){const el=$("vgLiveBroadcast");$("vgLiveBroadcastText").textContent="📡 VGAMEING SYSTEM · "+message;el.style.display="block";}
+ function listenBroadcasts(){const sb=client();if(!sb||window.vgBroadcastChannelStarted)return;window.vgBroadcastChannelStarted=true;sb.from("vg_broadcasts").select("id,message,created_at").eq("active",true).order("created_at",{ascending:false}).limit(1).then(({data})=>{if(data&&data[0])showBroadcast(data[0].message);});sb.channel("vg-live-broadcasts").on("postgres_changes",{event:"INSERT",schema:"public",table:"vg_broadcasts"},payload=>{if(payload.new&&payload.new.active)showBroadcast(payload.new.message);}).subscribe();}
+ window.vgClaimMission=vgClaimMission;window.vgBuyItem=vgBuyItem;window.vgOpenCrate=vgOpenCrate;window.vgLoadInventory=vgLoadInventory;window.vgSendBroadcast=vgSendBroadcast;window.vgStopBroadcast=vgStopBroadcast;
+ $("vgCoinLauncher").addEventListener("click",show);$("vgCoinClose").addEventListener("click",hide);$("vgCoinOverlay").addEventListener("click",e=>{if(e.target===$("vgCoinOverlay"))hide();});document.addEventListener("keydown",e=>{if(e.key==="Escape")hide();});
+ window.addEventListener("vg-auth-ready",()=>{vgRefreshWallet();listenBroadcasts();});
+ if(typeof vgSupabase!=="undefined"&&vgSupabase){vgSupabase.auth.onAuthStateChange(()=>{setTimeout(()=>{vgRefreshWallet();listenBroadcasts();},250);});}
+ setTimeout(()=>{vgRefreshWallet();listenBroadcasts();},1500);
+})();
+</script>
+
 </body>
 </html>
