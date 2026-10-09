@@ -3164,5 +3164,66 @@ function renderMobTable() {
 </script>
 <!-- END VGAMEING ELITE FEATURES PACK -->
 
+
+<!-- VGAMEING FIRST-VISIT ONBOARDING -->
+<style>
+#vgFirstVisitTutorial{position:fixed;inset:0;z-index:2147483605;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,3,12,.88);backdrop-filter:blur(16px)}
+#vgFirstVisitTutorial.show{display:flex}
+.vg-tour-card{width:min(560px,100%);background:linear-gradient(145deg,#111326,#090912);border:1px solid #00f3ff77;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 0 65px #00f3ff20;color:#f8fafc;position:relative;overflow:hidden}
+.vg-tour-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 100% 0%,#7000ff22,transparent 45%)}
+.vg-tour-kicker{font:900 10px monospace;letter-spacing:.2em;color:#00f3ff}
+.vg-tour-step{display:none;position:relative;min-height:220px;padding-top:18px}
+.vg-tour-step.active{display:block;animation:vgTourIn .25s ease-out}
+@keyframes vgTourIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.vg-tour-icon{font-size:52px;margin:10px 0 14px;filter:drop-shadow(0 0 14px #00f3ff44)}
+.vg-tour-title{font-size:clamp(22px,5vw,30px);font-weight:1000;letter-spacing:-.03em}
+.vg-tour-copy{font-size:13px;line-height:1.7;color:#b9c1d3;margin-top:9px;max-width:440px}
+.vg-tour-progress{height:5px;background:#24243a;border-radius:99px;overflow:hidden;margin:16px 0 18px}
+#vgTourProgressFill{height:100%;width:25%;background:linear-gradient(90deg,#00f3ff,#8b5cf6);transition:width .25s}
+.vg-tour-btn{border:1px solid #00f3ff66;background:#00f3ff;color:#030712;font-size:11px;font-weight:1000;letter-spacing:.06em;border-radius:10px;padding:11px 15px;cursor:pointer}
+.vg-tour-btn.secondary{background:transparent;color:#d1d5db;border-color:#424259}
+.vg-tour-btn:hover{filter:brightness(1.12)}
+@media(prefers-reduced-motion:reduce){.vg-tour-step.active{animation:none}}
+</style>
+<div id="vgFirstVisitTutorial" role="dialog" aria-modal="true" aria-labelledby="vgTourHeading">
+ <div class="vg-tour-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div class="vg-tour-kicker">VGAMEING // NEW AGENT ORIENTATION</div><div id="vgTourCounter" style="font:11px monospace;color:#9ca3af">01 / 04</div></div>
+  <div class="vg-tour-progress"><div id="vgTourProgressFill"></div></div>
+  <div class="vg-tour-step active" data-tour-step="0"><div class="vg-tour-icon">⚡</div><h2 id="vgTourHeading" class="vg-tour-title">Welcome to Vgameing.</h2><p class="vg-tour-copy">Your Minecraft gaming hub starts here. Explore challenges, test your knowledge, play mini-games and build your player profile. Let's get you mission-ready.</p></div>
+  <div class="vg-tour-step" data-tour-step="1"><div class="vg-tour-icon">🌱</div><h2 class="vg-tour-title">Explore the Seed Vault.</h2><p class="vg-tour-copy">Open <b style="color:#a5f3fc">Seeds</b> from the navigation, browse seed cards, inspect available details and copy a seed code to try in your Minecraft world. Always check the edition and version.</p></div>
+  <div class="vg-tour-step" data-tour-step="2"><div class="vg-tour-icon">🎮</div><h2 class="vg-tour-title">Enter the Arcade.</h2><p class="vg-tour-copy">Try the mini-games, beat your scores, complete challenges and test your Minecraft knowledge in the Quiz. Your best runs are your next mission.</p></div>
+  <div class="vg-tour-step" data-tour-step="3"><div class="vg-tour-icon">🔴</div><h2 class="vg-tour-title">Build, customise, level up.</h2><p class="vg-tour-copy">Open <b style="color:#a5f3fc">V-CORE</b> for the Redstone Sandbox, trophy case, gamer ID card and theme store. You're all set, agent. Have fun!</p></div>
+  <div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:4px"><button id="vgTourSkip" class="vg-tour-btn secondary">SKIP TUTORIAL</button><div style="display:flex;gap:8px"><button id="vgTourBack" class="vg-tour-btn secondary" style="display:none">← BACK</button><button id="vgTourNext" class="vg-tour-btn">NEXT →</button></div></div>
+  <p style="position:relative;font-size:10px;color:#6b7280;margin-top:14px">FIRST-VISIT GUIDE · Your choice is remembered on this browser.</p>
+ </div>
+</div>
+<script>
+(function(){
+ const KEY='vgameing_onboarding_v1';
+ const modal=document.getElementById('vgFirstVisitTutorial');
+ if(!modal)return;
+ let seen=false;try{seen=localStorage.getItem(KEY)==='done'}catch(e){seen=false}
+ // If storage is blocked, do not repeatedly interrupt the visitor in the same tab.
+ if(!seen){try{if(sessionStorage.getItem(KEY+'_session')==='done')seen=true}catch(e){}}
+ if(seen)return;
+ let step=0,closed=false;
+ const steps=Array.from(modal.querySelectorAll('[data-tour-step]'));
+ const next=document.getElementById('vgTourNext'),back=document.getElementById('vgTourBack'),skip=document.getElementById('vgTourSkip');
+ function remember(){try{localStorage.setItem(KEY,'done')}catch(e){}try{sessionStorage.setItem(KEY+'_session','done')}catch(e){}}
+ function finish(){remember();closed=true;modal.classList.remove('show');document.removeEventListener('keydown',onKey)}
+ function render(){steps.forEach((s,i)=>s.classList.toggle('active',i===step));document.getElementById('vgTourCounter').textContent=String(step+1).padStart(2,'0')+' / '+String(steps.length).padStart(2,'0');document.getElementById('vgTourProgressFill').style.width=((step+1)/steps.length*100)+'%';back.style.display=step===0?'none':'inline-block';next.textContent=step===steps.length-1?'GOT IT ✓':'NEXT →'}
+ function onKey(e){if(e.key==='Escape'){finish()}else if(e.key==='ArrowRight'&&!closed){if(step<steps.length-1){step++;render()}else finish()}else if(e.key==='ArrowLeft'&&!closed&&step>0){step--;render()}}
+ next.addEventListener('click',()=>{if(step<steps.length-1){step++;render()}else finish()});
+ back.addEventListener('click',()=>{if(step>0){step--;render()}});
+ skip.addEventListener('click',finish);
+ modal.addEventListener('click',e=>{if(e.target===modal)finish()});
+ document.addEventListener('keydown',onKey);
+ render();
+ // Show after the page has initialized; completion/skip is persisted before closing.
+ requestAnimationFrame(()=>modal.classList.add('show'));
+})();
+</script>
+<!-- END VGAMEING FIRST-VISIT ONBOARDING -->
+
 </body>
 </html>
