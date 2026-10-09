@@ -2211,7 +2211,7 @@
             loadLiveLeaderboard(activeLbTab);
         }
 
-        async async function submitScore(game, score) {
+        async function submitScore(game, score) {
             // Guests can play, but only logged-in accounts can enter the live leaderboard.
             if(!currentUser || !window.vgAuthUser || !window.vgProfile){
                 alert("🔒 Login with Google to appear on the live leaderboard.");
