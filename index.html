@@ -155,7 +155,7 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
             <nav id="navLinks" class="hidden md:flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-xs font-bold uppercase tracking-wider">
                 <button onclick="switchTab('home')" class="nav-btn px-3 py-1.5 rounded transition text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30" data-tab="home">Home</button>
                 <button onclick="switchTab('challenges')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="challenges">Challenges</button>
-                <button onclick="switchTab('quiz')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="quiz">Quiz</button>
+                <button onclick="switchTab('quiz')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="quiz">Daily Quiz</button>
                 <button onclick="switchTab('arcade')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="arcade">Arcade</button>
                 <button onclick="switchTab('boss-fight')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="boss-fight">Boss Fight</button>
                 <button onclick="switchTab('seeds')" class="nav-btn px-3 py-1.5 rounded transition text-gray-400 hover:text-white" data-tab="seeds">Seeds</button>
@@ -1113,11 +1113,23 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
 
         applyVgSettings();
 
-        // --- Navigation Controller ---
+        // --- Reliable Main Tab Router ---
         function switchTab(tabId) {
+            // Friendly aliases keep older buttons/links working without leaving the previous tab visible.
+            const aliases = {
+                videos: 'youtube',
+                shorts: 'youtube',
+                'videos-shorts': 'youtube',
+                daily: 'quiz',
+                'daily-quiz': 'quiz',
+                'daily-quizzes': 'quiz',
+                seeds: 'seeds',
+                'boss-fight': 'boss-fight'
+            };
+            tabId = aliases[tabId] || tabId;
             const targetSection = document.getElementById('tab-' + tabId);
-            if (!targetSection) {
-                console.warn('[Vgameing] Unknown tab; no section found:', tabId);
+            if (!targetSection || !targetSection.matches('main > section[id^="tab-"]')) {
+                console.warn('[Vgameing] Unknown or misplaced tab; no section found:', tabId);
                 return false;
             }
 
@@ -1126,29 +1138,28 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
                 return false;
             }
 
-            window.vgActiveTab = tabId;
-
-            // Close floating V-Core / seed-preview overlays when changing main tabs.
-            // These fixed overlays must never sit on top of the Seed Vault content.
+            // Close floating panels first so their grids cannot cover any main tab.
             const eliteOverlay = document.getElementById('vgElitePanel');
             const seedPreviewOverlay = document.getElementById('vgSeedModal');
             if (eliteOverlay) eliteOverlay.classList.remove('open');
             if (seedPreviewOverlay) seedPreviewOverlay.classList.remove('open');
 
-            // Hide only the main tab sections, then reveal the requested target.
+            // Critical fix: clear stale inline display styles left by the old Seeds/Boss-only router.
+            // A previous inline display:block beats Tailwind's .hidden class and made Seed Vault bleed across tabs.
             document.querySelectorAll('main > section[id^="tab-"]').forEach(function (section) {
                 section.classList.add('hidden');
                 section.setAttribute('aria-hidden', 'true');
+                section.style.setProperty('display', 'none', 'important');
+                section.style.removeProperty('visibility');
+                section.style.removeProperty('opacity');
             });
+
             targetSection.classList.remove('hidden');
             targetSection.setAttribute('aria-hidden', 'false');
-
-            // Explicitly restore layout for Seed Vault and Boss Fight after removing .hidden.
-            if (tabId === 'seeds' || tabId === 'boss-fight') {
-                targetSection.style.display = 'block';
-                targetSection.style.visibility = 'visible';
-                targetSection.style.opacity = '1';
-            }
+            targetSection.style.setProperty('display', 'block', 'important');
+            targetSection.style.setProperty('visibility', 'visible');
+            targetSection.style.setProperty('opacity', '1');
+            window.vgActiveTab = tabId;
 
             if (tabId === 'seeds' && typeof window.renderSeeds === 'function') {
                 try {
@@ -1159,15 +1170,15 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
                 }
             }
 
+            if (tabId === 'quiz') {
+                try { startNewQuiz(); } catch (error) { console.error('[Vgameing] Daily Quiz initialization failed:', error); }
+            }
+
             if (tabId === 'boss-fight') {
                 if (typeof window.initBossFight === 'function') {
-                    try {
-                        window.initBossFight();
-                    } catch (error) {
-                        console.error('[Vgameing] Boss Fight initialization failed:', error);
-                    }
+                    try { window.initBossFight(); }
+                    catch (error) { console.error('[Vgameing] Boss Fight initialization failed:', error); }
                 } else {
-                    console.warn('[Vgameing] initBossFight is not available yet; retrying after script load.');
                     window.setTimeout(function () {
                         if (window.vgActiveTab === 'boss-fight' && typeof window.initBossFight === 'function') {
                             window.initBossFight();
@@ -1265,64 +1276,131 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
             document.getElementById('challengeDifficulty').innerText = `Difficulty: ${rand.diff}`;
         }
 
-        // --- Dynamic Randomized Quiz Engine ---
+        // --- Daily Minecraft Quiz Engine ---
         const quizMasterPool = [
             { q: "Which mob drops Ender Pearls?", options: ["Enderman", "Creeper", "Zombie", "Skeleton"], answer: 0 },
-            { q: "What tool is required to mine Diamond Ore?", options: ["Wooden Pickaxe", "Stone Pickaxe or higher", "Golden Pickaxe", "Iron Shovel"], answer: 1 },
+            { q: "What tool is required to mine Diamond Ore?", options: ["Wooden Pickaxe", "Iron Pickaxe or better", "Golden Pickaxe", "Iron Shovel"], answer: 1 },
             { q: "Which mob explodes when it gets too close to the player?", options: ["Spider", "Creeper", "Witch", "Phantom"], answer: 1 },
-            { q: "What fuel source burns the longest in a furnace?", options: ["Coal", "Wooden Planks", "Lava Bucket", "Stick"], answer: 2 },
+            { q: "Which furnace fuel lasts the longest per item?", options: ["Coal", "Wooden Planks", "Lava Bucket", "Stick"], answer: 2 },
             { q: "Which dimension is home to the Ender Dragon?", options: ["The Nether", "The Overworld", "The End", "The Aether"], answer: 2 },
-            { q: "What is required to grow a Nether Wart?", options: ["Water Block", "Soul Sand", "Farmland", "Podzol"], answer: 1 },
-            { q: "Which potion effect allows you to breathe underwater?", options: ["Night Vision", "Water Breathing", "Swiftness", "Invisibility"], answer: 1 }
+            { q: "What block is needed to grow Nether Wart?", options: ["Water Block", "Soul Sand", "Farmland", "Podzol"], answer: 1 },
+            { q: "Which potion effect lets you breathe underwater?", options: ["Night Vision", "Water Breathing", "Swiftness", "Invisibility"], answer: 1 },
+            { q: "What do you need to activate an End Portal in Survival?", options: ["Blaze Rods", "Eyes of Ender", "Dragon Egg", "End Crystals"], answer: 1 },
+            { q: "Which tool is best for collecting stone blocks?", options: ["Pickaxe", "Hoe", "Shears", "Fishing Rod"], answer: 0 },
+            { q: "What happens when a Creeper is struck by lightning?", options: ["It becomes invisible", "It becomes charged", "It drops diamonds", "It turns into a zombie"], answer: 1 },
+            { q: "Which villager profession trades enchanted books?", options: ["Cleric", "Librarian", "Farmer", "Armorer"], answer: 1 },
+            { q: "Which item is needed to craft a torch?", options: ["Stick and coal/charcoal", "Iron and string", "Sand and flint", "Copper and wood"], answer: 0 }
         ];
-        
+
         let currentQuizQuestions = [];
         let currentQuizIndex = 0;
         let quizScore = 0;
+        let quizAnswerLocked = false;
 
         function startNewQuiz() {
+            const card = document.getElementById('quizCard');
+            if (!card) return;
             currentQuizIndex = 0;
             quizScore = 0;
-            let shuffled = [...quizMasterPool].sort(() => 0.5 - Math.random());
-            currentQuizQuestions = shuffled.slice(0, 5);
-            loadQuizQuestion();
-        }
-
-        function loadQuizQuestion() {
-            if (currentQuizIndex >= currentQuizQuestions.length) {
-                document.getElementById('quizCard').innerHTML = `
-                    <div class="text-center space-y-4 py-6">
-                        <div class="text-3xl font-black text-neon-yellow">Quiz Complete! 🎉</div>
-                        <p class="text-lg text-white">Score: <span class="text-neon-cyan">${quizScore} / ${currentQuizQuestions.length}</span></p>
-                        <button onclick="resetAndRestartQuiz()" class="px-6 py-2.5 rounded-xl bg-neon-yellow text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg">PLAY NEW QUIZ</button>
-                    </div>`;
-                return;
+            quizAnswerLocked = false;
+            // Fisher-Yates shuffle avoids the bias from sorting with a random comparator.
+            const shuffled = [...quizMasterPool];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
-            let q = currentQuizQuestions[currentQuizIndex];
-            document.getElementById('quizProgress').innerText = `Question ${currentQuizIndex + 1} of ${currentQuizQuestions.length}`;
-            document.getElementById('quizScoreTracker').innerText = `Score: ${quizScore}`;
-            document.getElementById('quizQuestion').innerText = q.q;
-            document.getElementById('quizOptions').innerHTML = q.options.map((opt, idx) => `
-                <button onclick="checkQuizAnswer(${idx})" class="w-full text-left p-3 rounded-xl bg-neon-dark border border-gray-800 hover:border-neon-yellow text-sm text-gray-200 transition">${opt}</button>
-            `).join('');
-        }
-
-        function checkQuizAnswer(idx) {
-            if (idx === currentQuizQuestions[currentQuizIndex].answer) quizScore++;
-            currentQuizIndex++;
+            currentQuizQuestions = shuffled.slice(0, 5);
+            renderQuizCardShell();
             loadQuizQuestion();
         }
 
-        function resetAndRestartQuiz() {
-            document.getElementById('quizCard').innerHTML = `
+        function renderQuizCardShell() {
+            const card = document.getElementById('quizCard');
+            if (!card) return;
+            card.innerHTML = `
                 <div class="flex justify-between items-center text-xs text-gray-400 font-mono">
                     <span id="quizProgress">Question 1 of 5</span>
                     <span id="quizScoreTracker">Score: 0</span>
                 </div>
-                <div id="quizQuestion" class="text-lg font-bold text-white min-h-[60px]">Loading question...</div>
-                <div id="quizOptions" class="space-y-3"></div>`;
+                <div id="quizQuestion" class="text-lg font-bold text-white min-h-[60px]" aria-live="polite">Loading question...</div>
+                <div id="quizOptions" class="space-y-3"></div>
+                <p id="quizFeedback" class="min-h-[18px] text-xs text-gray-400" role="status" aria-live="polite"></p>`;
+        }
+
+        function loadQuizQuestion() {
+            const card = document.getElementById('quizCard');
+            if (!card) return;
+            if (currentQuizIndex >= currentQuizQuestions.length) {
+                const total = currentQuizQuestions.length;
+                const percent = total ? Math.round(quizScore / total * 100) : 0;
+                card.innerHTML = `
+                    <div class="text-center space-y-4 py-6">
+                        <div class="text-3xl font-black text-neon-yellow">Daily Quiz Complete! 🎉</div>
+                        <p class="text-lg text-white">Score: <span class="text-neon-cyan">${quizScore} / ${total}</span></p>
+                        <p class="text-sm text-gray-400">${percent}% accuracy — ${percent >= 80 ? 'Excellent work, Minecraft expert!' : 'Practice and try a fresh set!'}</p>
+                        <button type="button" onclick="resetAndRestartQuiz()" class="px-6 py-2.5 rounded-xl bg-neon-yellow text-black font-extrabold text-sm hover:opacity-90 transition shadow-lg">PLAY NEW QUIZ</button>
+                    </div>`;
+                return;
+            }
+            const q = currentQuizQuestions[currentQuizIndex];
+            const progress = document.getElementById('quizProgress');
+            const tracker = document.getElementById('quizScoreTracker');
+            const question = document.getElementById('quizQuestion');
+            const options = document.getElementById('quizOptions');
+            const feedback = document.getElementById('quizFeedback');
+            if (!progress || !tracker || !question || !options) {
+                renderQuizCardShell();
+                return loadQuizQuestion();
+            }
+            quizAnswerLocked = false;
+            progress.textContent = `Question ${currentQuizIndex + 1} of ${currentQuizQuestions.length}`;
+            tracker.textContent = `Score: ${quizScore}`;
+            question.textContent = q.q;
+            if (feedback) feedback.textContent = '';
+            options.innerHTML = '';
+            q.options.forEach(function (option, index) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'w-full text-left p-3 rounded-xl bg-neon-dark border border-gray-800 hover:border-neon-yellow text-sm text-gray-200 transition';
+                button.textContent = option;
+                button.addEventListener('click', function () { checkQuizAnswer(index); });
+                options.appendChild(button);
+            });
+        }
+
+        function checkQuizAnswer(idx) {
+            if (quizAnswerLocked || currentQuizIndex >= currentQuizQuestions.length) return;
+            const question = currentQuizQuestions[currentQuizIndex];
+            if (!question || !Number.isInteger(idx) || idx < 0 || idx >= question.options.length) return;
+            quizAnswerLocked = true;
+            const buttons = document.querySelectorAll('#quizOptions button');
+            buttons.forEach(function (button, index) {
+                button.disabled = true;
+                button.classList.add('opacity-70', 'cursor-not-allowed');
+                if (index === question.answer) button.classList.add('border-neon-green', 'text-neon-green');
+                else if (index === idx) button.classList.add('border-neon-pink', 'text-neon-pink');
+            });
+            const correct = idx === question.answer;
+            if (correct) quizScore++;
+            const feedback = document.getElementById('quizFeedback');
+            if (feedback) feedback.textContent = correct ? '✓ Correct! Nice one.' : '✗ Not quite — correct answer: ' + question.options[question.answer];
+            const tracker = document.getElementById('quizScoreTracker');
+            if (tracker) tracker.textContent = 'Score: ' + quizScore;
+            window.setTimeout(function () {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            }, 650);
+        }
+
+        function resetAndRestartQuiz() {
             startNewQuiz();
         }
+
+        // Keep inline/legacy callers working, and let tab routing initialize the quiz on demand.
+        window.startNewQuiz = startNewQuiz;
+        window.loadQuizQuestion = loadQuizQuestion;
+        window.checkQuizAnswer = checkQuizAnswer;
+        window.resetAndRestartQuiz = resetAndRestartQuiz;
 
         // --- Expanded Seed Vault ---
         const seedCollection = [
