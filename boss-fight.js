@@ -49,6 +49,7 @@
 
   function paintState(state) {
     if (!state) return;
+    const hadState = !!raidState;
     const wasDefeated = !!(raidState && raidState.defeated);
     raidState = state;
     eventEndAt = Date.parse(state.event_ends_at) || (Date.now() + DAY_MS);
@@ -76,7 +77,8 @@
       attackBtn.textContent = state.defeated ? '🏆 ENDER DRAGON DEFEATED' : (busy ? '⚡ STRIKE IN PROGRESS…' : '⚔️ ATTACK THE ENDER DRAGON');
     }
     if (state.defeated && !wasDefeated) setStatus('WORLD RAID CLEARED — waiting for the next 24-hour cycle.');
-    else if (!state.defeated && !busy && !wasDefeated) setStatus('GLOBAL RAID ONLINE · every strike counts for all players.');
+    else if (wasDefeated && !state.defeated) setStatus('NEW 24-HOUR RAID CYCLE LIVE — attack the Ender Dragon!');
+    else if (!hadState && !state.defeated) setStatus('GLOBAL RAID ONLINE · every strike counts for all players.');
     paintCountdown();
   }
 
