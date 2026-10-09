@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="vgameing-build" content="2026-10-09-arcade-effects-v1">
-    <meta name="theme-color" content="#00f3ff">
+    <meta name="vgameing-build" content="2026-10-09-cyberpunk-polish-v1">
+    <meta name="theme-color" content="#0b0f19">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>V-Gaming Hub | Official Vgameing Gaming Hub</title>
+    <title>V-Gaming Hub | OFFICIAL AGENT NETWORK</title>
     <!-- Tailwind CSS with Neon Theme Configuration -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -35,6 +36,10 @@
         }
     </script>
     <style>
+        :root { --neon-glow: #00f3ff; }
+        :root[data-theme="purple"] { --neon-glow: #bf00ff; }
+        :root[data-theme="green"] { --neon-glow: #00ff66; }
+        .neon-element { box-shadow: 0 0 10px var(--neon-glow); border-color: var(--neon-glow); }
         .neon-glow-cyan { box-shadow: 0 0 20px rgba(0, 243, 255, 0.25); }
         .neon-glow-pink { box-shadow: 0 0 20px rgba(255, 0, 85, 0.25); }
         .neon-glow-green { box-shadow: 0 0 20px rgba(0, 255, 102, 0.25); }
@@ -210,7 +215,7 @@
               <div class="flex items-center justify-between mb-4"><div><h3 class="text-lg font-black text-white">🎨 Appearance</h3><p class="text-[10px] text-gray-500">Customize the Vgameing look.</p></div><span class="text-xl">✨</span></div>
               <div class="space-y-3">
                 <div class="vg-setting-row"><span>🌙 Dark / Light mode</span><button id="setThemeBtn" type="button" class="vg-toggle" onclick="toggleVgTheme()"></button></div>
-                <div class="vg-setting-row"><span>🎨 Accent color</span><div class="flex items-center gap-2"><input id="setAccentColor" type="color" value="#00f3ff" class="w-11 h-8 rounded cursor-pointer bg-transparent" onchange="setVgAccent(this.value)"><span id="setAccentValue" class="text-[10px] font-mono text-neon-cyan">#00F3FF</span></div></div>
+                <div class="vg-setting-row"><span>🎨 Neon accent</span><div class="flex items-center gap-2"><span id="setAccentSwatch" aria-label="Current neon accent" style="display:inline-block;width:22px;height:22px;border-radius:7px;background:var(--neon-glow,#00f3ff);box-shadow:0 0 12px var(--neon-glow,#00f3ff);border:1px solid #ffffff55"></span><span id="setAccentValue" class="text-[10px] font-mono text-neon-cyan">#00F3FF</span></div></div>
                 <div class="vg-setting-row"><span>✨ Neon effects</span><button id="setNeonBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('neon')"></button></div>
                 <div class="vg-setting-row"><span>🔊 Sound effects</span><button id="setSoundBtn" type="button" class="vg-toggle" onclick="toggleVgSetting('sound')"></button></div>
                 <div class="vg-setting-row"><span>🎵 Background music</span><button id="setMusicBtn" type="button" class="vg-toggle" onclick="toggleVgMusic()"></button></div>
@@ -973,9 +978,13 @@
           document.body.classList.toggle("vg-no-neon",!vgSettings.neon);
           document.body.classList.toggle("vg-no-anim",!vgSettings.animations);
           document.body.classList.add("vg-accent-enabled");
-          document.documentElement.style.setProperty("--vg-accent",vgSettings.accent||"#00f3ff");
           const accent=vgSettings.accent||"#00f3ff";
-          const color=document.getElementById("setAccentColor");if(color)color.value=accent;
+          document.documentElement.style.setProperty("--vg-accent",accent);
+          document.documentElement.style.setProperty("--neon-glow",accent);
+          document.body.style.setProperty("--neon-glow",accent);
+          const themeName = /a855f7|b000ff|bf00ff/i.test(accent) ? "purple" : /39ff88|00ff66/i.test(accent) ? "green" : "cyan";
+          document.documentElement.dataset.theme=themeName;
+          const swatch=document.getElementById("setAccentSwatch");if(swatch)swatch.style.background=accent;
           const val=document.getElementById("setAccentValue");if(val)val.textContent=accent.toUpperCase();
           const map={neon:"setNeonBtn",sound:"setSoundBtn",music:"setMusicBtn",animations:"setAnimBtn",notifications:"setNotifMasterBtn",notifAchievement:"setNotifAchievementBtn",notifRank:"setNotifRankBtn",notifChallenge:"setNotifChallengeBtn",notifSeed:"setNotifSeedBtn",coordinates:"setCoordsBtn",verifiedSeeds:"setVerifiedSeedsBtn",publicProfile:"setPublicProfileBtn",leaderboardName:"setLeaderboardNameBtn"};
           Object.keys(map).forEach(k=>{const b=document.getElementById(map[k]);if(b)b.classList.toggle("on",!!vgSettings[k]);});
@@ -986,7 +995,7 @@
           const musicVol=document.getElementById("setMusicVolume");if(musicVol)musicVol.value=vgSettings.musicVolume||12;
           const musicLabel=document.getElementById("setMusicVolumeLabel");if(musicLabel)musicLabel.textContent=(vgSettings.musicVolume||12)+"%";
           vgUpdateMusicUI();
-          const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content=vgSettings.accent||"#00f3ff";
+          const themeMeta=document.querySelector('meta[name="theme-color"]');if(themeMeta)themeMeta.content="#0b0f19";
         }
         function toggleVgTheme(){vgSettings.theme=vgSettings.theme==="dark"?"light":"dark";saveVgSettings();applyVgSettings();showSettingsSaved();vgPlayUiSound("toggle");}
         function toggleVgSetting(key){vgSettings[key]=!vgSettings[key];saveVgSettings();applyVgSettings();showSettingsSaved();if(vgSettings.sound)vgPlayUiSound("toggle");}
@@ -3140,8 +3149,8 @@ function renderMobTable() {
  // Count genuine user interactions locally; never present this browser-only value as a global server total.
  document.addEventListener('click',e=>{if(e.target.closest('#vgElitePanel,#vgSeedModal,#vgEliteBtn'))return;countAction()},{passive:true});
  const themes=[['Neon Core','120','🧊','#00f3ff'],['Nether Lava','80','🔥','#ff4d00'],['End Dimension','80','🌌','#a855f7'],['Retro Green','60','🟩','#39ff88']];
- function renderThemes(){$('vgThemeList').innerHTML=themes.map(t=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #34304b;padding:9px;border-radius:10px" class="'+(activeTheme===t[0]?'vg-theme-active':'')+'"><span style="font-size:11px">'+t[2]+' <b>'+t[0]+'</b><br><small style="color:#9ca3af">'+(owned.includes(t[0])?'Owned':t[1]+' coins')+'</small></span><button class="vg-elite-btn" data-theme="'+t[0]+'" style="position:static;padding:7px 9px">'+(owned.includes(t[0])?'EQUIP':'BUY')+'</button></div>').join('');$('vgThemeList').querySelectorAll('[data-theme]').forEach(btn=>btn.onclick=()=>{let t=themes.find(x=>x[0]===btn.dataset.theme);if(!owned.includes(t[0])){if(coins<+t[1])return toast('Not enough V-Coins');coins-=+t[1];owned.push(t[0]);save('coins',coins);save('themes',owned);if(owned.length>=3)award('collector')}activeTheme=t[0];save('activeTheme',activeTheme);document.documentElement.style.setProperty('--vg-accent',t[3]);document.body.style.setProperty('--vg-accent',t[3]);save('activeAccent',t[3]);renderThemes();renderStats();toast(t[0]+' theme equipped')})}
- const savedAccent=read('activeAccent','#00f3ff');document.documentElement.style.setProperty('--vg-accent',savedAccent);
+ function renderThemes(){$('vgThemeList').innerHTML=themes.map(t=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #34304b;padding:9px;border-radius:10px" class="'+(activeTheme===t[0]?'vg-theme-active':'')+'"><span style="font-size:11px">'+t[2]+' <b>'+t[0]+'</b><br><small style="color:#9ca3af">'+(owned.includes(t[0])?'Owned':t[1]+' coins')+'</small></span><button class="vg-elite-btn" data-theme="'+t[0]+'" style="position:static;padding:7px 9px">'+(owned.includes(t[0])?'EQUIP':'BUY')+'</button></div>').join('');$('vgThemeList').querySelectorAll('[data-theme]').forEach(btn=>btn.onclick=()=>{let t=themes.find(x=>x[0]===btn.dataset.theme);if(!owned.includes(t[0])){if(coins<+t[1])return toast('Not enough V-Coins');coins-=+t[1];owned.push(t[0]);save('coins',coins);save('themes',owned);if(owned.length>=3)award('collector')}activeTheme=t[0];save('activeTheme',activeTheme);document.documentElement.style.setProperty('--vg-accent',t[3]);document.body.style.setProperty('--vg-accent',t[3]);document.documentElement.style.setProperty('--neon-glow',t[3]);document.body.style.setProperty('--neon-glow',t[3]);document.documentElement.dataset.theme=(/a855f7|b000ff|bf00ff/i.test(t[3])?'purple':/39ff88|00ff66/i.test(t[3])?'green':'cyan');save('activeAccent',t[3]);renderThemes();renderStats();toast(t[0]+' theme equipped')})}
+ const savedAccent=read('activeAccent','#00f3ff');document.documentElement.style.setProperty('--vg-accent',savedAccent);document.documentElement.style.setProperty('--neon-glow',savedAccent);document.documentElement.dataset.theme=(/a855f7|b000ff|bf00ff/i.test(savedAccent)?'purple':/39ff88|00ff66/i.test(savedAccent)?'green':'cyan');
  // Gamer card generator
  function drawCard(){const c=$('vgCardCanvas'),x=c.getContext('2d');let name=($('vgCardName').value||userTag()||'PLAYER').slice(0,18);$('vgCardName').value=name;x.clearRect(0,0,c.width,c.height);let g=x.createLinearGradient(0,0,880,500);g.addColorStop(0,'#071b2b');g.addColorStop(.55,'#11102b');g.addColorStop(1,'#270b37');x.fillStyle=g;x.fillRect(0,0,880,500);x.strokeStyle='#00f3ff';x.lineWidth=3;x.strokeRect(18,18,844,464);x.globalAlpha=.15;x.strokeStyle='#a855f7';for(let i=0;i<900;i+=30){x.beginPath();x.moveTo(i,0);x.lineTo(i-140,500);x.stroke()}x.globalAlpha=1;x.fillStyle='#00f3ff';x.font='bold 25px monospace';x.fillText('VGAMEING // PLAYER ID',55,75);x.fillStyle='#fff';x.font='bold 57px sans-serif';x.fillText(name.toUpperCase(),55,175);x.fillStyle='#c4b5fd';x.font='bold 25px monospace';x.fillText(($('vgEdition').value||'Java Edition').toUpperCase(),55,225);x.fillStyle='#facc15';x.font='bold 26px monospace';x.fillText('V-COINS  '+coins,55,300);x.fillStyle='#00f3ff';x.font='bold 25px monospace';x.fillText('RANK  '+(actions>=1000?'ELITE':actions>=100?'OPERATIVE':'ROOKIE'),55,350);x.fillStyle='#9ca3af';x.font='18px monospace';x.fillText('TROPHIES '+unlocked.length+'  //  ACTIONS '+actions,55,415);x.fillStyle=read('verified',false)?'#39ff88':'#fbbf24';x.font='bold 18px monospace';x.fillText(read('verified',false)?'✓ VERIFIED AGENT':'GUEST PROFILE',610,440)}
  $('vgMakeCard').onclick=()=>{drawCard();toast('Gamer ID generated')};$('vgDownloadCard').onclick=()=>{drawCard();let a=document.createElement('a');a.download='Vgameing-Player-ID.png';a.href=$('vgCardCanvas').toDataURL('image/png');a.click()};$('vgCardName').addEventListener('input',drawCard);$('vgEdition').addEventListener('change',drawCard);
@@ -3338,3 +3347,58 @@ function renderMobTable() {
 
 </body>
 </html>
+
+
+<!-- VGAMEING NEW PLAYER QUEST LOG -->
+<style>
+#vgQuestWidget{position:fixed;right:18px;bottom:88px;z-index:9998;width:min(320px,calc(100vw - 28px));color:#f8fafc;font:12px/1.5 system-ui,sans-serif}
+#vgQuestWidget .vgq-shell{border:1px solid #00f3ff66;border-radius:15px;background:linear-gradient(145deg,#101426f5,#080b14f5);box-shadow:0 0 24px #00f3ff18;overflow:hidden;backdrop-filter:blur(14px)}
+#vgQuestWidget .vgq-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;background:#00f3ff0b}
+#vgQuestWidget .vgq-title{font-weight:950;letter-spacing:.08em;color:var(--neon-glow,#00f3ff)}
+#vgQuestWidget .vgq-toggle{border:1px solid #00f3ff55;border-radius:8px;padding:5px 8px;color:#e5e7eb;background:#111827;cursor:pointer}
+#vgQuestWidget .vgq-body{padding:10px 12px 12px}
+#vgQuestWidget .vgq-row{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid #ffffff12}
+#vgQuestWidget .vgq-row:last-child{border-bottom:0}
+#vgQuestWidget .vgq-row button{margin-left:auto;white-space:nowrap;border:1px solid var(--neon-glow,#00f3ff);border-radius:7px;padding:5px 8px;background:#00f3ff12;color:#fff;font-weight:800;cursor:pointer}
+#vgQuestWidget .vgq-row button:disabled{opacity:.55;cursor:default}
+#vgQuestWidget .vgq-pulse{animation:vgQuestPulse 1.8s ease-in-out infinite}
+@keyframes vgQuestPulse{0%,100%{box-shadow:0 0 0 0 #00f3ff00}50%{box-shadow:0 0 16px 2px #00f3ff44}}
+#vgQuestWidget .vgq-status{font-size:10px;color:#9ca3af;margin-top:7px}
+@media(prefers-reduced-motion:reduce){#vgQuestWidget .vgq-pulse{animation:none}}
+</style>
+<aside id="vgQuestWidget" aria-label="New player quests">
+ <div class="vgq-shell">
+  <div class="vgq-head"><div><div class="vgq-title">✦ NEW PLAYER QUESTS</div><div style="font-size:10px;color:#9ca3af">Starter missions · V-Coins</div></div><button id="vgQuestToggle" class="vgq-toggle vgq-pulse" type="button" aria-expanded="true">− HIDE</button></div>
+  <div id="vgQuestBody" class="vgq-body">
+   <div class="vgq-row"><span>🌱</span><span>Visit the Seed Vault <small style="display:block;color:#9ca3af">Reward: 40 V-Coins</small></span><button type="button" data-vg-quest="seed_explorer">START</button></div>
+   <div class="vgq-row"><span>🎮</span><span>Open the Arcade <small style="display:block;color:#9ca3af">Reward: 50 V-Coins</small></span><button type="button" data-vg-quest="arcade_player">START</button></div>
+   <div id="vgQuestStatus" class="vgq-status">Choose a mission to get started. Rewards require login.</div>
+  </div>
+ </div>
+</aside>
+<script>
+(function(){
+ const widget=document.getElementById('vgQuestWidget');if(!widget)return;
+ const body=document.getElementById('vgQuestBody'),toggle=document.getElementById('vgQuestToggle'),status=document.getElementById('vgQuestStatus');
+ const key='vgameing_starter_quests_v1';let done={};try{done=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){}
+ function paint(){widget.querySelectorAll('[data-vg-quest]').forEach(b=>{const complete=!!done[b.dataset.vgQuest];b.disabled=complete;b.textContent=complete?'✓ DONE':'START';b.classList.toggle('vgq-pulse',!complete)});}
+ toggle.addEventListener('click',()=>{const open=body.style.display==='none';body.style.display=open?'block':'none';toggle.textContent=open?'− HIDE':'+ SHOW';toggle.setAttribute('aria-expanded',String(open));});
+ widget.querySelectorAll('[data-vg-quest]').forEach(btn=>btn.addEventListener('click',async()=>{
+   const mission=btn.dataset.vgQuest;if(done[mission])return;
+   const destination=mission==='seed_explorer'?'seeds':'arcade';
+   if(typeof window.switchTab==='function'){try{window.switchTab(destination)}catch(e){}}
+   status.textContent='Opening '+(mission==='seed_explorer'?'Seed Vault':'Arcade')+'…';
+   if(!window.vgAuthUser||!window.vgSupabase){status.textContent='Log in first to claim V-Coin quest rewards. Explore the feature, then return here.';return;}
+   btn.disabled=true;btn.textContent='…';
+   try{
+    const result=await window.vgSupabase.functions.invoke('vgameing-economy',{body:{action:'claim_mission',mission}});
+    if(result.error||!result.data||result.data.error){throw new Error(result.data&&result.data.error||'Reward could not be confirmed');}
+    done[mission]=true;try{localStorage.setItem(key,JSON.stringify(done))}catch(e){}
+    status.textContent='Quest claimed! '+(result.data.message||'V-Coins added to your wallet.');
+    paint();
+   }catch(e){btn.disabled=false;btn.textContent='START';status.textContent='Could not claim yet. Sign in and try again.';}
+ }));
+ paint();
+})();
+</script>
+<!-- END VGAMEING NEW PLAYER QUEST LOG -->
