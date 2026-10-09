@@ -716,6 +716,7 @@
         }
 
         async function applyOAuthUser(user){
+            if(window.vgAuthUser?.id!==user?.id) vgPlayUiSound("login");
             if(user){
               window.vgAuthUser=user;
             }
