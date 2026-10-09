@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="vgameing-build" content="2026-10-08-settings-music-v2">
+    <meta name="vgameing-build" content="2026-10-09-arcade-effects-v1">
     <meta name="theme-color" content="#00f3ff">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -64,7 +64,15 @@
         .vg-glass{background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(18px)}
         .vg-float{animation:vgFloat 5s ease-in-out infinite}@keyframes vgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 </style>
-</head>
+<style>
+.vg-shake{animation:vgShake .16s linear 2!important}@keyframes vgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.vg-flame-text{color:#ffb347!important;text-shadow:0 0 5px #ff5e00,0 0 14px #ff2600;animation:vgFlame .28s infinite alternate}@keyframes vgFlame{to{filter:brightness(1.5);text-shadow:0 0 9px #ff5e00,0 0 22px #ff2600}}
+.vg-redstone-strip{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}.vg-redstone-dust{width:14px;height:14px;border-radius:3px;background:#3b1518;border:1px solid #63242a;animation:vgRedstonePulse 1.9s infinite;animation-delay:var(--pulse-delay)}@keyframes vgRedstonePulse{0%,8%,100%{background:#3b1518}25%,65%{background:#ff2b36;box-shadow:0 0 12px #ff2633}}
+.vg-seed-copied{border-color:#39ff88!important;box-shadow:0 0 24px #39ff8855!important}
+.vg-toast-host{position:fixed;right:18px;bottom:96px;z-index:2147483500;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:min(360px,calc(100vw - 24px))}.vg-toast-card{background:#10101cf5;border:1px solid #00f3ff88;border-radius:14px;padding:13px 16px;color:#fff;box-shadow:0 0 28px #00f3ff25;animation:vgToastIn .3s ease-out}.vg-toast-card b{font-size:11px;color:#00f3ff}.vg-toast-card p{font-size:12px;color:#cbd5e1;margin-top:3px}@keyframes vgToastIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+.vg-confetti{position:fixed;width:7px;height:10px;background:hsl(var(--hue) 95% 60%);z-index:2147483600;pointer-events:none;animation:vgConfettiFly .9s ease-out forwards}@keyframes vgConfettiFly{to{transform:translate(var(--dx),var(--dy)) rotate(500deg);opacity:0}}
+.vg-click-spark{position:fixed;width:5px;height:5px;background:#00f3ff;border-radius:1px;box-shadow:0 0 10px #00f3ff;z-index:2147483600;pointer-events:none;animation:vgSparkFly .5s ease-out forwards}@keyframes vgSparkFly{to{transform:translate(24px,-24px) scale(.1);opacity:0}}
+</style></head>
 <body class="bg-neon-dark text-gray-100 font-sans min-h-screen flex flex-col justify-between selection:bg-neon-cyan selection:text-black">
     <!-- ================= SECURE EMAIL VERIFICATION & SIGN-IN MODAL ================= -->
     <div id="authModal" style="display:none!important" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -2203,7 +2211,7 @@
             loadLiveLeaderboard(activeLbTab);
         }
 
-        async function submitScore(game, score) {
+        async async function submitScore(game, score) {
             // Guests can play, but only logged-in accounts can enter the live leaderboard.
             if(!currentUser || !window.vgAuthUser || !window.vgProfile){
                 alert("🔒 Login with Google to appear on the live leaderboard.");
@@ -2459,7 +2467,13 @@
           document.getElementById("rsResult").textContent = seconds.toFixed(1) + (seconds === 1 ? " second" : " seconds");
           document.getElementById("rsTicks").textContent = redstoneTicks + " redstone ticks • " + (redstoneTicks * 2) + " game ticks";
         }
-        function renderMobTable() {
+        
+function vgToast(title,message){if(!vgSettings.notifications)return;let host=document.getElementById("vgToastHost");if(!host){host=document.createElement("div");host.id="vgToastHost";host.className="vg-toast-host";document.body.appendChild(host);}const card=document.createElement("div");card.className="vg-toast-card";card.innerHTML='<b></b><p></p>';card.querySelector("b").textContent=title;card.querySelector("p").textContent=message;host.appendChild(card);vgPlayUiSound("success");setTimeout(()=>card.remove(),3600);}
+function vgConfettiBurst(parent){const r=(parent||document.body).getBoundingClientRect();for(let i=0;i<28;i++){const p=document.createElement("i");p.className="vg-confetti";p.style.left=(r.left+r.width/2)+"px";p.style.top=(r.top+r.height/2)+"px";p.style.setProperty("--dx",(Math.random()*240-120)+"px");p.style.setProperty("--dy",(Math.random()*-190-20)+"px");p.style.setProperty("--hue",Math.floor(Math.random()*360));document.body.appendChild(p);setTimeout(()=>p.remove(),1000);}}
+function unlockSpeedDemon(){if(localStorage.getItem("vg_speed_demon_unlocked"))return;localStorage.setItem("vg_speed_demon_unlocked","1");const c=Number(localStorage.getItem("vgaming_vcoins")||0)+100;localStorage.setItem("vgaming_vcoins",String(c));const el=document.getElementById("settingsCoins");if(el)el.textContent=c+" 🪙";vgToast("🏆 ACHIEVEMENT UNLOCKED: SPEED DEMON","+100 V-Coins · 8+ CPS");vgConfettiBurst(document.getElementById("gameArena"));}
+async function copyVgSeed(btn){const seed=String(btn.dataset.seed||"");if(!seed)return;try{await navigator.clipboard.writeText(seed);}catch(e){const x=document.createElement("textarea");x.value=seed;document.body.appendChild(x);x.select();try{document.execCommand("copy");}catch(_){}x.remove();}const card=btn.closest(".vg-seed-card");if(card){card.classList.add("vg-seed-copied");setTimeout(()=>card.classList.remove("vg-seed-copied"),1200);}const old=btn.dataset.oldText||btn.textContent;btn.dataset.oldText=old;btn.textContent="✅ Copied!";setTimeout(()=>{if(btn.isConnected)btn.textContent=old;},1200);vgToast("🌱 SEED COPIED","Seed "+seed+" copied to clipboard.");}
+document.addEventListener("click",function(e){if(vgSettings?.animations===false||e.target.closest("input,textarea,select,button,a,[role=button]"))return;for(let i=0;i<4;i++){const p=document.createElement("i");p.className="vg-click-spark";p.style.left=e.clientX+"px";p.style.top=e.clientY+"px";document.body.appendChild(p);setTimeout(()=>p.remove(),520);}});
+function renderMobTable() {
           const body = document.getElementById("mobTableBody"); if (!body) return;
           const q = (document.getElementById("mobSearch")?.value || "").toLowerCase().trim();
           body.innerHTML = mobRows.filter(function(row){ return row.join(" ").toLowerCase().includes(q); }).map(function(row){
