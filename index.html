@@ -58,13 +58,16 @@
         .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
         .vg-no-neon .vg-no-anim main>section{animation:none!important}
     
-        /* Seed Vault owns its layout; floating utility grids stay inside their overlays. */
-        #tab-seeds { position: relative; isolation: isolate; width: 100%; }
-        #tab-seeds.hidden { display: none !important; }
-        #tab-seeds:not(.hidden) { display: block !important; visibility: visible !important; opacity: 1 !important; }
-        #vgElitePanel, #vgSeedModal { display: none; }
-        #vgElitePanel.open { display: block; }
-        #vgSeedModal.open { display: flex; }
+        /* Keep the Seed Vault and Boss Fight as independent main-tab layout roots. */
+        #tab-seeds, #tab-boss-fight { position: relative; isolation: isolate; width: 100%; min-width: 0; }
+        #tab-seeds.hidden, #tab-boss-fight.hidden { display: none !important; }
+        #tab-seeds:not(.hidden), #tab-boss-fight:not(.hidden) { display: block !important; visibility: visible !important; opacity: 1 !important; }
+        /* Utility grid is only visible while its own fixed overlay is explicitly open. */
+        #vgElitePanel:not(.open), #vgSeedModal:not(.open) { display: none !important; pointer-events: none !important; }
+        #vgElitePanel.open { display: block !important; pointer-events: auto; }
+        #vgSeedModal.open { display: flex !important; pointer-events: auto; }
+        #tab-seeds #seedsGrid { width: 100%; min-width: 0; }
+        #tab-boss-fight #bossFightApp { width: 100%; min-width: 0; }
         #tab-seeds #seedsGrid { display: grid; min-height: 1px; }
         #tab-seeds #seedSearchInput { display: block; visibility: visible; }
         /* Vgameing professional polish + music permission */
@@ -399,23 +402,29 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
             <div id="seedsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- BOSS FIGHT TAB -->
-        <section id="tab-boss-fight" class="hidden space-y-6 max-w-5xl mx-auto">
-          <div class="rounded-3xl border border-neon-pink/40 bg-gradient-to-br from-[#190916] via-[#100b1b] to-[#07121b] p-6 sm:p-9 neon-glow-pink">
-            <div class="text-[10px] font-black tracking-[.25em] text-neon-pink">VGAMEING // RAID PROTOCOL</div>
-            <h2 class="mt-2 text-3xl sm:text-5xl font-black text-white">⚔️ BOSS FIGHT <span class="text-neon-pink">ONLINE</span></h2>
-            <p class="mt-3 text-sm text-gray-300">Fight the Ender Titan. Attack, heal, and survive its turns to claim victory.</p>
+        <!-- BOSS FIGHT TAB: isolated from Seed Vault and powered by shared Supabase state -->
+        <section id="tab-boss-fight" class="hidden space-y-6 w-full max-w-5xl mx-auto" aria-labelledby="bossFightHeading">
+          <div class="rounded-3xl border border-purple-400/40 bg-gradient-to-br from-[#160b2b] via-[#0b1022] to-[#080d19] p-6 sm:p-9 neon-glow-pink overflow-hidden">
+            <div class="text-[10px] font-black tracking-[.25em] text-purple-300">VGAMEING // END DIMENSION RAID</div>
+            <h2 id="bossFightHeading" class="mt-2 text-3xl sm:text-5xl font-black text-white">🐉 ENDER DRAGON <span class="text-purple-300">WORLD RAID</span></h2>
+            <p class="mt-3 text-sm text-gray-300">Every attack from every player adds to the same global raid. Reach 100,000 attacks before the 24-hour event cycle ends!</p>
           </div>
           <div class="rounded-2xl border border-neon-cyan/30 bg-neon-cyan/5 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div><div class="text-[10px] font-black tracking-[.22em] text-neon-cyan">⏳ LIVE EVENT CYCLE</div><p class="mt-1 text-sm text-gray-300">Next Boss Fight event reset</p></div>
+            <div><div class="text-[10px] font-black tracking-[.22em] text-neon-cyan">⏳ GLOBAL EVENT RESET</div><p class="mt-1 text-sm text-gray-300">Shared server countdown · cycles every 24 hours</p></div>
             <div id="bossEventCountdown" class="font-mono text-3xl sm:text-4xl font-black tracking-wider text-neon-cyan" role="timer" aria-live="off">24:00:00</div>
           </div>
-          <div id="bossFightApp" class="rounded-2xl border border-neon-pink/30 bg-neon-card p-5 sm:p-7 space-y-5">
-            <div class="flex items-center justify-between gap-3"><div><div class="text-xs font-black tracking-widest text-gray-400">BOSS HP</div><div id="bossFightHpText" class="text-sm font-black text-neon-pink">1000 / 1000</div></div><div id="bossFightStatus" role="status" aria-live="polite" class="text-xs text-gray-300">Prepare for battle.</div></div>
-            <div class="h-4 overflow-hidden rounded-full border border-neon-pink/30 bg-black/50"><div id="bossFightHpBar" class="h-full w-full bg-gradient-to-r from-neon-pink to-neon-purple transition-all duration-300"></div></div>
-            <div id="bossFightArena" class="min-h-48 rounded-2xl border border-gray-800 bg-[radial-gradient(circle_at_50%_30%,#38133b,#100b1b_55%,#05060b)] flex flex-col items-center justify-center p-6 text-center"><div id="bossFightBoss" class="text-7xl sm:text-8xl select-none" aria-label="Ender Titan boss">👾</div><div class="mt-3 text-xl font-black text-white">ENDER TITAN</div><p class="mt-1 text-xs text-gray-400">A corrupted guardian from the End dimension.</p></div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><button id="bossAttackBtn" type="button" class="rounded-xl bg-neon-pink px-4 py-3 font-black text-white hover:brightness-110">⚔️ ATTACK</button><button id="bossHealBtn" type="button" class="rounded-xl border border-neon-green/40 bg-neon-green/10 px-4 py-3 font-black text-neon-green hover:bg-neon-green/20">💚 HEAL (+35)</button><button id="bossRestartBtn" type="button" class="rounded-xl border border-gray-700 px-4 py-3 font-black text-gray-200 hover:border-neon-cyan">↻ RESTART RAID</button></div>
-            <div class="grid grid-cols-2 gap-3"><div class="rounded-xl border border-gray-800 bg-black/20 p-3"><div class="text-[10px] font-bold text-gray-500">YOUR HP</div><div id="bossPlayerHpText" class="mt-1 text-xl font-black text-neon-green">100 / 100</div></div><div class="rounded-xl border border-gray-800 bg-black/20 p-3"><div class="text-[10px] font-bold text-gray-500">RAID LOG</div><div id="bossFightLog" class="mt-1 text-xs text-gray-300">The Ender Titan is waiting…</div></div></div>
+          <div id="bossFightApp" class="space-y-5 rounded-2xl border border-purple-400/30 bg-neon-card p-5 sm:p-7">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><div><div class="text-xs font-black tracking-widest text-purple-200">GLOBAL DRAGON SHIELD</div><div id="bossFightHpText" class="text-sm font-black text-neon-pink">0 / 100,000 attacks</div></div><div id="bossFightStatus" role="status" aria-live="polite" class="text-xs text-gray-300">Connecting to global raid…</div></div>
+            <div class="h-4 overflow-hidden rounded-full border border-purple-400/30 bg-black/50"><div id="bossFightHpBar" class="h-full w-0 bg-gradient-to-r from-purple-500 via-neon-pink to-neon-cyan transition-all duration-300"></div></div>
+            <div id="bossFightArena" class="min-h-56 rounded-2xl border border-purple-400/20 bg-[radial-gradient(circle_at_50%_30%,#30205b,#100b1b_55%,#05060b)] flex flex-col items-center justify-center p-6 text-center">
+              <div id="bossFightBoss" class="select-none text-7xl sm:text-8xl drop-shadow-[0_0_24px_rgba(168,85,247,.65)]" aria-label="Ender Dragon boss">🐉</div>
+              <div class="mt-3 text-xl font-black text-white">THE ENDER DRAGON</div>
+              <p class="mt-1 max-w-xl text-xs text-gray-400">The Ender Dragon is a shared world boss. Your click counts toward the global 100,000-hit target for every player.</p>
+              <div class="mt-4 rounded-xl border border-purple-300/20 bg-black/30 px-4 py-2"><span class="text-[10px] font-bold tracking-widest text-gray-500">GLOBAL RAID STATUS</span><div id="bossGlobalStatus" class="mt-1 text-sm font-black text-purple-200">SYNCING WITH SERVER…</div></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><button id="bossAttackBtn" type="button" class="rounded-xl bg-gradient-to-r from-purple-600 to-neon-pink px-4 py-4 font-black text-white shadow-lg hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">⚔️ ATTACK THE ENDER DRAGON</button><button id="bossRefreshBtn" type="button" class="rounded-xl border border-gray-700 bg-black/20 px-4 py-4 font-black text-gray-200 hover:border-neon-cyan">↻ SYNC GLOBAL RAID</button></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="rounded-xl border border-gray-800 bg-black/20 p-3"><div class="text-[10px] font-bold text-gray-500">GLOBAL TARGET</div><div id="bossGlobalCount" class="mt-1 text-xl font-black text-neon-cyan">0 / 100,000</div></div><div class="rounded-xl border border-gray-800 bg-black/20 p-3"><div class="text-[10px] font-bold text-gray-500">LAST RAID MESSAGE</div><div id="bossFightLog" class="mt-1 text-xs text-gray-300">Waiting for the first strike…</div></div></div>
+            <p class="text-[10px] leading-relaxed text-gray-500">Rewards: every completed world raid grants a standard Dragon Cache; the server rolls a separate 1% chance for the ultra-rare Dragon Heart Relic. Temporary server session pools are cleaned every 2 hours.</p>
           </div>
         </section>
 
@@ -3237,7 +3246,7 @@ function renderMobTable() {
  function award(id){if(!unlocked.includes(id)){unlocked.push(id);save('badges',unlocked);toast('🏆 Trophy unlocked: '+badges.find(b=>b[0]===id)[1])}renderBadges()}
  const badges=[['first','🎮','First Login','Open the player core'],['clicks','⚡','100 Actions','Use the hub 100 times'],['explorer','🌱','Seed Explorer','Preview a seed'],['builder','🔴','Redstone Builder','Use the sandbox'],['collector','🎨','Style Collector','Own 3 themes'],['veteran','🛰️','Active Agent','Return and keep playing']];
  function renderBadges(){$('vgTrophyGrid').innerHTML=badges.map(b=>'<div class="vg-trophy '+(unlocked.includes(b[0])?'unlocked':'')+'"><span class="ico">'+b[1]+'</span><b>'+b[2]+'</b><div style="font-size:9px;color:#9ca3af;margin-top:4px">'+b[3]+'</div></div>').join('');$('vgProfileLine').textContent=userTag()+' · '+unlocked.length+'/'+badges.length+' trophies';}
- function renderStats(){let count=Math.min(actions,100000);$('vgBossFill').style.width=(count/1000)+'%';$('vgBossCount').textContent=count.toLocaleString()+' / 100,000 actions';$('vgActionCount').textContent=actions;$('vgCoinBalance').textContent=coins+' V-Coins';$('vgAgentRank').textContent=actions>=1000?'ELITE':actions>=100?'OPERATIVE':'ROOKIE';$('vgAgentStatus').textContent=(read('verified',false)?'VERIFIED':'UNCONFIRMED');$('vgClearance').textContent=read('verified',false)?'VGA-'+Math.random().toString(36).slice(2,6).toUpperCase():'GUEST-01';}
+ function renderStats(){$('vgActionCount').textContent=actions;$('vgCoinBalance').textContent=coins+' V-Coins';$('vgAgentRank').textContent=actions>=1000?'ELITE':actions>=100?'OPERATIVE':'ROOKIE';$('vgAgentStatus').textContent=(read('verified',false)?'VERIFIED':'UNCONFIRMED');$('vgClearance').textContent=read('verified',false)?'VGA-'+Math.random().toString(36).slice(2,6).toUpperCase():'GUEST-01';}
  function countAction(){actions++;save('actions',actions);if(actions===1)award('first');if(actions>=100)award('clicks');renderStats()}
  const panel=$('vgElitePanel');$('vgEliteBtn').addEventListener('click',()=>{panel.classList.add('open');renderBadges();renderStats();drawCard();countAction()});$('vgEliteClose').addEventListener('click',()=>panel.classList.remove('open'));panel.addEventListener('click',e=>{if(e.target===panel)panel.classList.remove('open')});
  // Count genuine user interactions locally; never present this browser-only value as a global server total.
