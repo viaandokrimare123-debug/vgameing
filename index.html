@@ -2216,17 +2216,27 @@
             leaderboardLoadPromise=(async function(){
                 try {
                     const result=await vgSupabase.from('leaderboard')
-                      .select('username,game,score,created_at')
+                      .select('user_id,username,game,score,created_at')
                       .eq('game',game)
                       .order('score',{ascending:game==='reaction'})
                       .order('created_at',{ascending:false})
                       .limit(500);
                     if(result.error) throw result.error;
+                    const rows=result.data||[];
+                    const ids=Array.from(new Set(rows.map(function(row){return row.user_id;}).filter(Boolean)));
+                    let profileNames=new Map();
+                    if(ids.length){
+                        const profiles=await vgSupabase.from('vg_profiles').select('user_id,gamer_tag').in('user_id',ids);
+                        if(profiles.error) throw profiles.error;
+                        (profiles.data||[]).forEach(function(p){profileNames.set(p.user_id,p.gamer_tag);});
+                    }
                     const best=new Map();
-                    (result.data||[]).forEach(function(row){
-                        const name=String(row.username||'Player').trim();if(name.toLowerCase()==='guest'||name.toLowerCase().startsWith('guest '))return;
-                        const old=best.get(name);
-                        if(!old || leaderboardSort(game,row,old)<0) best.set(name,{name:name,score:Number(row.score)||0,created_at:row.created_at});
+                    rows.forEach(function(row){
+                        const stableId=row.user_id||('legacy:'+String(row.username||'Player').trim().toLowerCase());
+                        const name=String(profileNames.get(row.user_id)||row.username||'Player').trim();
+                        if(name.toLowerCase()==='guest'||name.toLowerCase().startsWith('guest '))return;
+                        const old=best.get(stableId);
+                        if(!old || leaderboardSort(game,row,old)<0) best.set(stableId,{name:name,user_id:row.user_id||null,score:Number(row.score)||0,created_at:row.created_at});
                     });
                     leaderboards[game]=Array.from(best.values()).sort((a,b)=>leaderboardSort(game,a,b)).slice(0,28);
                     localStorage.setItem('vgaming_leaderboards',JSON.stringify(leaderboards));
@@ -2264,6 +2274,7 @@
 
             if(vgSupabase && window.vgAuthUser && window.vgProfile){
                 const result=await vgSupabase.from('leaderboard').insert({
+                    user_id:window.vgAuthUser.id,
                     username:window.vgProfile.gamer_tag,
                     game:game,
                     score:Number(score)||0,
