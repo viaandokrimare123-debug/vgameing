@@ -58,8 +58,13 @@
         .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
         .vg-no-neon .vg-no-anim main>section{animation:none!important}
     
-        /* Seed Vault active-tab visibility safeguard */
+        /* Seed Vault owns its layout; floating utility grids stay inside their overlays. */
+        #tab-seeds { position: relative; isolation: isolate; width: 100%; }
+        #tab-seeds.hidden { display: none !important; }
         #tab-seeds:not(.hidden) { display: block !important; visibility: visible !important; opacity: 1 !important; }
+        #vgElitePanel, #vgSeedModal { display: none; }
+        #vgElitePanel.open { display: block; }
+        #vgSeedModal.open { display: flex; }
         #tab-seeds #seedsGrid { display: grid; min-height: 1px; }
         #tab-seeds #seedSearchInput { display: block; visibility: visible; }
         /* Vgameing professional polish + music permission */
@@ -1113,6 +1118,13 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
             }
 
             window.vgActiveTab = tabId;
+
+            // Close floating V-Core / seed-preview overlays when changing main tabs.
+            // These fixed overlays must never sit on top of the Seed Vault content.
+            const eliteOverlay = document.getElementById('vgElitePanel');
+            const seedPreviewOverlay = document.getElementById('vgSeedModal');
+            if (eliteOverlay) eliteOverlay.classList.remove('open');
+            if (seedPreviewOverlay) seedPreviewOverlay.classList.remove('open');
 
             // Hide only the main tab sections, then reveal the requested target.
             document.querySelectorAll('main > section[id^="tab-"]').forEach(function (section) {
