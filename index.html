@@ -58,21 +58,20 @@
         .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
         .vg-no-neon .vg-no-anim main>section{animation:none!important}
     
-        /* Keep the Seed Vault and Boss Fight as independent main-tab layout roots. */
+        /* Independent tab roots: visibility is controlled only by the router's .hidden state. */
         #tab-seeds, #tab-boss-fight { position: relative; isolation: isolate; width: 100%; min-width: 0; }
-        #tab-seeds.hidden, #tab-boss-fight.hidden { display: none !important; }
-        #tab-seeds:not(.hidden), #tab-boss-fight:not(.hidden) { display: block !important; visibility: visible !important; opacity: 1 !important; }
-        /* Utility grid is only visible while its own fixed overlay is explicitly open. */
+        #tab-seeds #seedsGrid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); align-items: stretch; gap: 1rem; width: 100%; min-width: 0; }
+        @media (min-width: 768px) { #tab-seeds #seedsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        #tab-seeds #seedsGrid > * { position: relative; inset: auto; float: none; transform: none; min-width: 0; }
+        #tab-seeds #seedSearchInput { display: block; width: 100%; visibility: visible; }
+        #tab-boss-fight #bossFightApp { width: 100%; min-width: 0; }
+        /* Utility overlays must never occupy page layout or intercept clicks while closed. */
         #vgElitePanel:not(.open), #vgSeedModal:not(.open) { display: none !important; pointer-events: none !important; }
+        #vgElitePanel { position: fixed; inset: 0; z-index: 10000; overflow-y: auto; }
         #vgElitePanel.open { display: block !important; pointer-events: auto; }
         #vgSeedModal.open { display: flex !important; pointer-events: auto; }
-        #vgElitePanel { position: fixed; inset: 0; z-index: 10000; overflow-y: auto; }
         #vgElitePanel .vg-elite-grid { position: relative; min-width: 0; }
-        #tab-seeds, #tab-boss-fight, #tab-youtube, #tab-shorts, #tab-community, #tab-friends, #tab-tools, #tab-leaderboard, #tab-quiz { overflow: clip; }
-        #tab-seeds #seedsGrid { width: 100%; min-width: 0; }
-        #tab-boss-fight #bossFightApp { width: 100%; min-width: 0; }
-        #tab-seeds #seedsGrid { display: grid; min-height: 1px; }
-        #tab-seeds #seedSearchInput { display: block; visibility: visible; }
+        #tab-boss-fight, #tab-youtube, #tab-shorts, #tab-community, #tab-friends, #tab-tools, #tab-leaderboard, #tab-quiz { min-width: 0; }
         /* Vgameing professional polish + music permission */
         .vg-pro-shell{position:relative}.vg-pro-shell:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(0,243,255,.045) 35%,transparent 55%,rgba(176,0,255,.045) 85%,transparent 100%);opacity:.8}
         header{box-shadow:0 8px 35px rgba(0,0,0,.25)}
@@ -2377,35 +2376,56 @@ main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; vis
 ];
 
         function renderSeeds(seedsToRender) {
+            const grid = document.getElementById('seedsGrid');
+            if (!grid) return;
+            const source = Array.isArray(seedsToRender) ? seedsToRender : seedCollection;
             const counter = document.getElementById('seedVaultCount');
-            if (counter) counter.textContent = seedCollection.length + '+ catalog seeds loaded';
-            document.getElementById('seedsGrid').innerHTML = seedsToRender.map(s => `
-                <div class="vg-seed-card bg-neon-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-neon-green/40 transition">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h3 class="font-bold text-white text-base">${s.name}</h3>
-                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-neon-green/10 text-neon-green border border-neon-green/30">${s.version}</span>
+            if (counter) counter.textContent = seedCollection.length + ' catalog seeds loaded';
+            if (!source.length) {
+                grid.innerHTML = '<div class="col-span-full rounded-xl border border-gray-800 bg-neon-card p-6 text-center text-sm text-gray-400">No seeds match that search. Try another biome, structure, or seed number.</div>';
+                return;
+            }
+            grid.innerHTML = source.map(function (s) {
+                const name = String(s.name || 'Minecraft Seed');
+                const version = String(s.version || 'Version varies');
+                const description = String(s.desc || 'Explore this Minecraft world seed.');
+                const seed = String(s.seed ?? '');
+                const escapeHtml = function (value) {
+                    return value.replace(/[&<>"']/g, function (char) {
+                        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+                    });
+                };
+                return `
+                    <article class="vg-seed-card relative bg-neon-card border border-gray-800 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-neon-green/40 transition">
+                        <div>
+                            <div class="flex flex-wrap justify-between items-start gap-2">
+                                <h3 class="font-bold text-white text-base break-words">${escapeHtml(name)}</h3>
+                                <span class="shrink-0 text-[10px] font-mono px-2 py-0.5 rounded bg-neon-green/10 text-neon-green border border-neon-green/30">${escapeHtml(version)}</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">${escapeHtml(description)}</p>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2">${s.desc}</p>
-                    </div>
-                    <div class="flex justify-between items-center bg-neon-dark px-3 py-2 rounded-xl border border-gray-800">
-                        <span class="font-mono text-xs text-neon-green select-all font-bold">${s.seed}</span>
-                        <button type="button" data-seed="${s.seed}" onclick="copyVgSeed(this)" class="text-xs px-3 py-1 rounded bg-neon-green/20 text-neon-green font-bold hover:bg-neon-green hover:text-black transition">Copy</button>
-                    </div>
-                </div>
-            `).join('');
+                        <div class="flex justify-between items-center gap-3 bg-neon-dark px-3 py-2 rounded-xl border border-gray-800">
+                            <span class="font-mono text-xs text-neon-green select-all font-bold break-all">${escapeHtml(seed)}</span>
+                            <button type="button" data-seed="${escapeHtml(seed)}" onclick="copyVgSeed(this)" class="shrink-0 text-xs px-3 py-1 rounded bg-neon-green/20 text-neon-green font-bold hover:bg-neon-green hover:text-black transition">Copy</button>
+                        </div>
+                    </article>`;
+            }).join('');
         }
 
         function filterSeeds() {
-            let query = document.getElementById('seedSearchInput').value.toLowerCase();
-            let filtered = seedCollection.filter(s => 
-                s.name.toLowerCase().includes(query) || 
-                s.desc.toLowerCase().includes(query) || 
-                s.tags.some(t => t.toLowerCase().includes(query)) ||
-                s.seed.includes(query)
-            );
+            const input = document.getElementById('seedSearchInput');
+            if (!input) return;
+            const query = input.value.trim().toLowerCase();
+            const filtered = seedCollection.filter(function (seed) {
+                return String(seed.name || '').toLowerCase().includes(query) ||
+                    String(seed.desc || '').toLowerCase().includes(query) ||
+                    (Array.isArray(seed.tags) && seed.tags.some(function (tag) { return String(tag).toLowerCase().includes(query); })) ||
+                    String(seed.seed ?? '').includes(query);
+            });
             renderSeeds(filtered);
         }
+        window.renderSeeds = renderSeeds;
+        window.filterSeeds = filterSeeds;
 
         // --- Live Supabase Leaderboards & Arcade System ---
         let leaderboards = JSON.parse(localStorage.getItem('vgaming_leaderboards')) || { reaction: [], cps: [], zombie: [] };
