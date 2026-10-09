@@ -2185,7 +2185,7 @@
                     if(result.error) throw result.error;
                     const best=new Map();
                     (result.data||[]).forEach(function(row){
-                        const name=String(row.username||'Player');
+                        const name=String(row.username||'Player').trim();if(name.toLowerCase()==='guest'||name.toLowerCase().startsWith('guest '))return;
                         const old=best.get(name);
                         if(!old || leaderboardSort(game,row,old)<0) best.set(name,{name:name,score:Number(row.score)||0,created_at:row.created_at});
                     });
@@ -2292,12 +2292,12 @@
                 arena.onclick = () => {
                     if (!started) {
                         started = true; clicks = 1; let start = Date.now();
-                        arena.innerHTML = `<div id="cCount" class="text-4xl font-black text-white">1</div>`;
+                        arena.innerHTML = `<div class="text-center"><div id="cCount" class="text-4xl font-black text-white">1</div><div id="cCombo" class="mt-3 text-xs font-black tracking-[.2em] text-orange-400">COMBO START</div></div>`;
                         gameInterval = setInterval(() => {
                             let left = (5.0 - (Date.now() - start)/1000).toFixed(1);
-                            if (left <= 0) { clearInterval(gameInterval); arena.onclick = null; vgPlayUiSound(clicks>=30?'win':'lose'); submitScore('cps', Number((clicks/5.0).toFixed(2))); }
+                            if (left <= 0) { clearInterval(gameInterval); arena.onclick = null; const finalCps=Number((clicks/5.0).toFixed(2));vgPlayUiSound(clicks>=30?'win':'lose');if(finalCps>=8)unlockSpeedDemon();if(finalCps>=10){vgConfettiBurst(arena);vgToast('⚡ ARCADE CLEAR','You reached '+finalCps+' CPS!');}submitScore('cps', finalCps); }
                         }, 50);
-                    } else { clicks++; document.getElementById('cCount').innerText = clicks; }
+                    } else { clicks++; const n=document.getElementById('cCount');if(n)n.textContent=clicks;const cpsNow=clicks/Math.max(.1,(Date.now()-start)/1000);if(cpsNow>=8){if(n)n.classList.add('vg-flame-text');arena.classList.add('vg-shake');setTimeout(()=>arena.classList.remove('vg-shake'),160);vgPlayUiSound('click');const combo=document.getElementById('cCombo');if(combo)combo.textContent='🔥 '+cpsNow.toFixed(1)+' CPS · ON FIRE';} }
                 };
             } else if (type === 'zombie') {
                 arena.className = "h-64 sm:h-80 bg-zinc-950 rounded-xl border border-neon-green/40 flex items-center justify-center relative cursor-crosshair";
@@ -2308,11 +2308,11 @@
                     let z = document.createElement('div');
                     z.className = "absolute text-2xl cursor-pointer select-none"; z.innerText = '🧟';
                     z.style.left = `${Math.floor(Math.random()*75)+10}%`; z.style.top = `${Math.floor(Math.random()*70)+15}%`;
-                    z.onclick = (e) => { e.stopPropagation(); if(!active)return; kills++; document.getElementById('zKills').innerText = kills; z.remove(); };
+                    z.onclick = (e) => { e.stopPropagation(); if(!active)return; kills++; document.getElementById('zKills').innerText = kills; arena.classList.add('vg-shake');setTimeout(()=>arena.classList.remove('vg-shake'),130);vgPlayUiSound('click');z.remove(); };
                     arena.appendChild(z);
                     setTimeout(() => { if(z.parentNode) z.remove(); }, 1200);
                 }, 700);
-                gameTimeout = setTimeout(() => { active = false; clearInterval(sp); arena.onclick = null; vgPlayUiSound(kills>=20?'win':'lose'); submitScore('zombie', kills); }, 10000);
+                gameTimeout = setTimeout(() => { active = false; clearInterval(sp); arena.onclick = null; vgPlayUiSound(kills>=20?'win':'lose');if(kills>=20){vgConfettiBurst(arena);vgToast('🏆 ZOMBIE SLAYER','You eliminated '+kills+' zombies!');}submitScore('zombie', kills); }, 10000);
             }
         }
 
