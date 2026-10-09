@@ -3242,7 +3242,7 @@ function renderMobTable() {
 #vgCoinStatus{min-height:22px;color:#a5f3fc;font-size:12px;margin:8px 0}
 #vgLiveBroadcast{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:140;width:min(850px,calc(100% - 24px));border:1px solid #00f3ff99;border-radius:13px;padding:12px 44px 12px 14px;background:linear-gradient(90deg,#091b2b,#1a0b2b);color:#e0fcff;box-shadow:0 0 30px #00f3ff35;font:800 13px/1.4 system-ui}
 #vgLiveBroadcast button{position:absolute;right:10px;top:8px;background:transparent;color:#fff;border:0;font-size:20px;cursor:pointer}
-#vgOwnerCrown{display:none;color:#fff;text-shadow:0 0 7px #fff,0 0 14px #ff00d4,0 0 22px #00f3ff;animation:vgCrownPulse 2s ease-in-out infinite}
+#vgOwnerCrown{display:none;color:#fff;text-shadow:0 0 7px #fff,0 0 14px #ff00d4,0 0 22px #00f3ff;animation:vgCrownPulse 2s ease-in-out infinite}#displayUserTag.vg-owner-tag::after{content:" ♛";color:#fff;text-shadow:0 0 7px #fff,0 0 14px #ff00d4,0 0 22px #00f3ff;animation:vgCrownPulse 2s ease-in-out infinite}
 @keyframes vgCrownPulse{50%{filter:hue-rotate(120deg);text-shadow:0 0 8px #facc15,0 0 20px #ff00d4}}
 @media(max-width:600px){#vgCoinLauncher{left:10px;bottom:12px;padding:10px 12px}#vgCoinPanel{padding:13px}}
 </style>
@@ -3302,7 +3302,7 @@ function renderMobTable() {
  function show(){ $("vgCoinOverlay").classList.add("vg-open");$("vgCoinOverlay").setAttribute("aria-hidden","false");vgRefreshWallet(); }
  function hide(){ $("vgCoinOverlay").classList.remove("vg-open");$("vgCoinOverlay").setAttribute("aria-hidden","true"); }
  async function vgRefreshWallet(){
-   if(!window.vgAuthUser){$("vgCoinLauncherBalance").textContent="LOGIN";$("vgCoinBigBalance").textContent="Login required";$("vgCoinAccountLabel").textContent="Use the site login first";$("vgCoinRole").textContent="GUEST";$("vgCoinOwnerNote").textContent="Sign in to save progress."; $("vgOwnerAdminSection").style.display="none";return;}
+   if(!window.vgAuthUser){$("vgCoinLauncherBalance").textContent="LOGIN";$("vgCoinBigBalance").textContent="Login required";$("vgCoinAccountLabel").textContent="Use the site login first";$("vgCoinRole").textContent="GUEST";$("vgCoinOwnerNote").textContent="Sign in to save progress."; $("vgOwnerAdminSection").style.display="none";vgEconomyOwner=false;const t=$("displayUserTag");if(t)t.classList.remove("vg-owner-tag");const b=$("vgVerifiedBadge");if(b){b.style.display="";b.textContent="✓";}return;}
    try{const data=await call("get_wallet");vgEconomyOwner=!!data.owner;
      const balance=data.unlimited?"∞ UNLIMITED":String(data.balance??0)+" 🪙";
      $("vgCoinLauncherBalance").textContent=data.unlimited?"∞":String(data.balance??0);
@@ -3313,8 +3313,8 @@ function renderMobTable() {
      $("vgOwnerAdminSection").style.display=data.owner?"block":"none";
      const verified=$("vgVerifiedBadge");
      const tag=$("displayUserTag");
-     if(data.owner){if(verified){verified.classList.remove("hidden");verified.style.display="inline-block";verified.textContent="♛";verified.title="Vgameing Owner";verified.setAttribute("aria-label","Vgameing Owner");}if(tag){tag.innerHTML=tag.textContent.replace(/</g,"&lt;").replace(/>/g,"&gt;")+' <span id="vgOwnerCrown" style="display:inline;color:#fff">♛</span>';}}
-     else if(verified){verified.textContent="✓";verified.title="Verified Vgameing account";verified.setAttribute("aria-label","Verified Vgameing account");verified.style.display="";}
+     if(data.owner){if(verified){verified.classList.add("hidden");verified.style.display="none";verified.textContent="✓";verified.title="Verified Vgameing account";verified.setAttribute("aria-label","Verified Vgameing account");}if(tag)tag.classList.add("vg-owner-tag");}
+     else {if(tag)tag.classList.remove("vg-owner-tag");if(verified){verified.textContent="✓";verified.title="Verified Vgameing account";verified.setAttribute("aria-label","Verified Vgameing account");verified.style.display="";}}
      if(data.owner)await vgLoadBroadcastHistory();
      await vgLoadInventory();
    }catch(e){$("vgCoinLauncherBalance").textContent="RETRY";setStatus(e.message,true);}
