@@ -2993,5 +2993,21 @@
 </script>
 <!-- ================= END VGAMEING GEMINI AI CHATBOT ================= -->
 
+
+<style>
+/* Vgameing polish: accessible motion, layered cards and reveal states */
+.vg-polish-card{backdrop-filter:blur(14px);background:linear-gradient(135deg,rgba(18,18,31,.96),rgba(10,10,18,.86));border:1px solid rgba(0,243,255,.18);box-shadow:0 12px 36px rgba(0,0,0,.18);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}.vg-polish-card:hover{transform:translateY(-3px);border-color:rgba(0,243,255,.5);box-shadow:0 15px 45px rgba(0,243,255,.09)}
+.vg-easter-egg header{animation:vgHue .55s ease 3;box-shadow:0 0 42px rgba(0,243,255,.55)}@keyframes vgHue{50%{filter:hue-rotate(95deg) saturate(1.5)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+<script>
+(function(){
+ if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('vg-polish-visible');observer.unobserve(entry.target);}});},{threshold:.08});
+ document.querySelectorAll('main > section > div').forEach(function(el){el.classList.add('vg-polish-reveal');observer.observe(el);});
+ var keys='';document.addEventListener('keydown',function(e){if(e.key.length===1){keys=(keys+e.key.toUpperCase()).slice(-9);if(keys==='MINECRAFT'){document.body.classList.add('vg-easter-egg');setTimeout(function(){document.body.classList.remove('vg-easter-egg');},1700);if(window.vgPlaySound)window.vgPlaySound('success');}}});
+})();
+</script>
+<style>.vg-polish-reveal{opacity:.01;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}.vg-polish-reveal.vg-polish-visible{opacity:1;transform:none}</style>
 </body>
 </html>
