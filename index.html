@@ -58,20 +58,26 @@
         .vg-task-btn{position:relative;overflow:hidden}.vg-task-btn:after{content:"";position:absolute;inset:-30%;background:radial-gradient(circle,rgba(0,243,255,.16),transparent 60%);opacity:0;transition:.2s}.vg-task-btn:hover:after{opacity:1}
         .vg-no-neon .vg-no-anim main>section{animation:none!important}
     
-        /* Independent tab roots: visibility is controlled only by the router's .hidden state. */
-        #tab-seeds, #tab-boss-fight { position: relative; isolation: isolate; width: 100%; min-width: 0; }
-        #tab-seeds #seedsGrid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); align-items: stretch; gap: 1rem; width: 100%; min-width: 0; }
+        /* Hard isolate Seed Vault from all unrelated grids and floating widgets. */
+        main { position: relative; isolation: isolate; }
+        main > section[id^="tab-"] { position: relative; z-index: 0; width: 100%; min-width: 0; }
+        main > section[id^="tab-"].hidden { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+        main > section[id^="tab-"]:not(.hidden) { display: block !important; visibility: visible !important; pointer-events: auto !important; }
+        #tab-seeds { position: relative !important; z-index: 20 !important; isolation: isolate !important; overflow: visible !important; width: 100%; min-width: 0; }
+        #tab-seeds #seedSearchInput { position: relative !important; z-index: 2 !important; display: block !important; width: 100%; visibility: visible !important; }
+        #tab-seeds #seedsGrid { position: relative !important; z-index: 1 !important; display: grid !important; grid-template-columns: minmax(0, 1fr); align-items: stretch; gap: 1rem; width: 100%; min-width: 0; }
         @media (min-width: 768px) { #tab-seeds #seedsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        #tab-seeds #seedsGrid > * { position: relative; inset: auto; float: none; transform: none; min-width: 0; }
-        #tab-seeds #seedSearchInput { display: block; width: 100%; visibility: visible; }
+        #tab-seeds #seedsGrid > *, #tab-seeds .vg-seed-card { position: relative !important; inset: auto !important; float: none !important; transform: none; z-index: auto !important; min-width: 0; }
+        #tab-boss-fight { position: relative; isolation: isolate; width: 100%; min-width: 0; }
         #tab-boss-fight #bossFightApp { width: 100%; min-width: 0; }
-        /* Utility overlays must never occupy page layout or intercept clicks while closed. */
-        #vgElitePanel:not(.open), #vgSeedModal:not(.open) { display: none !important; pointer-events: none !important; }
-        #vgElitePanel { position: fixed; inset: 0; z-index: 10000; overflow-y: auto; }
-        #vgElitePanel.open { display: block !important; pointer-events: auto; }
-        #vgSeedModal.open { display: flex !important; pointer-events: auto; }
-        #vgElitePanel .vg-elite-grid { position: relative; min-width: 0; }
-        #tab-boss-fight, #tab-youtube, #tab-shorts, #tab-community, #tab-friends, #tab-tools, #tab-leaderboard, #tab-quiz { min-width: 0; }
+        /* Floating overlays are removed from the page flow unless deliberately opened. */
+        #vgElitePanel:not(.open), #vgSeedModal:not(.open), #vgCoinOverlay:not(.open), #vgFirstVisitTutorial:not(.open) { display: none !important; visibility: hidden !important; pointer-events: none !important; }
+        #vgElitePanel { position: fixed; inset: 0; z-index: 2147483001; overflow-y: auto; }
+        #vgElitePanel.open { display: block !important; visibility: visible !important; pointer-events: auto !important; }
+        #vgSeedModal { position: fixed; inset: 0; z-index: 2147483002; }
+        #vgSeedModal.open { display: flex !important; visibility: visible !important; pointer-events: auto !important; }
+        #vgCoinOverlay.open { display: flex !important; visibility: visible !important; pointer-events: auto !important; }
+        #vgFirstVisitTutorial.open { display: flex !important; visibility: visible !important; pointer-events: auto !important; }
         /* Vgameing professional polish + music permission */
         .vg-pro-shell{position:relative}.vg-pro-shell:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 0%,rgba(0,243,255,.045) 35%,transparent 55%,rgba(176,0,255,.045) 85%,transparent 100%);opacity:.8}
         header{box-shadow:0 8px 35px rgba(0,0,0,.25)}
