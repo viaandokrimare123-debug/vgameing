@@ -79,15 +79,8 @@
         main>section>div,.bg-neon-card{transition:box-shadow .25s ease,border-color .25s ease,transform .25s ease}main>section>div:hover{border-color:rgba(0,243,255,.22)}
         .vg-music-consent{background:radial-gradient(circle at 50% 0%,rgba(0,243,255,.12),transparent 45%),rgba(5,5,12,.92)}.vg-consent-orb{box-shadow:0 0 35px rgba(0,243,255,.3),0 0 80px rgba(176,0,255,.15)}.vg-no-neon .vg-consent-orb{box-shadow:none}
         .vg-verified-tick{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#1687f8;color:#fff;font-size:11px;font-weight:1000;line-height:1;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 2px rgba(22,135,248,.18),0 0 16px rgba(22,135,248,.55);cursor:help;vertical-align:middle}.vg-verified-tick.hidden{display:none}
-/* Keep the main game tabs visible when routing has activated them. */
-main > #tab-seeds:not(.hidden),
-main > #tab-boss-fight:not(.hidden) {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-main > #tab-seeds:not(.hidden) #seedsGrid { display: grid !important; min-height: 1px; }
-main > #tab-seeds:not(.hidden) #seedSearchInput { display: block !important; visibility: visible !important; }.vg-verified-tick:hover{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 0 3px rgba(22,135,248,.2),0 0 24px rgba(22,135,248,.8)}
+/* Tab visibility is controlled by switchTab(); scoped Seed Vault grid rules are above. */
+.vg-verified-tick:hover{transform:scale(1.12) rotate(-4deg);box-shadow:0 0 0 3px rgba(22,135,248,.2),0 0 24px rgba(22,135,248,.8)}
         .vg-hero-shine{position:relative;overflow:hidden}.vg-hero-shine:after{content:"";position:absolute;inset:-80% -20%;background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.07) 50%,transparent 58%);transform:translateX(-55%) rotate(8deg);animation:vgShine 7s linear infinite;pointer-events:none}@keyframes vgShine{to{transform:translateX(55%) rotate(8deg)}}
         .vg-glass{background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(18px)}
         .vg-float{animation:vgFloat 5s ease-in-out infinite}@keyframes vgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
