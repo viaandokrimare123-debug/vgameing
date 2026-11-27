@@ -91,7 +91,7 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
 <section class="ai-studio" id="ai-studio">
   <div class="ai-head">
     <div><div class="ai-kicker">✦ V-Gaming Hub Intelligence</div><h2>Meet your AI Creator Copilot.</h2><p>Go from one rough idea to a creator-ready plan. Generate scripts, hooks, thumbnail concepts, Shorts and practical feedback in your own language and style.</p></div>
-    <span class="ai-live">✦ AI POWERED · GEMINI</span>
+    <span class="ai-live">✦ AI POWERED · CLOUDFLARE</span>
   </div>
   <div class="ai-form">
     <div class="ai-field full"><label for="aiTopic">YOUR VIDEO IDEA *</label><input id="aiTopic" maxlength="700" placeholder="Example: I challenged the best RIVALS player using only a knife..." /></div>
@@ -119,8 +119,8 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
   <p class="small">Purchases are not enabled yet. No payment will be taken. A parent/guardian must set up and manage the payment account before checkout can go live.</p>
 </section>
 <section class="image-studio" id="thumbnail-studio">
-  <div class="ai-kicker">✦ NANO BANANA AI IMAGE LAB</div>
-  <h2>Generate a real YouTube thumbnail.</h2>
+  <div class="ai-kicker">✦ FLUX AI IMAGE LAB</div>
+  <h2>Generate a real YouTube thumbnail with FLUX.</h2>
   <p>Describe your scene. AI creates a 16:9 background, then V-Gaming Hub adds your headline as crisp editable text. One image = 1 credit.</p>
   <div class="image-grid">
     <div>
@@ -131,7 +131,7 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
       <label for="imageHeadline">THUMBNAIL WORDS (OPTIONAL)</label>
       <input id="imageHeadline" maxlength="36" placeholder="Example: I WON?!">
       <div class="btnrow"><button class="ai-generate" id="imageGenerateBtn" onclick="generateThumbnail()">✦ Generate image · 1 credit</button><button class="ai-secondary" onclick="refreshCredits()">Refresh credits</button></div>
-      <p class="small" id="imageStatus" aria-live="polite">Your prompt is sent securely to the AI service. Your API key is never placed in this page.</p>
+      <p class="small" id="imageStatus" aria-live="polite">Powered by FLUX.1 Schnell through your secure Supabase backend. Your API token is never placed in this page.</p>
     </div>
     <div>
       <div id="thumbEmpty" class="thumb-empty">Your generated thumbnail will appear here.</div>
@@ -233,7 +233,7 @@ async function runCreatorAI(){
  const status=document.getElementById("aiStatus");
  const button=document.getElementById("aiGenerateBtn");
  if(topic.length<3){status.textContent="Add a video idea first.";document.getElementById("aiTopic").focus();return;}
- button.disabled=true;button.textContent="✦ Creating your pack…";status.textContent="AI is researching and building your creator pack…";
+ button.disabled=true;button.textContent="✦ Creating your pack…";status.textContent="Cloudflare AI is building your creator pack…";
  output.textContent="Thinking through the idea, hook, structure and details. This can take a few seconds…";
  try{
   const data=await creatorRequest({mode:document.getElementById("aiMode").value,topic,context:document.getElementById("aiContext").value,language:document.getElementById("aiLanguage").value,format:document.getElementById("aiFormat").value,tone:document.getElementById("aiTone").value});
