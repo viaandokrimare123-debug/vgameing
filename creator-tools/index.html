@@ -33,6 +33,24 @@
 .ai-note{color:#8192aa;font-size:11px;margin-top:11px;position:relative}
 @media(max-width:680px){.ai-form{grid-template-columns:1fr}.ai-field.full{grid-column:auto}.ai-head{display:block}.ai-live{display:inline-block;margin-top:12px}}
 </style>
+
+<style>
+.wallet-panel,.image-studio{margin:22px 0;padding:22px;border:1px solid #315274;border-radius:20px;background:linear-gradient(145deg,#101d30,#0a1220);box-shadow:0 18px 55px #0004}
+.wallet-top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.credit-count{font-size:28px;font-weight:950;color:#8df8e4}
+.pack-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.pack{border:1px solid #30445f;border-radius:14px;padding:14px;background:#0b1422}
+.pack strong{display:block;font-size:20px}.pack small{color:#9eacc4}
+.image-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.image-studio h2{font-size:clamp(23px,4vw,34px);margin:6px 0}
+.image-studio p{color:#a8b7cc;font-size:14px}
+.image-studio label{display:block;color:#cbd8e9;font-size:12px;font-weight:800;margin:12px 0 7px}
+.image-studio input,.image-studio textarea,.image-studio select{width:100%;border:1px solid #30425c;border-radius:12px;background:#080f1b;color:#f4f8ff;padding:12px;font:inherit}
+.thumb-preview{width:100%;display:block;border-radius:14px;border:1px solid #344a67;background:#080f1b;min-height:120px;object-fit:contain}
+.thumb-empty{padding:45px 12px;text-align:center;color:#8192aa;border:1px dashed #344a67;border-radius:14px}
+@media(max-width:680px){.image-grid,.pack-grid{grid-template-columns:1fr}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <header class="wrap top"><a class="brand" href="/">V-GAMING <b>HUB</b></a><a class="nav" href="/">← Back to Hub</a></header>
@@ -54,6 +72,42 @@
   <div class="ai-actions"><button class="ai-generate" id="aiGenerateBtn" onclick="runCreatorAI()">✦ Generate with AI</button><button class="ai-secondary" onclick="clearCreatorAI()">Clear</button><span class="small" id="aiStatus" aria-live="polite">Ready when you are.</span></div>
   <div class="ai-output-wrap"><div class="ai-output-top"><span>YOUR AI CREATOR PACK</span><button class="ai-secondary" onclick="copyCreatorAI()">Copy result</button></div><div class="ai-output" id="aiOutput" aria-live="polite">Your custom creator pack will appear here. Start with one idea—even a messy one.</div></div>
   <p class="ai-note">AI suggestions are creative starting points, not guaranteed views or verified SEO data. Don't paste passwords, private details or anything sensitive.</p>
+</section>
+
+<section class="wallet-panel" id="creator-wallet">
+  <div class="wallet-top">
+    <div><div class="ai-kicker">✦ CREATOR CREDIT WALLET</div><h2 style="margin:5px 0">Your generation credits</h2><p class="sub" style="margin:0">New users start with 3 free thumbnail credits. One AI thumbnail uses 1 credit.</p></div>
+    <div><div class="credit-count"><span id="creditBalance">—</span> <span style="font-size:13px">credits</span></div><div class="small" id="creditStatus">Connecting your secure wallet…</div></div>
+  </div>
+  <div class="pack-grid">
+    <div class="pack"><strong>₹49</strong><b>5 credits</b><br><small>Starter pack · checkout coming soon</small></div>
+    <div class="pack"><strong>₹99</strong><b>15 credits</b><br><small>Creator pack · checkout coming soon</small></div>
+    <div class="pack"><strong>₹199</strong><b>35 credits</b><br><small>Studio pack · checkout coming soon</small></div>
+  </div>
+  <p class="small">Purchases are not enabled yet. No payment will be taken. A parent/guardian must set up and manage the payment account before checkout can go live.</p>
+</section>
+<section class="image-studio" id="thumbnail-studio">
+  <div class="ai-kicker">✦ NANO BANANA AI IMAGE LAB</div>
+  <h2>Generate a real YouTube thumbnail.</h2>
+  <p>Describe your scene. AI creates a 16:9 background, then V-Gaming Hub adds your headline as crisp editable text. One image = 1 credit.</p>
+  <div class="image-grid">
+    <div>
+      <label for="imagePrompt">DESCRIBE YOUR THUMBNAIL *</label>
+      <textarea id="imagePrompt" maxlength="1200" placeholder="Example: A Roblox-style futuristic arena, my avatar on the left, a huge glowing victory portal on the right, cinematic blue and orange lighting..."></textarea>
+      <label for="imageStyle">VISUAL STYLE</label>
+      <select id="imageStyle"><option>cinematic gaming thumbnail</option><option>bright cartoon gaming</option><option>photorealistic dramatic scene</option><option>3D animated gaming poster</option><option>clean minimalist creator design</option></select>
+      <label for="imageHeadline">THUMBNAIL WORDS (OPTIONAL)</label>
+      <input id="imageHeadline" maxlength="36" placeholder="Example: I WON?!">
+      <div class="btnrow"><button class="ai-generate" id="imageGenerateBtn" onclick="generateThumbnail()">✦ Generate image · 1 credit</button><button class="ai-secondary" onclick="refreshCredits()">Refresh credits</button></div>
+      <p class="small" id="imageStatus" aria-live="polite">Your prompt is sent securely to the AI service. Your API key is never placed in this page.</p>
+    </div>
+    <div>
+      <div id="thumbEmpty" class="thumb-empty">Your generated thumbnail will appear here.</div>
+      <img id="thumbnailPreview" class="thumb-preview" alt="Generated YouTube thumbnail preview" hidden>
+      <canvas id="thumbnailCanvas" width="1280" height="720" hidden></canvas>
+      <div class="btnrow"><button class="ai-secondary" id="downloadThumbnailBtn" onclick="downloadThumbnail()" disabled>Download PNG</button></div>
+    </div>
+  </div>
 </section>
 <section class="tools">
 <article class="card"><h2>✦ Opening Hook Generator</h2><p class="sub">Create a first line for your video.</p><label class="label" for="hookTopic">What happens?</label><input id="hookTopic" placeholder="e.g. I nearly lost the final round"><label class="label" for="hookTone">Tone</label><select id="hookTone"><option value="suspense">Suspenseful</option><option value="funny">Funny</option><option value="bold">Bold</option></select><div class="btnrow"><button class="btn" onclick="makeHook()">Generate</button><button class="btn secondary" onclick="copyResult('hookResult',this)">Copy</button></div><div class="result" id="hookResult" aria-live="polite">Your hooks will appear here.</div></article>
@@ -104,22 +158,102 @@ function makeTags(){const t=clean($('tagTopic').value)||'gaming';const a=[t,...t
 <script>
 const CREATOR_AI_URL="https://xtmjivldcwyajgyhmygk.supabase.co/functions/v1/creator-ai";
 const CREATOR_AI_KEY="sb_publishable_LJYIhtSx9nbKbt9VjLXkeg_ubMt_KSI";
+const creatorSupabase=window.supabase.createClient("https://xtmjivldcwyajgyhmygk.supabase.co",CREATOR_AI_KEY);
+let creatorSession=null;
+let thumbnailDataUrl=null;
+
+async function ensureCreatorSession(){
+ const {data:{session}}=await creatorSupabase.auth.getSession();
+ if(session){creatorSession=session;return session;}
+ const {data,error}=await creatorSupabase.auth.signInAnonymously();
+ if(error)throw new Error("Secure guest sign-in is not enabled yet. The site owner must enable Anonymous Sign-Ins in Supabase Auth settings.");
+ creatorSession=data.session;
+ return data.session;
+}
+async function creatorRequest(payload){
+ const session=await ensureCreatorSession();
+ const response=await fetch(CREATOR_AI_URL,{
+  method:"POST",
+  headers:{"Content-Type":"application/json","apikey":CREATOR_AI_KEY,"Authorization":"Bearer "+session.access_token},
+  body:JSON.stringify(payload)
+ });
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(data.error||"Request failed ("+response.status+").");
+ return data;
+}
+async function refreshCredits(){
+ const status=document.getElementById("creditStatus");
+ try{
+  status.textContent="Loading wallet…";
+  const data=await creatorRequest({mode:"wallet"});
+  document.getElementById("creditBalance").textContent=data.credits;
+  status.textContent="Secure guest wallet connected.";
+  return data.credits;
+ }catch(error){
+  status.textContent=error.message;
+  document.getElementById("creditBalance").textContent="—";
+  return null;
+ }
+}
 async function runCreatorAI(){
  const topic=document.getElementById("aiTopic").value.trim();
  const output=document.getElementById("aiOutput");
  const status=document.getElementById("aiStatus");
  const button=document.getElementById("aiGenerateBtn");
  if(topic.length<3){status.textContent="Add a video idea first.";document.getElementById("aiTopic").focus();return;}
- button.disabled=true;button.textContent="✦ Creating your pack...";status.textContent="AI is building your creator pack...";
- output.textContent="Thinking through the idea, hook, structure and details. This can take a few seconds...";
+ button.disabled=true;button.textContent="✦ Creating your pack…";status.textContent="AI is researching and building your creator pack…";
+ output.textContent="Thinking through the idea, hook, structure and details. This can take a few seconds…";
  try{
-  const response=await fetch(CREATOR_AI_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":CREATOR_AI_KEY,"Authorization":"Bearer "+CREATOR_AI_KEY},body:JSON.stringify({mode:document.getElementById("aiMode").value,topic,context:document.getElementById("aiContext").value,language:document.getElementById("aiLanguage").value,format:document.getElementById("aiFormat").value,tone:document.getElementById("aiTone").value})});
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data.error||"AI request failed ("+response.status+").");
+  const data=await creatorRequest({mode:document.getElementById("aiMode").value,topic,context:document.getElementById("aiContext").value,language:document.getElementById("aiLanguage").value,format:document.getElementById("aiFormat").value,tone:document.getElementById("aiTone").value});
   output.textContent=data.answer||"The AI returned an empty result. Try again.";
-  status.textContent="Done · "+(data.model||"AI")+" · Review and make it yours.";
- }catch(error){output.textContent="AI could not complete this request.\n\n"+error.message+"\n\nIf this keeps happening, the site owner should check the creator-ai function and its Gemini API secret in Supabase.";status.textContent="Something needs attention.";}
+  if(data.sources?.length)output.textContent+="\n\nRESEARCH SOURCES\n"+data.sources.map(x=>"• "+x.title+" — "+x.url).join("\n");
+  status.textContent="Done · "+(data.model||"AI")+". Review and make it yours.";
+ }catch(error){output.textContent="AI could not complete this request.\n\n"+error.message;status.textContent="Something needs attention.";}
  finally{button.disabled=false;button.textContent="✦ Generate with AI";}
+}
+async function generateThumbnail(){
+ const prompt=document.getElementById("imagePrompt").value.trim();
+ const status=document.getElementById("imageStatus");
+ const button=document.getElementById("imageGenerateBtn");
+ if(prompt.length<5){status.textContent="Describe the thumbnail first.";return;}
+ button.disabled=true;button.textContent="✦ Creating thumbnail…";status.textContent="Checking credits and generating your image…";
+ try{
+  const data=await creatorRequest({mode:"image",prompt,style:document.getElementById("imageStyle").value,overlayText:document.getElementById("imageHeadline").value});
+  const raw="data:"+(data.mimeType||"image/png")+";base64,"+data.imageData;
+  const image=new Image();
+  image.onload=()=>{
+   const canvas=document.getElementById("thumbnailCanvas"),ctx=canvas.getContext("2d");
+   ctx.clearRect(0,0,1280,720);
+   const scale=Math.max(1280/image.width,720/image.height);
+   const w=image.width*scale,h=image.height*scale;
+   ctx.drawImage(image,(1280-w)/2,(720-h)/2,w,h);
+   const headline=document.getElementById("imageHeadline").value.trim();
+   if(headline){
+    const gradient=ctx.createLinearGradient(0,420,0,720);
+    gradient.addColorStop(0,"rgba(0,0,0,0)");
+    gradient.addColorStop(1,"rgba(0,0,0,.82)");
+    ctx.fillStyle=gradient;ctx.fillRect(0,390,1280,330);
+    let size=110;ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="900 "+size+"px system-ui,Arial";
+    while(ctx.measureText(headline).width>1120&&size>42){size-=4;ctx.font="900 "+size+"px system-ui,Arial";}
+    ctx.lineJoin="round";ctx.lineWidth=18;ctx.strokeStyle="#07101c";ctx.strokeText(headline.toUpperCase(),640,590,1120);
+    ctx.fillStyle="#ffffff";ctx.fillText(headline.toUpperCase(),640,590,1120);
+   }
+   thumbnailDataUrl=canvas.toDataURL("image/png");
+   document.getElementById("thumbnailPreview").src=thumbnailDataUrl;
+   document.getElementById("thumbnailPreview").hidden=false;
+   document.getElementById("thumbEmpty").hidden=true;
+   document.getElementById("downloadThumbnailBtn").disabled=false;
+   status.textContent="Thumbnail ready · 1 credit used · "+data.credits+" credits left.";
+   document.getElementById("creditBalance").textContent=data.credits;
+  };
+  image.onerror=()=>{throw new Error("The generated image could not be previewed.");};
+  image.src=raw;
+ }catch(error){status.textContent=error.message;await refreshCredits();}
+ finally{button.disabled=false;button.textContent="✦ Generate image · 1 credit";}
+}
+function downloadThumbnail(){
+ if(!thumbnailDataUrl)return;
+ const a=document.createElement("a");a.href=thumbnailDataUrl;a.download="v-gaming-ai-thumbnail.png";a.click();
 }
 async function copyCreatorAI(){
  const text=document.getElementById("aiOutput").textContent;
@@ -131,6 +265,7 @@ function clearCreatorAI(){
  document.getElementById("aiOutput").textContent="Your custom creator pack will appear here. Start with one idea—even a messy one.";
  document.getElementById("aiStatus").textContent="Ready when you are.";
 }
+refreshCredits();
 </script>
 </body>
 </html>
