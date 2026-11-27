@@ -20,20 +20,20 @@
 <article class="card"><h2>✦ Title Generator</h2><p class="sub">Create clickable title ideas for your next upload.</p>
 <label class="label" for="titleTopic">Video topic or game</label><input id="titleTopic" placeholder="e.g. Roblox RIVALS 1v1 challenge">
 <label class="label" for="titleStyle">Title style</label><select id="titleStyle"><option value="curious">Curiosity / mystery</option><option value="challenge">Challenge</option><option value="funny">Funny</option><option value="epic">Epic / intense</option><option value="tutorial">Helpful / tutorial</option></select>
-<div class="btnrow"><button class="btn" onclick="makeTitles()">Generate titles</button><button class="btn secondary" onclick="copyResult('titleResult')">Copy</button></div><div class="result" id="titleResult" aria-live="polite">Your title ideas will appear here.</div></article>
+<div class="btnrow"><button class="btn" onclick="makeTitles()">Generate titles</button><button class="btn secondary" onclick="copyResult('titleResult',this)">Copy</button></div><div class="result" id="titleResult" aria-live="polite">Your title ideas will appear here.</div></article>
 <article class="card"><h2>✦ Description Builder</h2><p class="sub">Draft a clean description you can edit before publishing.</p>
 <label class="label" for="descTopic">Video topic</label><input id="descTopic" placeholder="e.g. Roblox funny moments">
 <label class="label" for="channelName">Channel name</label><input id="channelName" placeholder="Your channel name">
 <label class="label" for="descLink">Website or social link (optional)</label><input id="descLink" placeholder="https://...">
-<div class="btnrow"><button class="btn" onclick="makeDescription()">Build description</button><button class="btn secondary" onclick="copyResult('descResult')">Copy</button></div><div class="result" id="descResult" aria-live="polite">Your description draft will appear here.</div></article>
+<div class="btnrow"><button class="btn" onclick="makeDescription()">Build description</button><button class="btn secondary" onclick="copyResult('descResult',this)">Copy</button></div><div class="result" id="descResult" aria-live="polite">Your description draft will appear here.</div></article>
 <article class="card"><h2>✦ Hashtag Generator</h2><p class="sub">Generate relevant hashtags. Choose only those that fit your video.</p>
 <label class="label" for="hashTopic">Topic or game</label><input id="hashTopic" placeholder="e.g. Roblox gaming shorts">
 <label class="label" for="hashPlatform">Platform</label><select id="hashPlatform"><option>YouTube Shorts</option><option>YouTube video</option><option>Instagram Reels</option></select>
-<div class="btnrow"><button class="btn" onclick="makeHashtags()">Generate hashtags</button><button class="btn secondary" onclick="copyResult('hashResult')">Copy</button></div><div class="result" id="hashResult" aria-live="polite">Your hashtags will appear here.</div></article>
+<div class="btnrow"><button class="btn" onclick="makeHashtags()">Generate hashtags</button><button class="btn secondary" onclick="copyResult('hashResult',this)">Copy</button></div><div class="result" id="hashResult" aria-live="polite">Your hashtags will appear here.</div></article>
 <article class="card"><h2>✦ Thumbnail Text Ideas</h2><p class="sub">Short phrases designed to be readable on a small screen.</p>
 <label class="label" for="thumbTopic">Video topic</label><input id="thumbTopic" placeholder="e.g. I won with only a knife">
 <label class="label" for="thumbMood">Mood</label><select id="thumbMood"><option value="dramatic">Dramatic</option><option value="funny">Funny</option><option value="surprise">Surprising</option><option value="challenge">Challenge</option></select>
-<div class="btnrow"><button class="btn" onclick="makeThumb()">Generate text</button><button class="btn secondary" onclick="copyResult('thumbResult')">Copy</button></div><div class="result" id="thumbResult" aria-live="polite">Thumbnail phrases will appear here.</div></article>
+<div class="btnrow"><button class="btn" onclick="makeThumb()">Generate text</button><button class="btn secondary" onclick="copyResult('thumbResult',this)">Copy</button></div><div class="result" id="thumbResult" aria-live="polite">Thumbnail phrases will appear here.</div></article>
 </section>
 </main>
 <footer class="wrap footer"><span>© V-Gaming Hub · Creator Tools</span><span>Use these ideas as a starting point—make every upload your own.</span></footer>
