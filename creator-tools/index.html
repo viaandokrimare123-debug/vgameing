@@ -260,7 +260,7 @@ function renderCreatorAuth(session){
 async function ensureCreatorSession(){
  const {data:{session},error}=await creatorSupabase.auth.getSession();
  if(error)throw error;
- if(!session)throw new Error("Please sign in or create an account above to use Creator AI.");
+ if(!session||session.user?.is_anonymous)throw new Error("Please sign in or create an account above to use Creator AI. Guest access is disabled.");
  creatorSession=session;
  return session;
 }
