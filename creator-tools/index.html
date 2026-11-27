@@ -239,21 +239,22 @@ function setAuthStatus(message,isError=false){
  const el=document.getElementById("authStatus");
  if(el){el.textContent=message;el.style.color=isError?"#fca5a5":"#9eacc4";}
 }
+let creatorRecoveryMode=false;
 function renderCreatorAuth(session){
  creatorSession=session||null;
- const signedIn=!!session?.user;
- const isGuest=!!session?.user?.is_anonymous;
+ const signedIn=!!session?.user&&!session.user.is_anonymous;
  document.getElementById("authSignedOut").hidden=signedIn;
  document.getElementById("authSignedIn").hidden=!signedIn;
- document.getElementById("authUserEmail").textContent=session?.user?.email||(isGuest?"Temporary guest account":"Signed in");
- document.getElementById("authUserNote").textContent=isGuest?"Guest session active. Upgrade it to keep this wallet across devices.":"Your account is connected to your creator wallet.";
- document.getElementById("authUpgrade").hidden=!isGuest;
- document.getElementById("authRecovery").hidden=true;
- if(signedIn)setAuthStatus(isGuest?"Guest session active. Secure it with an email and password to preserve this wallet.":"Signed in securely. Your creator wallet is linked to this account.");
- else {
+ document.getElementById("authUpgrade").hidden=true;
+ document.getElementById("authRecovery").hidden=!creatorRecoveryMode;
+ if(signedIn){
+  document.getElementById("authUserEmail").textContent=session.user.email||"Signed in";
+  document.getElementById("authUserNote").textContent="Your account is connected to your creator wallet.";
+  setAuthStatus("Signed in securely. Your creator wallet is linked to this account.");
+ }else{
   document.getElementById("creditBalance").textContent="—";
   document.getElementById("creditStatus").textContent="Sign in to load your wallet.";
-  setAuthStatus("Sign in or create an account to unlock Creator AI.");
+  if(!creatorRecoveryMode)setAuthStatus("Sign in or create an account to unlock Creator AI.");
  }
 }
 async function ensureCreatorSession(){
@@ -311,12 +312,21 @@ async function creatorResetPassword(){
 async function creatorUpdatePassword(){
  const password=document.getElementById("authNewPassword").value;
  if(password.length<8){setAuthStatus("Use a password with at least 8 characters.",true);return;}
+ const button=document.querySelector("#authRecovery button");
+ if(button){button.disabled=true;button.textContent="Updating…";}
  try{
-  const {error}=await creatorSupabase.auth.updateUser({password});
+  const {data,error}=await creatorSupabase.auth.updateUser({password});
   if(error)throw error;
+  if(!data?.user)throw new Error("The reset session was not accepted. Request a fresh reset email and open its newest link on this same browser.");
+  creatorRecoveryMode=false;
   document.getElementById("authRecovery").hidden=true;
-  setAuthStatus("Password updated successfully.");
- }catch(error){setAuthStatus(error.message||"Could not update your password.",true);}
+  document.getElementById("authNewPassword").value="";
+  setAuthStatus("Password updated successfully. You can now sign in with your new password.");
+  await creatorSupabase.auth.signOut();
+  renderCreatorAuth(null);
+  setAuthStatus("Password updated successfully. Sign in using your new password.");
+ }catch(error){setAuthStatus(error.message||"Could not update your password. Request a new reset link and open it in this browser.",true);}
+ finally{if(button){button.disabled=false;button.textContent="Update password";}}
 }
 async function creatorSignOut(){
  const {error}=await creatorSupabase.auth.signOut();
@@ -324,33 +334,29 @@ async function creatorSignOut(){
  renderCreatorAuth(null);
 }
 async function initializeCreatorAuth(){
- let {data,error}=await creatorSupabase.auth.getSession();
- if(error)setAuthStatus(error.message,true);
- let session=data?.session||null;
-
- // Let visitors use Creator AI immediately with a temporary anonymous account.
- // Email/password sign-in is optional; users can link an email later to keep the wallet.
- if(!session){
-  setAuthStatus("Starting a free guest session…");
-  const guest=await creatorSupabase.auth.signInAnonymously();
-  if(guest.error){
-   renderCreatorAuth(null);
-   setAuthStatus("Guest access could not start: "+guest.error.message+" Enable Anonymous Sign-Ins in Supabase Authentication settings, or sign in with an account.",true);
-  }else{
-   session=guest.data.session;
-   renderCreatorAuth(session);
-   await refreshCredits();
-  }
- }else{
-  renderCreatorAuth(session);
-  await refreshCredits();
- }
-
+ // Subscribe before reading the session so the password-recovery event cannot be missed.
  creatorSupabase.auth.onAuthStateChange((event,nextSession)=>{
+  if(event==="PASSWORD_RECOVERY"){
+   creatorRecoveryMode=true;
+   document.getElementById("authRecovery").hidden=false;
+   setAuthStatus("Choose a new password below. Keep this page open until it is updated.");
+  }else if(event==="SIGNED_OUT"){
+   creatorRecoveryMode=false;
+  }
   renderCreatorAuth(nextSession);
-  if(event==="PASSWORD_RECOVERY")document.getElementById("authRecovery").hidden=false;
-  if(nextSession)Promise.resolve().then(()=>refreshCredits());
+  if(event==="PASSWORD_RECOVERY"){
+   creatorRecoveryMode=true;
+   document.getElementById("authRecovery").hidden=false;
+   setAuthStatus("Password reset verified. Enter your new password below.");
+  }
+  if(nextSession&&!nextSession.user?.is_anonymous)Promise.resolve().then(()=>refreshCredits());
  });
+ const {data,error}=await creatorSupabase.auth.getSession();
+ if(error)setAuthStatus(error.message,true);
+ const session=data?.session||null;
+ // Mandatory account sign-in: never create an anonymous/guest session.
+ renderCreatorAuth(session);
+ if(session&&!session.user?.is_anonymous)await refreshCredits();
 }
 async function creatorRequest(payload){
  const session=await ensureCreatorSession();
