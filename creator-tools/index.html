@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d18">
+<meta name="description" content="Free YouTube creator tools: generate video titles, descriptions, hashtags and thumbnail text ideas in seconds.">
+<title>Creator Tools — V-Gaming Hub</title>
+<style>
+:root{color-scheme:dark;--bg:#080d18;--panel:#101827;--panel2:#141f31;--line:#24334b;--text:#f3f7ff;--muted:#9eacc4;--cyan:#00e5ff;--purple:#9b7bff;--green:#68f0b0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#17294a 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}a{color:inherit;text-decoration:none}.wrap{width:min(1120px,92%);margin:auto}.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid #1b2940}.brand{font-weight:900;letter-spacing:.4px}.brand b{color:var(--cyan)}.nav{color:var(--muted);font-size:14px}.hero{padding:54px 0 30px;text-align:center}.pill{display:inline-block;border:1px solid #2b4568;background:#102039;color:#9ceeff;border-radius:99px;padding:6px 13px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.hero h1{font-size:clamp(32px,5.8vw,62px);line-height:1.08;letter-spacing:-1.8px;margin:18px 0}.hero h1 span{background:linear-gradient(90deg,var(--cyan),#b5a1ff);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{color:var(--muted);max-width:650px;margin:0 auto}.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:24px 0 55px}.card{background:linear-gradient(160deg,#121d2e,#0e1624);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 12px 35px #0002}.card h2{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 18px}.label{display:block;font-size:13px;color:#c6d2e5;font-weight:650;margin:12px 0 6px}input,textarea,select{width:100%;border:1px solid #2b3a53;border-radius:11px;background:#080f1b;color:var(--text);padding:12px;font:inherit;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00e5ff17}textarea{resize:vertical;min-height:90px}.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer;background:linear-gradient(90deg,var(--cyan),#8daeff);color:#06111d}.btn.secondary{background:#1b2a40;color:#dce8fa;border:1px solid #31435e}.result{margin-top:14px;padding:14px;border-radius:12px;background:#080f1b;border:1px dashed #344762;white-space:pre-wrap;overflow-wrap:anywhere;min-height:52px;color:#e9f2ff}.small{font-size:12px;color:var(--muted);margin-top:10px}.footer{border-top:1px solid #1b2940;padding:24px 0 40px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:760px){.tools{grid-template-columns:1fr}.hero{padding-top:38px}.card{padding:18px}.top{gap:12px}.nav{font-size:12px}}
+</style>
+</head>
+<body>
+<header class="wrap top"><a class="brand" href="/">V-GAMING <b>HUB</b></a><a class="nav" href="/">← Back to Hub</a></header>
+<main class="wrap">
+<section class="hero"><span class="pill">Free creator toolkit</span><h1>Make your next video<br><span>stand out.</span></h1><p>Generate catchy YouTube titles, video descriptions, hashtags and thumbnail text ideas. Free to use—no sign-up needed.</p></section>
+<section class="tools">
+<article class="card"><h2>✦ Title Generator</h2><p class="sub">Create clickable title ideas for your next upload.</p>
+<label class="label" for="titleTopic">Video topic or game</label><input id="titleTopic" placeholder="e.g. Roblox RIVALS 1v1 challenge">
+<label class="label" for="titleStyle">Title style</label><select id="titleStyle"><option value="curious">Curiosity / mystery</option><option value="challenge">Challenge</option><option value="funny">Funny</option><option value="epic">Epic / intense</option><option value="tutorial">Helpful / tutorial</option></select>
+<div class="btnrow"><button class="btn" onclick="makeTitles()">Generate titles</button><button class="btn secondary" onclick="copyResult('titleResult')">Copy</button></div><div class="result" id="titleResult" aria-live="polite">Your title ideas will appear here.</div></article>
+<article class="card"><h2>✦ Description Builder</h2><p class="sub">Draft a clean description you can edit before publishing.</p>
+<label class="label" for="descTopic">Video topic</label><input id="descTopic" placeholder="e.g. Roblox funny moments">
+<label class="label" for="channelName">Channel name</label><input id="channelName" placeholder="Your channel name">
+<label class="label" for="descLink">Website or social link (optional)</label><input id="descLink" placeholder="https://...">
+<div class="btnrow"><button class="btn" onclick="makeDescription()">Build description</button><button class="btn secondary" onclick="copyResult('descResult')">Copy</button></div><div class="result" id="descResult" aria-live="polite">Your description draft will appear here.</div></article>
+<article class="card"><h2>✦ Hashtag Generator</h2><p class="sub">Generate relevant hashtags. Choose only those that fit your video.</p>
+<label class="label" for="hashTopic">Topic or game</label><input id="hashTopic" placeholder="e.g. Roblox gaming shorts">
+<label class="label" for="hashPlatform">Platform</label><select id="hashPlatform"><option>YouTube Shorts</option><option>YouTube video</option><option>Instagram Reels</option></select>
+<div class="btnrow"><button class="btn" onclick="makeHashtags()">Generate hashtags</button><button class="btn secondary" onclick="copyResult('hashResult')">Copy</button></div><div class="result" id="hashResult" aria-live="polite">Your hashtags will appear here.</div></article>
+<article class="card"><h2>✦ Thumbnail Text Ideas</h2><p class="sub">Short phrases designed to be readable on a small screen.</p>
+<label class="label" for="thumbTopic">Video topic</label><input id="thumbTopic" placeholder="e.g. I won with only a knife">
+<label class="label" for="thumbMood">Mood</label><select id="thumbMood"><option value="dramatic">Dramatic</option><option value="funny">Funny</option><option value="surprise">Surprising</option><option value="challenge">Challenge</option></select>
+<div class="btnrow"><button class="btn" onclick="makeThumb()">Generate text</button><button class="btn secondary" onclick="copyResult('thumbResult')">Copy</button></div><div class="result" id="thumbResult" aria-live="polite">Thumbnail phrases will appear here.</div></article>
+</section>
+</main>
+<footer class="wrap footer"><span>© V-Gaming Hub · Creator Tools</span><span>Use these ideas as a starting point—make every upload your own.</span></footer>
+<script>
+const $=id=>document.getElementById(id);
+const clean=s=>s.trim().replace(/\s+/g,' ');
+function show(id,text){$(id).textContent=text;}
+function makeTitles(){const t=clean($('titleTopic').value)||'this gaming challenge';const s=$('titleStyle').value;let a=[];
+if(s==='curious')a=[`I Tried ${t}… and THIS Happened`,`Nobody Expected This in ${t}`,`The Most Unexpected Moment in ${t}`,`Wait Until You See the End of ${t}`,`This Changed Everything in ${t}`];
+if(s==='challenge')a=[`Can I Beat ${t} Without Losing?`,`I Made ${t} WAY Harder`,`The ${t} Challenge Is Actually Insane`,`One Rule. One Match. ${t}.`,`I Tried the Hardest ${t} Challenge`];
+if(s==='funny')a=[`My Brain Disconnected During ${t}`,`This Was NOT in the Plan: ${t}`,`I Somehow Made ${t} Even Worse`,`Skill Issue? The ${t} Experience`,`Everything Went Wrong in ${t}`];
+if(s==='epic')a=[`The Craziest Comeback in ${t}`,`I Was NOT Giving Up on ${t}`,`One Last Chance in ${t}`,`This Match Got PERSONAL: ${t}`,`An Unreal Finish to ${t}`];
+if(s==='tutorial')a=[`How to Get Better at ${t}`,`5 Tips That Make ${t} Easier`,`Beginner to Better: ${t} Guide`,`The Mistake Everyone Makes in ${t}`,`A Simple Guide to ${t}`];
+show('titleResult',a.map((x,i)=>(i+1)+'. '+x).join('\n'));}
+function makeDescription(){const t=clean($('descTopic').value)||'this video';const c=clean($('channelName').value)||'My Channel';const l=clean($('descLink').value);show('descResult',`Welcome to ${c}!\n\nIn this video, we're checking out ${t}. Watch till the end and tell me your favourite moment in the comments!\n\nIf you enjoyed the video, consider liking it and subscribing for more content.\n\n🔔 Subscribe for more: [Add your channel link]\n${l?'🌐 More: '+l+'\n':''}\n#gaming #youtube #${t.toLowerCase().replace(/[^a-z0-9 ]/g,'').split(' ').filter(Boolean).slice(0,2).join('')}`);}
+function makeHashtags(){const t=clean($('hashTopic').value)||'gaming';const words=t.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(Boolean);const topic=words.slice(0,3).map(x=>'#'+x);const base=$('hashPlatform').value==='YouTube Shorts'?['#shorts','#youtubeshorts','#gaming']:['#youtube','#gaming','#gameplay'];show('hashResult',[...new Set([...topic,...base,'#creator','#videogames'])].join(' '));}
+function makeThumb(){const t=clean($('thumbTopic').value)||'THIS MATCH';const mood=$('thumbMood').value;let a=mood==='dramatic'?['IT GOT INTENSE','NO WAY OUT','ONE LAST TRY','THE FINAL MOMENT']:mood==='funny'?['WHAT AM I DOING?','BRO WHAT?!','I MESSED UP','ZERO BRAIN CELLS']:mood==='surprise'?['I DID NOT EXPECT THIS','WAIT… WHAT?','PLOT TWIST','HOW DID THAT HAPPEN?']:['CAN I DO IT?','ONE RULE ONLY','IMPOSSIBLE CHALLENGE','NO SECOND CHANCE'];show('thumbResult',a.map(x=>'• '+x).join('\n')+'\n\nTopic: '+t+'\nTip: Keep the main text to 2–5 words and make it readable on mobile.');}
+async function copyResult(id){const t=$(id).textContent;if(!t||t.includes('will appear here'))return;try{await navigator.clipboard.writeText(t);const b=event?.currentTarget;if(b){const old=b.textContent;b.textContent='Copied!';setTimeout(()=>b.textContent=old,1200)}}catch(e){show(id,t+'\n\nSelect and copy the text manually.');}}
+</script>
+</body>
+</html>
