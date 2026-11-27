@@ -324,14 +324,32 @@ async function creatorSignOut(){
  renderCreatorAuth(null);
 }
 async function initializeCreatorAuth(){
- const {data,error}=await creatorSupabase.auth.getSession();
+ let {data,error}=await creatorSupabase.auth.getSession();
  if(error)setAuthStatus(error.message,true);
- renderCreatorAuth(data?.session||null);
- if(data?.session)await refreshCredits();
- creatorSupabase.auth.onAuthStateChange((event,session)=>{
+ let session=data?.session||null;
+
+ // Let visitors use Creator AI immediately with a temporary anonymous account.
+ // Email/password sign-in is optional; users can link an email later to keep the wallet.
+ if(!session){
+  setAuthStatus("Starting a free guest session…");
+  const guest=await creatorSupabase.auth.signInAnonymously();
+  if(guest.error){
+   renderCreatorAuth(null);
+   setAuthStatus("Guest access could not start: "+guest.error.message+" Enable Anonymous Sign-Ins in Supabase Authentication settings, or sign in with an account.",true);
+  }else{
+   session=guest.data.session;
+   renderCreatorAuth(session);
+   await refreshCredits();
+  }
+ }else{
   renderCreatorAuth(session);
+  await refreshCredits();
+ }
+
+ creatorSupabase.auth.onAuthStateChange((event,nextSession)=>{
+  renderCreatorAuth(nextSession);
   if(event==="PASSWORD_RECOVERY")document.getElementById("authRecovery").hidden=false;
-  if(session)Promise.resolve().then(()=>refreshCredits());
+  if(nextSession)Promise.resolve().then(()=>refreshCredits());
  });
 }
 async function creatorRequest(payload){
