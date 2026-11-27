@@ -83,6 +83,7 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
 @keyframes livePulse{0%,100%{box-shadow:0 0 0 0 #37d6c500}50%{box-shadow:0 0 0 5px #37d6c51a}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
+.auth-social{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:5px 0 16px}.auth-social-btn{min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;padding:10px 12px;border:1px solid #34445d;border-radius:12px;background:#101a2b;color:#f4f8ff;font:700 12px inherit;cursor:pointer;transition:.2s}.auth-social-btn:hover:not(:disabled){border-color:#00dff0;transform:translateY(-1px)}.auth-social-btn:disabled{opacity:.48;cursor:not-allowed}.auth-social-btn small{font-size:9px;color:#9eacc4}.auth-social-icon{display:inline-grid;place-items:center;width:20px;height:20px;font-weight:1000;font-size:16px}.google .auth-social-icon{font-family:Arial,sans-serif;color:#4285f4}.microsoft .auth-social-icon{grid-template-columns:repeat(2,7px);grid-template-rows:repeat(2,7px);gap:2px}.ms-mark i{width:7px;height:7px;background:#f35325}.ms-mark i:nth-child(2){background:#81bc06}.ms-mark i:nth-child(3){background:#05a6f0}.ms-mark i:nth-child(4){background:#ffba08}.chatgpt .auth-social-icon{color:#9defff}.auth-divider{display:flex;align-items:center;gap:12px;margin:4px 0 14px;color:#7f91aa;font-size:9px;font-weight:900;letter-spacing:.16em}.auth-divider:before,.auth-divider:after{content:"";height:1px;flex:1;background:#293b52}body.auth-required #ai-studio,body.auth-required #creator-wallet,body.auth-required #thumbnail-studio{display:none!important}@media(max-width:680px){.auth-social{grid-template-columns:1fr}.auth-social-btn{justify-content:flex-start}}
 .auth-panel{margin:8px 0 22px;padding:22px;border:1px solid #315274;border-radius:20px;background:radial-gradient(circle at 100% 0%,#00e5ff12,transparent 35%),linear-gradient(145deg,#101d30,#0a1220);box-shadow:0 18px 55px #0003}
 .auth-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.auth-head h2{font-size:clamp(22px,3vw,30px);margin:6px 0}.auth-head p{margin:0 0 15px}.auth-secure{padding:7px 10px;border:1px solid #37d6c566;border-radius:99px;color:#8df8e4;font-size:9px;font-weight:900;letter-spacing:.1em}
 .auth-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.auth-fields label,.auth-recovery label{display:block;color:#cbd8e9;font-size:11px;font-weight:900;margin:0 0 7px}.auth-fields input,.auth-recovery input{width:100%;border:1px solid #30425c;border-radius:11px;background:#080f1b;color:#f4f8ff;padding:12px;font:inherit}.auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:13px}.auth-link{border:0;background:none;color:#9ceeff;text-decoration:underline;cursor:pointer;font:inherit;font-size:12px}.auth-status{margin:13px 0 0;color:#9eacc4;font-size:12px}.auth-user{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.auth-user>div{flex:1;min-width:180px}.auth-user strong,.auth-user small{display:block;overflow-wrap:anywhere}.auth-user small{color:#9eacc4;font-size:11px;margin-top:3px}.auth-avatar{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#0a2b2c;color:#8df8e4;border:1px solid #37d6c566;font-weight:900}.auth-recovery{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.auth-recovery>div{flex:1}.auth-recovery input{margin-bottom:10px}
@@ -92,32 +93,19 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
 <body>
 <header class="wrap top"><a class="brand" href="/">V-GAMING <b>HUB</b></a><a class="nav" href="/">← Back to Hub</a></header>
 <main class="wrap">
-<section class="hero"><span class="pill">Free creator toolkit</span><h1>Make your next video<br><span>stand out.</span></h1><p>Generate catchy YouTube titles, video descriptions, hashtags and thumbnail text ideas. Free tools are open to everyone. Sign in to use the AI studio and keep your creator wallet.</p></section>
-<section class="ai-studio" id="ai-studio">
-  <div class="ai-head">
-    <div><div class="ai-kicker">✦ V-Gaming Hub Intelligence</div><h2>Meet your AI Creator Copilot.</h2><p>Go from one rough idea to a creator-ready plan. Generate scripts, hooks, thumbnail concepts, Shorts and practical feedback in your own language and style.</p></div>
-    <span class="ai-live">✦ AI POWERED · CLOUDFLARE</span>
-  </div>
-  <div class="ai-form">
-    <div class="ai-field full"><label for="aiTopic">YOUR VIDEO IDEA *</label><input id="aiTopic" maxlength="700" placeholder="Example: I challenged the best RIVALS player using only a knife..." /></div>
-    <div class="ai-field"><label for="aiMode">WHAT SHOULD AI DO?</label><select id="aiMode"><option value="full_pack">Complete Video Pack</option><option value="hook_doctor">Hook Doctor — fix my intro</option><option value="idea_lab">Idea Lab — fresh video ideas</option><option value="retention_coach">Retention Coach — improve my script</option><option value="shorts_repurpose">Shorts Repurposer — turn long into Shorts</option></select></div>
-    <div class="ai-field"><label for="aiLanguage">OUTPUT LANGUAGE</label><select id="aiLanguage"><option>Hinglish (natural Hindi + English)</option><option>Hindi</option><option>English</option></select></div>
-    <div class="ai-field"><label for="aiFormat">VIDEO FORMAT</label><select id="aiFormat"><option>YouTube Short (30–60 seconds)</option><option>YouTube Short (under 30 seconds)</option><option>Long YouTube video (5–10 minutes)</option><option>Long YouTube video (10–20 minutes)</option></select></div>
-    <div class="ai-field"><label for="aiTone">CREATOR VIBE</label><select id="aiTone"><option>Funny + high-energy</option><option>Suspenseful + dramatic</option><option>Chill + natural</option><option>Epic + cinematic</option><option>Educational + clear</option></select></div>
-    <div class="ai-field full"><label for="aiContext">EXTRA DETAILS / EXISTING SCRIPT (OPTIONAL)</label><textarea id="aiContext" maxlength="1200" placeholder="Tell AI what happens in the video, your audience, rules of the challenge, or paste a short draft to improve."></textarea></div>
-  </div>
-  <div class="ai-actions"><button class="ai-generate" id="aiGenerateBtn" onclick="runCreatorAI()">✦ Generate with AI</button><button class="ai-secondary" onclick="clearCreatorAI()">Clear</button><span class="small" id="aiStatus" aria-live="polite">Ready when you are.</span></div>
-  <div class="ai-output-wrap"><div class="ai-output-top"><span>YOUR AI CREATOR PACK</span><button class="ai-secondary" onclick="copyCreatorAI()">Copy result</button></div><div class="ai-output" id="aiOutput" aria-live="polite">Your custom creator pack will appear here. Start with one idea—even a messy one.</div></div>
-  <p class="ai-note">AI suggestions are creative starting points, not guaranteed views or verified SEO data. Don't paste passwords, private details or anything sensitive.</p>
-</section>
-
-
+<section class="hero"><span class="pill">Free creator toolkit</span><h1>Make your next video<br><span>stand out.</span></h1><p>Generate catchy YouTube titles, video descriptions, hashtags and thumbnail text ideas. Sign in or create an account to unlock the AI studio, image studio and creator wallet. Free creator tools remain available below.</p></section>
 <section class="auth-panel" id="creator-auth" aria-labelledby="authTitle">
   <div class="auth-head">
     <div><div class="ai-kicker">✦ V-GAMEING ACCOUNT</div><h2 id="authTitle">Your creator workspace</h2><p class="sub">Sign in to save your creator credits to your account and use AI tools across visits.</p></div>
     <span class="auth-secure">SECURE SUPABASE AUTH</span>
   </div>
   <div id="authSignedOut">
+    <div class="auth-social" aria-label="Social sign-in options">
+      <button class="auth-social-btn google" type="button" onclick="creatorOAuthSignIn('google','Google')"><span class="auth-social-icon">G</span>Continue with Google</button>
+      <button class="auth-social-btn microsoft" type="button" onclick="creatorOAuthSignIn('azure','Microsoft')"><span class="auth-social-icon ms-mark"><i></i><i></i><i></i><i></i></span>Continue with Microsoft</button>
+      <button class="auth-social-btn chatgpt" type="button" disabled title="ChatGPT sign-in integration will be added later"><span class="auth-social-icon">✳</span>Continue with ChatGPT <small>Coming later</small></button>
+    </div>
+    <div class="auth-divider"><span>OR USE EMAIL</span></div>
     <div class="auth-fields">
       <div><label for="authEmail">EMAIL ADDRESS</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></div>
       <div><label for="authPassword">PASSWORD</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="At least 8 characters"></div>
@@ -145,6 +133,26 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
   </div>
   <p class="auth-status" id="authStatus" role="status" aria-live="polite">Sign in or create an account to unlock Creator AI.</p>
 </section>
+
+
+<section class="ai-studio" id="ai-studio">
+  <div class="ai-head">
+    <div><div class="ai-kicker">✦ V-Gaming Hub Intelligence</div><h2>Meet your AI Creator Copilot.</h2><p>Go from one rough idea to a creator-ready plan. Generate scripts, hooks, thumbnail concepts, Shorts and practical feedback in your own language and style.</p></div>
+    <span class="ai-live">✦ AI POWERED · CLOUDFLARE</span>
+  </div>
+  <div class="ai-form">
+    <div class="ai-field full"><label for="aiTopic">YOUR VIDEO IDEA *</label><input id="aiTopic" maxlength="700" placeholder="Example: I challenged the best RIVALS player using only a knife..." /></div>
+    <div class="ai-field"><label for="aiMode">WHAT SHOULD AI DO?</label><select id="aiMode"><option value="full_pack">Complete Video Pack</option><option value="hook_doctor">Hook Doctor — fix my intro</option><option value="idea_lab">Idea Lab — fresh video ideas</option><option value="retention_coach">Retention Coach — improve my script</option><option value="shorts_repurpose">Shorts Repurposer — turn long into Shorts</option></select></div>
+    <div class="ai-field"><label for="aiLanguage">OUTPUT LANGUAGE</label><select id="aiLanguage"><option>Hinglish (natural Hindi + English)</option><option>Hindi</option><option>English</option></select></div>
+    <div class="ai-field"><label for="aiFormat">VIDEO FORMAT</label><select id="aiFormat"><option>YouTube Short (30–60 seconds)</option><option>YouTube Short (under 30 seconds)</option><option>Long YouTube video (5–10 minutes)</option><option>Long YouTube video (10–20 minutes)</option></select></div>
+    <div class="ai-field"><label for="aiTone">CREATOR VIBE</label><select id="aiTone"><option>Funny + high-energy</option><option>Suspenseful + dramatic</option><option>Chill + natural</option><option>Epic + cinematic</option><option>Educational + clear</option></select></div>
+    <div class="ai-field full"><label for="aiContext">EXTRA DETAILS / EXISTING SCRIPT (OPTIONAL)</label><textarea id="aiContext" maxlength="1200" placeholder="Tell AI what happens in the video, your audience, rules of the challenge, or paste a short draft to improve."></textarea></div>
+  </div>
+  <div class="ai-actions"><button class="ai-generate" id="aiGenerateBtn" onclick="runCreatorAI()">✦ Generate with AI</button><button class="ai-secondary" onclick="clearCreatorAI()">Clear</button><span class="small" id="aiStatus" aria-live="polite">Ready when you are.</span></div>
+  <div class="ai-output-wrap"><div class="ai-output-top"><span>YOUR AI CREATOR PACK</span><button class="ai-secondary" onclick="copyCreatorAI()">Copy result</button></div><div class="ai-output" id="aiOutput" aria-live="polite">Your custom creator pack will appear here. Start with one idea—even a messy one.</div></div>
+  <p class="ai-note">AI suggestions are creative starting points, not guaranteed views or verified SEO data. Don't paste passwords, private details or anything sensitive.</p>
+</section>
+
 
 <section class="wallet-panel" id="creator-wallet">
   <div class="wallet-top">
@@ -243,6 +251,7 @@ let creatorRecoveryMode=false;
 function renderCreatorAuth(session){
  creatorSession=session||null;
  const signedIn=!!session?.user&&!session.user.is_anonymous;
+ document.body.classList.toggle("auth-required",!signedIn);
  document.getElementById("authSignedOut").hidden=signedIn;
  document.getElementById("authSignedIn").hidden=!signedIn;
  document.getElementById("authUpgrade").hidden=true;
@@ -263,6 +272,20 @@ async function ensureCreatorSession(){
  if(!session||session.user?.is_anonymous)throw new Error("Please sign in or create an account above to use Creator AI. Guest access is disabled.");
  creatorSession=session;
  return session;
+}
+async function creatorOAuthSignIn(provider,label){
+ const buttons=[...document.querySelectorAll(".auth-social-btn")];
+ buttons.forEach(button=>button.disabled=true);
+ setAuthStatus("Connecting to "+label+"…");
+ try{
+  const options={redirectTo:authRedirectUrl};
+  if(provider==="azure")options.scopes="email";
+  const {error}=await creatorSupabase.auth.signInWithOAuth({provider,options});
+  if(error)throw error;
+ }catch(error){
+  setAuthStatus(error.message||label+" sign-in could not start. Check that this provider is enabled in Supabase.",true);
+  buttons.forEach(button=>button.disabled=false);
+ }
 }
 async function creatorSignIn(){
  const email=document.getElementById("authEmail").value.trim();
