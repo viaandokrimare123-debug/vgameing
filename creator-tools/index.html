@@ -11,11 +11,50 @@
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#17294a 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}a{color:inherit;text-decoration:none}.wrap{width:min(1120px,92%);margin:auto}.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid #1b2940}.brand{font-weight:900;letter-spacing:.4px}.brand b{color:var(--cyan)}.nav{color:var(--muted);font-size:14px}.hero{padding:54px 0 30px;text-align:center}.pill{display:inline-block;border:1px solid #2b4568;background:#102039;color:#9ceeff;border-radius:99px;padding:6px 13px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.hero h1{font-size:clamp(32px,5.8vw,62px);line-height:1.08;letter-spacing:-1.8px;margin:18px 0}.hero h1 span{background:linear-gradient(90deg,var(--cyan),#b5a1ff);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{color:var(--muted);max-width:650px;margin:0 auto}.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:24px 0 55px}.card{background:linear-gradient(160deg,#121d2e,#0e1624);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 12px 35px #0002}.card h2{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px;margin:0 0 18px}.label{display:block;font-size:13px;color:#c6d2e5;font-weight:650;margin:12px 0 6px}input,textarea,select{width:100%;border:1px solid #2b3a53;border-radius:11px;background:#080f1b;color:var(--text);padding:12px;font:inherit;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00e5ff17}textarea{resize:vertical;min-height:90px}.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer;background:linear-gradient(90deg,var(--cyan),#8daeff);color:#06111d}.btn.secondary{background:#1b2a40;color:#dce8fa;border:1px solid #31435e}.result{margin-top:14px;padding:14px;border-radius:12px;background:#080f1b;border:1px dashed #344762;white-space:pre-wrap;overflow-wrap:anywhere;min-height:52px;color:#e9f2ff}.small{font-size:12px;color:var(--muted);margin-top:10px}.footer{border-top:1px solid #1b2940;padding:24px 0 40px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media(max-width:760px){.tools{grid-template-columns:1fr}.hero{padding-top:38px}.card{padding:18px}.top{gap:12px}.nav{font-size:12px}}
 </style>
+<style>
+.ai-studio{position:relative;overflow:hidden;margin:8px auto 28px;padding:clamp(20px,4vw,34px);border:1px solid #315274;border-radius:24px;background:radial-gradient(circle at 90% 0%,#8b5cf633,transparent 34%),radial-gradient(circle at 0% 100%,#00e5ff18,transparent 38%),linear-gradient(145deg,#111d31,#0a1220);box-shadow:0 24px 70px #0005}
+.ai-studio:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,#ffffff08 50%,transparent 70%);transform:translateX(-100%);animation:aiSweep 9s ease-in-out infinite}
+@keyframes aiSweep{50%,100%{transform:translateX(100%)}}
+.ai-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;position:relative}
+.ai-kicker{font-size:11px;font-weight:900;letter-spacing:.18em;color:#a5f3fc;text-transform:uppercase}
+.ai-head h2{font-size:clamp(25px,4vw,38px);font-weight:950;letter-spacing:-1px;line-height:1.08;margin:8px 0}
+.ai-head p{max-width:650px;color:#a8b7cc;font-size:14px}
+.ai-live{padding:7px 11px;border:1px solid #37d6c5;color:#8df8e4;background:#0a2b2c;border-radius:99px;font-size:10px;font-weight:900;letter-spacing:.08em}
+.ai-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:22px;position:relative}
+.ai-field.full{grid-column:1/-1}.ai-field label{display:block;color:#cbd8e9;font-size:12px;font-weight:800;margin:0 0 7px}
+.ai-field input,.ai-field textarea,.ai-field select{width:100%;border:1px solid #30425c;border-radius:12px;background:#080f1b;color:#f4f8ff;padding:12px 13px;font:inherit;font-size:14px;outline:none}
+.ai-field textarea{min-height:88px;resize:vertical}.ai-field input:focus,.ai-field textarea:focus,.ai-field select:focus{border-color:#67e8f9;box-shadow:0 0 0 3px #00e5ff18}
+.ai-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px;position:relative}
+.ai-generate{border:0;border-radius:12px;padding:13px 19px;background:linear-gradient(100deg,#00e5ff,#a78bfa);color:#06111c;font-weight:950;cursor:pointer;box-shadow:0 8px 25px #00e5ff20}
+.ai-generate:disabled{opacity:.55;cursor:wait}.ai-secondary{border:1px solid #344a67;background:#18263b;color:#e4edfb;border-radius:12px;padding:12px 15px;font-weight:800;cursor:pointer}
+.ai-output-wrap{margin-top:18px;border:1px solid #2a3c55;border-radius:16px;background:#070d17;overflow:hidden;position:relative}
+.ai-output-top{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px solid #24344b;color:#a5f3fc;font-size:11px;font-weight:900;letter-spacing:.1em}
+.ai-output{padding:17px;min-height:150px;max-height:650px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;color:#e8f1ff;font-size:14px;line-height:1.75}
+.ai-note{color:#8192aa;font-size:11px;margin-top:11px;position:relative}
+@media(max-width:680px){.ai-form{grid-template-columns:1fr}.ai-field.full{grid-column:auto}.ai-head{display:block}.ai-live{display:inline-block;margin-top:12px}}
+</style>
 </head>
 <body>
 <header class="wrap top"><a class="brand" href="/">V-GAMING <b>HUB</b></a><a class="nav" href="/">← Back to Hub</a></header>
 <main class="wrap">
 <section class="hero"><span class="pill">Free creator toolkit</span><h1>Make your next video<br><span>stand out.</span></h1><p>Generate catchy YouTube titles, video descriptions, hashtags and thumbnail text ideas. Free to use—no sign-up needed.</p></section>
+<section class="ai-studio" id="ai-studio">
+  <div class="ai-head">
+    <div><div class="ai-kicker">✦ V-Gaming Hub Intelligence</div><h2>Meet your AI Creator Copilot.</h2><p>Go from one rough idea to a creator-ready plan. Generate scripts, hooks, thumbnail concepts, Shorts and practical feedback in your own language and style.</p></div>
+    <span class="ai-live">✦ AI POWERED · GEMINI</span>
+  </div>
+  <div class="ai-form">
+    <div class="ai-field full"><label for="aiTopic">YOUR VIDEO IDEA *</label><input id="aiTopic" maxlength="700" placeholder="Example: I challenged the best RIVALS player using only a knife..." /></div>
+    <div class="ai-field"><label for="aiMode">WHAT SHOULD AI DO?</label><select id="aiMode"><option value="full_pack">Complete Video Pack</option><option value="hook_doctor">Hook Doctor — fix my intro</option><option value="idea_lab">Idea Lab — fresh video ideas</option><option value="retention_coach">Retention Coach — improve my script</option><option value="shorts_repurpose">Shorts Repurposer — turn long into Shorts</option></select></div>
+    <div class="ai-field"><label for="aiLanguage">OUTPUT LANGUAGE</label><select id="aiLanguage"><option>Hinglish (natural Hindi + English)</option><option>Hindi</option><option>English</option></select></div>
+    <div class="ai-field"><label for="aiFormat">VIDEO FORMAT</label><select id="aiFormat"><option>YouTube Short (30–60 seconds)</option><option>YouTube Short (under 30 seconds)</option><option>Long YouTube video (5–10 minutes)</option><option>Long YouTube video (10–20 minutes)</option></select></div>
+    <div class="ai-field"><label for="aiTone">CREATOR VIBE</label><select id="aiTone"><option>Funny + high-energy</option><option>Suspenseful + dramatic</option><option>Chill + natural</option><option>Epic + cinematic</option><option>Educational + clear</option></select></div>
+    <div class="ai-field full"><label for="aiContext">EXTRA DETAILS / EXISTING SCRIPT (OPTIONAL)</label><textarea id="aiContext" maxlength="1200" placeholder="Tell AI what happens in the video, your audience, rules of the challenge, or paste a short draft to improve."></textarea></div>
+  </div>
+  <div class="ai-actions"><button class="ai-generate" id="aiGenerateBtn" onclick="runCreatorAI()">✦ Generate with AI</button><button class="ai-secondary" onclick="clearCreatorAI()">Clear</button><span class="small" id="aiStatus" aria-live="polite">Ready when you are.</span></div>
+  <div class="ai-output-wrap"><div class="ai-output-top"><span>YOUR AI CREATOR PACK</span><button class="ai-secondary" onclick="copyCreatorAI()">Copy result</button></div><div class="ai-output" id="aiOutput" aria-live="polite">Your custom creator pack will appear here. Start with one idea—even a messy one.</div></div>
+  <p class="ai-note">AI suggestions are creative starting points, not guaranteed views or verified SEO data. Don't paste passwords, private details or anything sensitive.</p>
+</section>
 <section class="tools">
 <article class="card"><h2>✦ Opening Hook Generator</h2><p class="sub">Create a first line for your video.</p><label class="label" for="hookTopic">What happens?</label><input id="hookTopic" placeholder="e.g. I nearly lost the final round"><label class="label" for="hookTone">Tone</label><select id="hookTone"><option value="suspense">Suspenseful</option><option value="funny">Funny</option><option value="bold">Bold</option></select><div class="btnrow"><button class="btn" onclick="makeHook()">Generate</button><button class="btn secondary" onclick="copyResult('hookResult',this)">Copy</button></div><div class="result" id="hookResult" aria-live="polite">Your hooks will appear here.</div></article>
 <article class="card"><h2>✦ Video Outline Builder</h2><p class="sub">Make a simple recording plan.</p><label class="label" for="outlineTopic">Video topic</label><input id="outlineTopic" placeholder="e.g. Three gaming challenges"><label class="label" for="outlineType">Format</label><select id="outlineType"><option value="short">Short</option><option value="long">Long video</option></select><div class="btnrow"><button class="btn" onclick="makeOutline()">Build outline</button><button class="btn secondary" onclick="copyResult('outlineResult',this)">Copy</button></div><div class="result" id="outlineResult" aria-live="polite">Your outline will appear here.</div></article>
@@ -61,6 +100,37 @@ function makeHook(){const t=clean($('hookTopic').value)||'the final challenge';c
 function makeOutline(){const t=clean($('outlineTopic').value)||'[topic]';const a=$('outlineType').value==='short'?['0–2 sec: Show the best moment.','2–8 sec: Explain the challenge.','8–40 sec: Show the key action; cut slow parts.','40–55 sec: Reveal the result.','Final seconds: Ask one viewer question.']:['1. Cold open: Preview the best moment.','2. Setup: Explain goal and rules.','3. Main section: Show the key stages.','4. Escalation: Add a new obstacle.','5. Payoff: Reveal the result.','6. Ending: Ask a relevant question.'];show('outlineResult','VIDEO: '+t+'\n\n'+a.join('\n'))}
 function makeComment(){const t=clean($('commentTopic').value)||'this video';show('commentResult','What was your favourite moment from '+t+'? Tell me below!')}
 function makeTags(){const t=clean($('tagTopic').value)||'gaming';const a=[t,...t.toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(x=>x.length>2)];show('tagResult',[...new Set(a)].slice(0,12).join(', '))}
+</script>
+<script>
+const CREATOR_AI_URL="https://xtmjivldcwyajgyhmygk.supabase.co/functions/v1/creator-ai";
+const CREATOR_AI_KEY="sb_publishable_LJYIhtSx9nbKbt9VjLXkeg_ubMt_KSI";
+async function runCreatorAI(){
+ const topic=document.getElementById("aiTopic").value.trim();
+ const output=document.getElementById("aiOutput");
+ const status=document.getElementById("aiStatus");
+ const button=document.getElementById("aiGenerateBtn");
+ if(topic.length<3){status.textContent="Add a video idea first.";document.getElementById("aiTopic").focus();return;}
+ button.disabled=true;button.textContent="✦ Creating your pack...";status.textContent="AI is building your creator pack...";
+ output.textContent="Thinking through the idea, hook, structure and details. This can take a few seconds...";
+ try{
+  const response=await fetch(CREATOR_AI_URL,{method:"POST",headers:{"Content-Type":"application/json","apikey":CREATOR_AI_KEY,"Authorization":"Bearer "+CREATOR_AI_KEY},body:JSON.stringify({mode:document.getElementById("aiMode").value,topic,context:document.getElementById("aiContext").value,language:document.getElementById("aiLanguage").value,format:document.getElementById("aiFormat").value,tone:document.getElementById("aiTone").value})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||"AI request failed ("+response.status+").");
+  output.textContent=data.answer||"The AI returned an empty result. Try again.";
+  status.textContent="Done · "+(data.model||"AI")+" · Review and make it yours.";
+ }catch(error){output.textContent="AI could not complete this request.\n\n"+error.message+"\n\nIf this keeps happening, the site owner should check the creator-ai function and its Gemini API secret in Supabase.";status.textContent="Something needs attention.";}
+ finally{button.disabled=false;button.textContent="✦ Generate with AI";}
+}
+async function copyCreatorAI(){
+ const text=document.getElementById("aiOutput").textContent;
+ try{await navigator.clipboard.writeText(text);document.getElementById("aiStatus").textContent="Copied to clipboard.";}
+ catch(e){document.getElementById("aiStatus").textContent="Select the result text and copy it manually.";}
+}
+function clearCreatorAI(){
+ ["aiTopic","aiContext"].forEach(id=>document.getElementById(id).value="");
+ document.getElementById("aiOutput").textContent="Your custom creator pack will appear here. Start with one idea—even a messy one.";
+ document.getElementById("aiStatus").textContent="Ready when you are.";
+}
 </script>
 </body>
 </html>
