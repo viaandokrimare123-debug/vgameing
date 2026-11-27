@@ -82,12 +82,17 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
 @keyframes softFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes livePulse{0%,100%{box-shadow:0 0 0 0 #37d6c500}50%{box-shadow:0 0 0 5px #37d6c51a}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.auth-panel{margin:8px 0 22px;padding:22px;border:1px solid #315274;border-radius:20px;background:radial-gradient(circle at 100% 0%,#00e5ff12,transparent 35%),linear-gradient(145deg,#101d30,#0a1220);box-shadow:0 18px 55px #0003}
+.auth-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.auth-head h2{font-size:clamp(22px,3vw,30px);margin:6px 0}.auth-head p{margin:0 0 15px}.auth-secure{padding:7px 10px;border:1px solid #37d6c566;border-radius:99px;color:#8df8e4;font-size:9px;font-weight:900;letter-spacing:.1em}
+.auth-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.auth-fields label,.auth-recovery label{display:block;color:#cbd8e9;font-size:11px;font-weight:900;margin:0 0 7px}.auth-fields input,.auth-recovery input{width:100%;border:1px solid #30425c;border-radius:11px;background:#080f1b;color:#f4f8ff;padding:12px;font:inherit}.auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:13px}.auth-link{border:0;background:none;color:#9ceeff;text-decoration:underline;cursor:pointer;font:inherit;font-size:12px}.auth-status{margin:13px 0 0;color:#9eacc4;font-size:12px}.auth-user{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.auth-user>div{flex:1;min-width:180px}.auth-user strong,.auth-user small{display:block;overflow-wrap:anywhere}.auth-user small{color:#9eacc4;font-size:11px;margin-top:3px}.auth-avatar{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#0a2b2c;color:#8df8e4;border:1px solid #37d6c566;font-weight:900}.auth-recovery{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.auth-recovery>div{flex:1}.auth-recovery input{margin-bottom:10px}
+@media(max-width:680px){.auth-fields{grid-template-columns:1fr}.auth-recovery{display:block}}
 </style>
 </head>
 <body>
 <header class="wrap top"><a class="brand" href="/">V-GAMING <b>HUB</b></a><a class="nav" href="/">← Back to Hub</a></header>
 <main class="wrap">
-<section class="hero"><span class="pill">Free creator toolkit</span><h1>Make your next video<br><span>stand out.</span></h1><p>Generate catchy YouTube titles, video descriptions, hashtags and thumbnail text ideas. Free to use—no sign-up needed.</p></section>
+<section class="hero"><span class="pill">Free creator toolkit</span><h1>Make your next video<br><span>stand out.</span></h1><p>Generate catchy YouTube titles, video descriptions, hashtags and thumbnail text ideas. Free tools are open to everyone. Sign in to use the AI studio and keep your creator wallet.</p></section>
 <section class="ai-studio" id="ai-studio">
   <div class="ai-head">
     <div><div class="ai-kicker">✦ V-Gaming Hub Intelligence</div><h2>Meet your AI Creator Copilot.</h2><p>Go from one rough idea to a creator-ready plan. Generate scripts, hooks, thumbnail concepts, Shorts and practical feedback in your own language and style.</p></div>
@@ -104,6 +109,33 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
   <div class="ai-actions"><button class="ai-generate" id="aiGenerateBtn" onclick="runCreatorAI()">✦ Generate with AI</button><button class="ai-secondary" onclick="clearCreatorAI()">Clear</button><span class="small" id="aiStatus" aria-live="polite">Ready when you are.</span></div>
   <div class="ai-output-wrap"><div class="ai-output-top"><span>YOUR AI CREATOR PACK</span><button class="ai-secondary" onclick="copyCreatorAI()">Copy result</button></div><div class="ai-output" id="aiOutput" aria-live="polite">Your custom creator pack will appear here. Start with one idea—even a messy one.</div></div>
   <p class="ai-note">AI suggestions are creative starting points, not guaranteed views or verified SEO data. Don't paste passwords, private details or anything sensitive.</p>
+</section>
+
+
+<section class="auth-panel" id="creator-auth" aria-labelledby="authTitle">
+  <div class="auth-head">
+    <div><div class="ai-kicker">✦ V-GAMEING ACCOUNT</div><h2 id="authTitle">Your creator workspace</h2><p class="sub">Sign in to save your creator credits to your account and use AI tools across visits.</p></div>
+    <span class="auth-secure">SECURE SUPABASE AUTH</span>
+  </div>
+  <div id="authSignedOut">
+    <div class="auth-fields">
+      <div><label for="authEmail">EMAIL ADDRESS</label><input id="authEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></div>
+      <div><label for="authPassword">PASSWORD</label><input id="authPassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="At least 8 characters"></div>
+    </div>
+    <div class="auth-actions">
+      <button class="ai-generate" id="authSignInBtn" type="button" onclick="creatorSignIn()">Sign in</button>
+      <button class="ai-secondary" id="authSignUpBtn" type="button" onclick="creatorSignUp()">Create account</button>
+      <button class="auth-link" type="button" onclick="creatorResetPassword()">Forgot password?</button>
+    </div>
+  </div>
+  <div id="authSignedIn" hidden>
+    <div class="auth-user"><span class="auth-avatar">✓</span><div><strong id="authUserEmail">Signed in</strong><small>Your account is connected to your creator wallet.</small></div><button class="ai-secondary" type="button" onclick="creatorSignOut()">Sign out</button></div>
+  </div>
+  <div id="authRecovery" hidden class="auth-recovery">
+    <label for="authNewPassword">NEW PASSWORD</label><input id="authNewPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="Choose a new password">
+    <button class="ai-generate" type="button" onclick="creatorUpdatePassword()">Update password</button>
+  </div>
+  <p class="auth-status" id="authStatus" role="status" aria-live="polite">Sign in or create an account to unlock Creator AI.</p>
 </section>
 
 <section class="wallet-panel" id="creator-wallet">
@@ -193,14 +225,93 @@ const CREATOR_AI_KEY="sb_publishable_LJYIhtSx9nbKbt9VjLXkeg_ubMt_KSI";
 const creatorSupabase=window.supabase.createClient("https://xtmjivldcwyajgyhmygk.supabase.co",CREATOR_AI_KEY);
 let creatorSession=null;
 let thumbnailDataUrl=null;
+const authRedirectUrl=window.location.origin+window.location.pathname;
 
+function setAuthStatus(message,isError=false){
+ const el=document.getElementById("authStatus");
+ if(el){el.textContent=message;el.style.color=isError?"#fca5a5":"#9eacc4";}
+}
+function renderCreatorAuth(session){
+ creatorSession=session||null;
+ const signedIn=!!session?.user;
+ document.getElementById("authSignedOut").hidden=signedIn;
+ document.getElementById("authSignedIn").hidden=!signedIn;
+ document.getElementById("authUserEmail").textContent=session?.user?.email||"Signed in";
+ document.getElementById("authRecovery").hidden=true;
+ if(signedIn)setAuthStatus("Signed in securely. Your creator wallet is linked to this account.");
+ else {
+  document.getElementById("creditBalance").textContent="—";
+  document.getElementById("creditStatus").textContent="Sign in to load your wallet.";
+  setAuthStatus("Sign in or create an account to unlock Creator AI.");
+ }
+}
 async function ensureCreatorSession(){
- const {data:{session}}=await creatorSupabase.auth.getSession();
- if(session){creatorSession=session;return session;}
- const {data,error}=await creatorSupabase.auth.signInAnonymously();
- if(error)throw new Error("Secure guest sign-in is not enabled yet. The site owner must enable Anonymous Sign-Ins in Supabase Auth settings.");
- creatorSession=data.session;
- return data.session;
+ const {data:{session},error}=await creatorSupabase.auth.getSession();
+ if(error)throw error;
+ if(!session)throw new Error("Please sign in or create an account above to use Creator AI.");
+ creatorSession=session;
+ return session;
+}
+async function creatorSignIn(){
+ const email=document.getElementById("authEmail").value.trim();
+ const password=document.getElementById("authPassword").value;
+ if(!email||!password){setAuthStatus("Enter your email and password.",true);return;}
+ const button=document.getElementById("authSignInBtn");button.disabled=true;button.textContent="Signing in…";
+ try{
+  const {data,error}=await creatorSupabase.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  renderCreatorAuth(data.session);await refreshCredits();
+ }catch(error){setAuthStatus(error.message||"Sign-in failed. Check your details and try again.",true);}
+ finally{button.disabled=false;button.textContent="Sign in";}
+}
+async function creatorSignUp(){
+ const email=document.getElementById("authEmail").value.trim();
+ const password=document.getElementById("authPassword").value;
+ if(!email||!password){setAuthStatus("Enter your email and choose a password.",true);return;}
+ if(password.length<8){setAuthStatus("Use a password with at least 8 characters.",true);return;}
+ const button=document.getElementById("authSignUpBtn");button.disabled=true;button.textContent="Creating…";
+ try{
+  const {data,error}=await creatorSupabase.auth.signUp({email,password,options:{emailRedirectTo:authRedirectUrl}});
+  if(error)throw error;
+  if(data.session){renderCreatorAuth(data.session);await refreshCredits();}
+  else setAuthStatus("Account created! Check your email for the confirmation link, then return here and sign in.");
+ }catch(error){setAuthStatus(error.message||"Could not create the account. Please try again.",true);}
+ finally{button.disabled=false;button.textContent="Create account";}
+}
+async function creatorResetPassword(){
+ const email=document.getElementById("authEmail").value.trim();
+ if(!email){setAuthStatus("Enter your email address first.",true);return;}
+ try{
+  const {error}=await creatorSupabase.auth.resetPasswordForEmail(email,{redirectTo:authRedirectUrl});
+  if(error)throw error;
+  setAuthStatus("If an account exists for that email, a password-reset link has been sent. Check your inbox.");
+ }catch(error){setAuthStatus(error.message||"Could not send the reset email.",true);}
+}
+async function creatorUpdatePassword(){
+ const password=document.getElementById("authNewPassword").value;
+ if(password.length<8){setAuthStatus("Use a password with at least 8 characters.",true);return;}
+ try{
+  const {error}=await creatorSupabase.auth.updateUser({password});
+  if(error)throw error;
+  document.getElementById("authRecovery").hidden=true;
+  setAuthStatus("Password updated successfully.");
+ }catch(error){setAuthStatus(error.message||"Could not update your password.",true);}
+}
+async function creatorSignOut(){
+ const {error}=await creatorSupabase.auth.signOut();
+ if(error){setAuthStatus(error.message,true);return;}
+ renderCreatorAuth(null);
+}
+async function initializeCreatorAuth(){
+ const {data,error}=await creatorSupabase.auth.getSession();
+ if(error)setAuthStatus(error.message,true);
+ renderCreatorAuth(data?.session||null);
+ if(data?.session)await refreshCredits();
+ creatorSupabase.auth.onAuthStateChange((event,session)=>{
+  renderCreatorAuth(session);
+  if(event==="PASSWORD_RECOVERY")document.getElementById("authRecovery").hidden=false;
+  if(session)Promise.resolve().then(()=>refreshCredits());
+ });
 }
 async function creatorRequest(payload){
  const session=await ensureCreatorSession();
@@ -219,7 +330,7 @@ async function refreshCredits(){
   status.textContent="Loading wallet…";
   const data=await creatorRequest({mode:"wallet"});
   document.getElementById("creditBalance").textContent=data.credits;
-  status.textContent="Secure guest wallet connected.";
+  status.textContent="Account wallet connected.";
   return data.credits;
  }catch(error){
   status.textContent=error.message;
@@ -297,7 +408,7 @@ function clearCreatorAI(){
  document.getElementById("aiOutput").textContent="Your custom creator pack will appear here. Start with one idea—even a messy one.";
  document.getElementById("aiStatus").textContent="Ready when you are.";
 }
-refreshCredits();
+initializeCreatorAuth();
 </script>
 </body>
 </html>
