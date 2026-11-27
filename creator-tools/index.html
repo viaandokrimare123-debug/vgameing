@@ -51,6 +51,38 @@
 @media(max-width:680px){.image-grid,.pack-grid{grid-template-columns:1fr}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* Motion polish: lightweight CSS only, no animation libraries */
+:root{scroll-behavior:smooth}
+body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite alternate}
+@keyframes ambientDrift{0%{background-position:0% 0%}100%{background-position:100% 60%}}
+.hero .pill{animation:softFloat 5s ease-in-out infinite}
+.hero h1{animation:riseIn .75s cubic-bezier(.2,.75,.25,1) both}
+.hero p{animation:riseIn .9s .08s cubic-bezier(.2,.75,.25,1) both}
+.ai-studio,.wallet-panel,.image-studio,.card{animation:riseIn .65s cubic-bezier(.2,.75,.25,1) both}
+.ai-studio{animation-delay:.08s}
+.wallet-panel{animation-delay:.14s}
+.image-studio{animation-delay:.2s}
+.card{transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}
+.card:hover{transform:translateY(-5px);border-color:#42658c;box-shadow:0 20px 48px #0005}
+.ai-generate,.ai-secondary,.btn{transition:transform .2s ease,filter .2s ease,box-shadow .2s ease}
+.ai-generate:hover,.btn:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 12px 28px #00e5ff28}
+.ai-secondary:hover{transform:translateY(-2px);border-color:#6c83a5}
+.ai-generate:active,.ai-secondary:active,.btn:active{transform:translateY(0) scale(.98)}
+.ai-live{animation:livePulse 2.8s ease-in-out infinite}
+.image-studio{position:relative;isolation:isolate}
+.image-studio:after{content:"";position:absolute;z-index:-1;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(120deg,#00e5ff66,#9b7bff55,transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.thumb-preview{animation:previewIn .55s cubic-bezier(.2,.8,.2,1) both;transition:transform .35s ease,box-shadow .35s ease}
+.thumb-preview:hover{transform:scale(1.012);box-shadow:0 16px 42px #00e5ff20}
+.ai-output-wrap{transition:border-color .25s ease,box-shadow .25s ease}
+.ai-output-wrap:focus-within{border-color:#4b789a;box-shadow:0 0 0 3px #00e5ff10}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes previewIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes softFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 #37d6c500}50%{box-shadow:0 0 0 5px #37d6c51a}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
 </head>
 <body>
 <header class="wrap top"><a class="brand" href="/">V-GAMING <b>HUB</b></a><a class="nav" href="/">← Back to Hub</a></header>
