@@ -129,7 +129,15 @@ body{background-size:180% 180%;animation:ambientDrift 24s ease-in-out infinite a
     </div>
   </div>
   <div id="authSignedIn" hidden>
-    <div class="auth-user"><span class="auth-avatar">✓</span><div><strong id="authUserEmail">Signed in</strong><small>Your account is connected to your creator wallet.</small></div><button class="ai-secondary" type="button" onclick="creatorSignOut()">Sign out</button></div>
+    <div class="auth-user"><span class="auth-avatar">✓</span><div><strong id="authUserEmail">Signed in</strong><small id="authUserNote">Your account is connected to your creator wallet.</small></div><button class="ai-secondary" type="button" onclick="creatorSignOut()">Sign out</button></div>
+    <div id="authUpgrade" class="auth-upgrade" hidden>
+      <p class="small">You're using a temporary guest account. Add an email and password to keep this same account and preserve its creator credits.</p>
+      <div class="auth-fields">
+        <div><label for="upgradeEmail">YOUR EMAIL</label><input id="upgradeEmail" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com"></div>
+        <div><label for="upgradePassword">CREATE A PASSWORD</label><input id="upgradePassword" type="password" autocomplete="new-password" minlength="8" maxlength="128" placeholder="At least 8 characters"></div>
+      </div>
+      <button class="ai-generate" type="button" onclick="creatorUpgradeAccount()">Secure my account</button>
+    </div>
   </div>
   <div id="authRecovery" hidden class="auth-recovery">
     <label for="authNewPassword">NEW PASSWORD</label><input id="authNewPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="Choose a new password">
@@ -234,11 +242,14 @@ function setAuthStatus(message,isError=false){
 function renderCreatorAuth(session){
  creatorSession=session||null;
  const signedIn=!!session?.user;
+ const isGuest=!!session?.user?.is_anonymous;
  document.getElementById("authSignedOut").hidden=signedIn;
  document.getElementById("authSignedIn").hidden=!signedIn;
- document.getElementById("authUserEmail").textContent=session?.user?.email||"Signed in";
+ document.getElementById("authUserEmail").textContent=session?.user?.email||(isGuest?"Temporary guest account":"Signed in");
+ document.getElementById("authUserNote").textContent=isGuest?"Guest session active. Upgrade it to keep this wallet across devices.":"Your account is connected to your creator wallet.";
+ document.getElementById("authUpgrade").hidden=!isGuest;
  document.getElementById("authRecovery").hidden=true;
- if(signedIn)setAuthStatus("Signed in securely. Your creator wallet is linked to this account.");
+ if(signedIn)setAuthStatus(isGuest?"Guest session active. Secure it with an email and password to preserve this wallet.":"Signed in securely. Your creator wallet is linked to this account.");
  else {
   document.getElementById("creditBalance").textContent="—";
   document.getElementById("creditStatus").textContent="Sign in to load your wallet.";
@@ -277,6 +288,16 @@ async function creatorSignUp(){
   else setAuthStatus("Account created! Check your email for the confirmation link, then return here and sign in.");
  }catch(error){setAuthStatus(error.message||"Could not create the account. Please try again.",true);}
  finally{button.disabled=false;button.textContent="Create account";}
+}
+async function creatorUpgradeAccount(){
+ const email=document.getElementById("upgradeEmail").value.trim();
+ const password=document.getElementById("upgradePassword").value;
+ if(!email||password.length<8){setAuthStatus("Enter a valid email and a password with at least 8 characters.",true);return;}
+ try{
+  const {error}=await creatorSupabase.auth.updateUser({email,password});
+  if(error)throw error;
+  setAuthStatus("Upgrade started. Check your email to confirm the address. Your existing wallet stays linked to this account.");
+ }catch(error){setAuthStatus(error.message||"Could not upgrade this guest account.",true);}
 }
 async function creatorResetPassword(){
  const email=document.getElementById("authEmail").value.trim();
